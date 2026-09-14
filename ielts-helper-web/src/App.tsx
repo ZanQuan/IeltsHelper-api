@@ -9,6 +9,7 @@ import Layout from './components/Layout';
 import VocabularyPage from './pages/VocabularyPage';
 import ErrorLogsPage from './pages/ErrorLogsPage';
 import WritingPage from './pages/WritingPage';
+import TestsPage from './pages/TestsPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -27,7 +28,8 @@ function AppRoutes() {
         <Route path="/lessons" element={<LessonLogsPage />} />
         <Route path="/vocabulary" element={<VocabularyPage />} />
         <Route path="/errors" element={<ErrorLogsPage />} />
-        <Route path="/writing" element={<WritingPage />} />      
+        <Route path="/writing" element={<WritingPage />} />
+        <Route path="/tests" element={<TestsPage />} />      
       </Route>
     </Routes>
   );

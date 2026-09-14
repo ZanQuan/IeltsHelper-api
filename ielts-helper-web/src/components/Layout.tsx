@@ -12,6 +12,7 @@ export default function Layout() {
         <NavLink to="/vocabulary">Từ vựng</NavLink>
         <NavLink to="/errors">Lỗi sai</NavLink>
         <NavLink to="/writing">Writing</NavLink>
+        <NavLink to="/tests">Listening & Reading</NavLink>
         <span style={{ marginLeft: 'auto' }}>Xin chào, {user?.name}</span>
         <button onClick={logout}>Đăng xuất</button>
       </nav>
