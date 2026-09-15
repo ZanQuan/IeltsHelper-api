@@ -37,6 +37,12 @@ public class ResetPasswordRequest
     public string NewPassword { get; set; } = string.Empty;
 }
 
+public class GoogleLoginRequest
+{
+    // ID token (JWT credential) returned by Google Identity Services on the frontend
+    public string Credential { get; set; } = string.Empty;
+}
+
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -84,6 +90,56 @@ public class AuthController : ControllerBase
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (result == PasswordVerificationResult.Failed)
             return Unauthorized(new { error = "Email hoặc mật khẩu không đúng." });
+
+        var token = GenerateJwtToken(user);
+        return Ok(new { token, userId = user.Id, name = user.Name, role = user.Role });
+    }
+
+    [HttpPost("google")]
+    public async Task<ActionResult> GoogleLogin(GoogleLoginRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Credential))
+            return BadRequest(new { error = "Thiếu thông tin đăng nhập Google." });
+
+        Google.Apis.Auth.GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            var clientId = _configuration["Google:ClientId"];
+            payload = await Google.Apis.Auth.GoogleJsonWebSignature.ValidateAsync(
+                request.Credential,
+                new Google.Apis.Auth.GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { clientId }
+                });
+        }
+        catch (Exception)
+        {
+            return Unauthorized(new { error = "Xác thực Google không hợp lệ." });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
+
+        if (user == null)
+        {
+            user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = payload.Name ?? payload.Email,
+                Email = payload.Email,
+                Role = "Student",
+                GoogleId = payload.Subject
+            };
+            // Tài khoản Google không dùng mật khẩu thường -> lưu một hash không thể đoán được
+            user.PasswordHash = _passwordHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+        else if (user.GoogleId == null)
+        {
+            // Email đã tồn tại (đăng ký bằng mật khẩu trước đó) -> liên kết với tài khoản Google
+            user.GoogleId = payload.Subject;
+            await _context.SaveChangesAsync();
+        }
 
         var token = GenerateJwtToken(user);
         return Ok(new { token, userId = user.Id, name = user.Name, role = user.Role });

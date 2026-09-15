@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from '../auth/AuthContext';
 import logo from '../assets/logo.png';
 
@@ -8,7 +9,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: FormEvent) {
@@ -19,6 +20,17 @@ export default function RegisterPage() {
       navigate('/');
     } catch {
       setError('Đăng ký thất bại — email có thể đã được dùng.');
+    }
+  }
+
+  async function handleGoogleSuccess(response: CredentialResponse) {
+    setError('');
+    try {
+      if (!response.credential) throw new Error('Thiếu credential');
+      await loginWithGoogle(response.credential);
+      navigate('/');
+    } catch {
+      setError('Đăng ký bằng Google thất bại.');
     }
   }
 
@@ -43,6 +55,14 @@ export default function RegisterPage() {
           {error && <p className="error-text">{error}</p>}
           <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>Đăng ký</button>
         </form>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '16px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#e5e5e5' }} />
+          <span className="muted" style={{ fontSize: 12 }}>hoặc</span>
+          <div style={{ flex: 1, height: 1, background: '#e5e5e5' }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Đăng ký bằng Google thất bại.')} />
+        </div>
         <p className="muted" style={{ textAlign: 'center', marginTop: 16 }}>
           Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
         </p>

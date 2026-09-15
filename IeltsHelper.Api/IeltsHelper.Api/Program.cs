@@ -1,10 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using IeltsHelper.Api.Services;
-using Microsoft.EntityFrameworkCore;
 using IeltsHelper.Api.Data;
+using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -55,7 +57,28 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var adminEmail = app.Configuration["Admin:Email"];
+    var adminPassword = app.Configuration["Admin:Password"];
 
+    if (!string.IsNullOrEmpty(adminEmail) && !await db.Users.AnyAsync(u => u.Role == "Admin"))
+    {
+        var hasher = new PasswordHasher<User>();
+        var admin = new User
+        {
+            Id = Guid.NewGuid(),
+            Name = "Quản trị viên",
+            Email = adminEmail,
+            Role = "Admin"
+        };
+        admin.PasswordHash = hasher.HashPassword(admin, adminPassword ?? "ChangeMe123!");
+        db.Users.Add(admin);
+        await db.SaveChangesAsync();
+        Console.WriteLine($"[Seed] Đã tạo tài khoản Admin: {adminEmail}");
+    }
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

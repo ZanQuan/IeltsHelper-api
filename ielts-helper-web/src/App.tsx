@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -15,6 +16,7 @@ import TestsPage from './pages/TestsPage';
 import CoursesPage from './pages/CoursesPage';
 import SpeakingPage from './pages/SpeakingPage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -40,6 +42,7 @@ function AppRoutes() {
         <Route path="/courses" element={<CoursesPage />} /> 
         <Route path="/speaking" element={<SpeakingPage />} />     
         <Route path="/teacher" element={<TeacherDashboardPage />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
       </Route>
     </Routes>
   );
@@ -47,10 +50,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }

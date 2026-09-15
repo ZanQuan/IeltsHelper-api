@@ -9,6 +9,7 @@ public class User
     public string Role { get; set; } = "Student"; // Student, Teacher, Admin
     public string? PasswordResetTokenHash { get; set; }
     public DateTime? PasswordResetTokenExpiresAt { get; set; }
+    public string? GoogleId { get; set; }
 
     public ICollection<LessonLog> LessonLogs { get; set; } = new List<LessonLog>();
     public ICollection<Vocabulary> Vocabularies { get; set; } = new List<Vocabulary>();

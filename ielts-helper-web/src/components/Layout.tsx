@@ -6,16 +6,17 @@ export default function Layout() {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { to: '/', label: 'Trang chủ' },
-    { to: '/lessons', label: 'Buổi học' },
-    { to: '/vocabulary', label: 'Từ vựng' },
-    { to: '/errors', label: 'Lỗi sai' },
-    { to: '/writing', label: 'Writing' },
-    { to: '/tests', label: 'Listening & Reading' },
-    { to: '/courses', label: 'Khóa học' },
-    { to: '/speaking', label: 'Speaking' },
-    { to: '/teacher', label: user?.role === 'Student' ? 'Giáo viên' : 'Học viên' },
-  ];
+  { to: '/', label: 'Trang chủ' },
+  { to: '/lessons', label: 'Buổi học' },
+  { to: '/vocabulary', label: 'Từ vựng' },
+  { to: '/errors', label: 'Lỗi sai' },
+  { to: '/writing', label: 'Writing' },
+  { to: '/tests', label: 'Listening & Reading' },
+  { to: '/courses', label: 'Khóa học' },
+  { to: '/speaking', label: 'Speaking' },
+  { to: '/teacher', label: user?.role === 'Student' ? 'Giáo viên' : 'Học viên' },
+  ...(user?.role === 'Admin' ? [{ to: '/admin', label: 'Quản trị' }] : []),
+];
 
   return (
     <div>
