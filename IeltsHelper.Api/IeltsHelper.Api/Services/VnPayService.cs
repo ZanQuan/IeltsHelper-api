@@ -47,7 +47,7 @@ public class VnPayService
         }
 
         var queryString = query.ToString();
-        var signData = queryString.Substring(0, queryString.Length - 1); // bỏ dấu & thừa ở cuối
+        var signData = queryString.Substring(0, queryString.Length - 1); 
 
         var secureHash = HmacSha512(hashSecret, signData);
 

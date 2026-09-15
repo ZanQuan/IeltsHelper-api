@@ -5,8 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
 using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Services;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -23,18 +25,32 @@ public class LoginRequest
     public string Password { get; set; } = string.Empty;
 }
 
+public class ForgotPasswordRequest
+{
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ResetPasswordRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
+
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly EmailService _emailService;
     private readonly PasswordHasher<User> _passwordHasher = new();
 
-    public AuthController(AppDbContext context, IConfiguration configuration)
+    public AuthController(AppDbContext context, IConfiguration configuration, EmailService emailService)
     {
         _context = context;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     [HttpPost("register")]
@@ -71,6 +87,76 @@ public class AuthController : ControllerBase
 
         var token = GenerateJwtToken(user);
         return Ok(new { token, userId = user.Id, name = user.Name, role = user.Role });
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult> ForgotPassword(ForgotPasswordRequest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user != null)
+        {
+            var rawToken = GenerateSecureToken();
+            user.PasswordResetTokenHash = HashToken(rawToken);
+            user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+            await _context.SaveChangesAsync();
+
+            var frontendUrl = _configuration["Frontend:BaseUrl"] ?? "http://localhost:5173";
+            var resetLink = $"{frontendUrl}/reset-password?email={Uri.EscapeDataString(user.Email)}&token={rawToken}";
+
+            var html = $@"
+                <p>Xin chào {user.Name},</p>
+                <p>Bạn (hoặc ai đó) vừa yêu cầu đặt lại mật khẩu cho tài khoản Whale English.</p>
+                <p><a href=""{resetLink}"">Bấm vào đây để đặt lại mật khẩu</a></p>
+                <p>Liên kết có hiệu lực trong 30 phút. Nếu bạn không yêu cầu điều này, hãy bỏ qua email.</p>";
+
+            try
+            {
+                await _emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu - Whale English", html);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ForgotPassword] Gửi email thất bại: {ex.Message}");
+            }
+        }
+
+        return Ok(new { message = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword(ResetPasswordRequest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+        if (user == null || user.PasswordResetTokenHash == null || user.PasswordResetTokenExpiresAt == null)
+            return BadRequest(new { error = "Liên kết không hợp lệ hoặc đã hết hạn." });
+
+        if (user.PasswordResetTokenExpiresAt < DateTime.UtcNow)
+            return BadRequest(new { error = "Liên kết đã hết hạn. Vui lòng yêu cầu lại." });
+
+        if (HashToken(request.Token) != user.PasswordResetTokenHash)
+            return BadRequest(new { error = "Liên kết không hợp lệ hoặc đã hết hạn." });
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+            return BadRequest(new { error = "Mật khẩu mới phải có ít nhất 6 ký tự." });
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
+        user.PasswordResetTokenHash = null;
+        user.PasswordResetTokenExpiresAt = null;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập ngay." });
+    }
+
+    private static string GenerateSecureToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToHexString(bytes); 
+    }
+
+    private static string HashToken(string token)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+        return Convert.ToHexString(bytes);
     }
 
     private string GenerateJwtToken(User user)

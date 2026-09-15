@@ -6,7 +6,7 @@ public class Course
     public Guid TeacherId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string TargetBand { get; set; } = string.Empty; // vd: "6.5-7.5"
+    public string TargetBand { get; set; } = string.Empty; 
     public decimal Price { get; set; }
     public DateTime CreatedAt { get; set; }
 

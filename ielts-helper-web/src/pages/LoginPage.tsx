@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import logo from '../assets/logo.png';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -21,21 +22,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '80px auto' }}>
-      <h2>Đăng nhập</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%' }} />
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <label>Mật khẩu</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%' }} />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" style={{ marginTop: 16 }}>Đăng nhập</button>
-      </form>
-      <p>Chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
+      <div className="card" style={{ width: 360 }}>
+        <img src={logo} alt="Whale English" style={{ height: 64, width: 64, objectFit: 'contain', display: 'block', margin: '0 auto 8px' }} />
+        <h1 style={{ fontSize: 26, textAlign: 'center' }}>Đăng nhập</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label className="label">Email</label>
+            <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </div>
+          <div className="field">
+            <label className="label">Mật khẩu</label>
+            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </div>
+          <p style={{ textAlign: 'right', margin: '-8px 0 12px' }}>
+            <Link to="/forgot-password" style={{ fontSize: 13 }}>Quên mật khẩu?</Link>
+          </p>
+          {error && <p className="error-text">{error}</p>}
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>Đăng nhập</button>
+        </form>
+        <p className="muted" style={{ textAlign: 'center', marginTop: 16 }}>
+          Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+        </p>
+      </div>
     </div>
   );
 }
