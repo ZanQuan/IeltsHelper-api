@@ -30,6 +30,7 @@ export default function TeacherDashboardPage() {
   const [teacherEmail, setTeacherEmail] = useState('');
   const [linking, setLinking] = useState(false);
   const [linkMessage, setLinkMessage] = useState('');
+  const [linkOk, setLinkOk] = useState(false);
 
   async function handleAddTeacher(e: FormEvent) {
     e.preventDefault();
@@ -38,8 +39,10 @@ export default function TeacherDashboardPage() {
     try {
       const res = await apiClient.post('/api/TeacherLinks/add-teacher', { teacherEmail });
       setLinkMessage(res.data.message);
+      setLinkOk(true);
       setTeacherEmail('');
     } catch (err) {
+      setLinkOk(false);
       if (axios.isAxiosError(err)) {
         setLinkMessage(err.response?.data?.error || 'Liên kết thất bại.');
       } else {
@@ -78,66 +81,119 @@ export default function TeacherDashboardPage() {
     setLoadingDetail(false);
   }
 
+  function initials(name: string) {
+    return name.trim().split(/\s+/).slice(-2).map((w) => w[0]).join('').toUpperCase();
+  }
+
   if (!isTeacher) {
     return (
-      <div style={{ maxWidth: 500, margin: '0 auto' }}>
+      <div style={{ maxWidth: 520, margin: '0 auto' }}>
         <h2>Liên kết giáo viên</h2>
-        <p style={{ color: '#666' }}>Thêm giáo viên đang dạy bạn để họ có thể xem tiến độ học của bạn.</p>
-        <form onSubmit={handleAddTeacher} style={{ padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-          <label>Email giáo viên</label><br />
-          <input
-            type="email"
-            value={teacherEmail}
-            onChange={(e) => setTeacherEmail(e.target.value)}
-            required
-            style={{ width: '100%' }}
-          />
-          <button type="submit" disabled={linking} style={{ marginTop: 12 }}>
+        <p className="muted" style={{ marginBottom: 20 }}>
+          Thêm giáo viên đang dạy bạn để họ xem được nhật ký buổi học và lỗi sai của bạn.
+        </p>
+        <form onSubmit={handleAddTeacher} className="card">
+          <div className="field">
+            <label className="label">Email giáo viên</label>
+            <input
+              className="input"
+              type="email"
+              value={teacherEmail}
+              onChange={(e) => setTeacherEmail(e.target.value)}
+              required
+              placeholder="giaovien@example.com"
+            />
+          </div>
+          <button type="submit" disabled={linking} className="btn btn-primary">
             {linking ? 'Đang liên kết...' : 'Thêm giáo viên'}
           </button>
+          {linkMessage && (
+            <p
+              style={{
+                marginTop: 14,
+                marginBottom: 0,
+                fontSize: 14,
+                color: linkOk ? 'var(--success)' : 'var(--danger)',
+              }}
+            >
+              {linkMessage}
+            </p>
+          )}
         </form>
-        {linkMessage && <p style={{ marginTop: 12 }}>{linkMessage}</p>}
       </div>
     );
   }
 
   if (selectedStudent) {
     return (
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <button onClick={() => setSelectedStudent(null)}>← Quay lại danh sách học viên</button>
-        <h2>{selectedStudent.name}</h2>
-        <p style={{ color: '#666' }}>{selectedStudent.email}</p>
+      <div>
+        <button
+          onClick={() => setSelectedStudent(null)}
+          className="btn btn-ghost"
+          style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}
+        >
+          ← Quay lại danh sách học viên
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
+          <span
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: 'var(--primary)',
+              color: 'white',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: 17,
+            }}
+          >
+            {initials(selectedStudent.name)}
+          </span>
+          <div>
+            <h2 style={{ margin: 0 }}>{selectedStudent.name}</h2>
+            <span className="muted">{selectedStudent.email}</span>
+          </div>
+        </div>
 
         {loadingDetail ? (
-          <p>Đang tải...</p>
+          <p className="muted">Đang tải...</p>
         ) : (
           <>
             <h3>Buổi học gần đây</h3>
             {studentLogs.length === 0 ? (
-              <p>Chưa có buổi học nào.</p>
+              <p className="muted">Chưa có buổi học nào.</p>
             ) : (
-              <ul style={{ listStyle: 'none', padding: 0 }}>
+              <div style={{ marginBottom: 28 }}>
                 {studentLogs.map((log) => (
-                  <li key={log.id} style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, marginBottom: 8 }}>
-                    <strong>{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</strong> — {log.skillFocus} (đánh giá: {log.selfRating}/5)
-                    <p style={{ margin: '4px 0' }}>{log.summary}</p>
-                  </li>
+                  <div key={log.id} className="list-item">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <strong>{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</strong>
+                        <span className="badge badge-primary" style={{ marginLeft: 10 }}>{log.skillFocus}</span>
+                      </div>
+                      <span className="badge badge-success">Hiểu bài: {log.selfRating}/5</span>
+                    </div>
+                    <p style={{ margin: '10px 0 0' }}>{log.summary}</p>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
 
             <h3>Lỗi sai thường gặp</h3>
             {studentErrors.length === 0 ? (
-              <p>Chưa có lỗi sai nào được ghi lại.</p>
+              <p className="muted">Chưa có lỗi sai nào được ghi lại.</p>
             ) : (
-              <ul style={{ listStyle: 'none', padding: 0 }}>
+              <div>
                 {studentErrors.map((err) => (
-                  <li key={err.id} style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, marginBottom: 8 }}>
-                    <strong>{err.errorType}</strong>
-                    <p style={{ margin: '4px 0' }}>{err.description}</p>
-                  </li>
+                  <div key={err.id} className="list-item">
+                    <span className="badge badge-accent">{err.errorType}</span>
+                    <p style={{ margin: '10px 0 0' }}>{err.description}</p>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </>
         )}
@@ -146,25 +202,51 @@ export default function TeacherDashboardPage() {
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto' }}>
+    <div>
       <h2>Học viên của tôi</h2>
+      <p className="muted" style={{ marginBottom: 24 }}>
+        Bấm vào từng học viên để xem nhật ký buổi học và lỗi sai họ đã ghi lại.
+      </p>
+
       {loadingStudents ? (
-        <p>Đang tải...</p>
+        <p className="muted">Đang tải...</p>
       ) : students.length === 0 ? (
-        <p>Chưa có học viên nào liên kết với bạn. Bảo học viên vào mục "Giáo viên" trong tài khoản của họ để thêm email của bạn.</p>
+        <div className="card">
+          <p className="muted" style={{ margin: 0 }}>
+            Chưa có học viên nào liên kết với bạn. Bảo học viên vào mục "Giáo viên" trong tài khoản của họ và nhập
+            email của bạn.
+          </p>
+        </div>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div>
           {students.map((s) => (
-            <li
-              key={s.id}
-              style={{ padding: 16, border: '1px solid #eee', borderRadius: 8, marginBottom: 12, cursor: 'pointer' }}
-              onClick={() => viewStudent(s)}
-            >
-              <strong>{s.name}</strong>
-              <p style={{ margin: '4px 0', color: '#666' }}>{s.email}</p>
-            </li>
+            <div key={s.id} className="list-item clickable" onClick={() => viewStudent(s)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <span
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: 'var(--primary-light)',
+                    color: 'var(--primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 800,
+                    fontSize: 14,
+                    flexShrink: 0,
+                  }}
+                >
+                  {initials(s.name)}
+                </span>
+                <div>
+                  <strong>{s.name}</strong>
+                  <p className="muted" style={{ margin: 0 }}>{s.email}</p>
+                </div>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

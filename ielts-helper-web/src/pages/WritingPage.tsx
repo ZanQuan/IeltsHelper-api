@@ -33,6 +33,8 @@ export default function WritingPage() {
   }, []);
 
   const wordCount = essayText.trim().split(/\s+/).filter(Boolean).length;
+  const minWords = taskType === 'Task 1' ? 150 : 250;
+  const enoughWords = wordCount >= minWords;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -57,63 +59,122 @@ export default function WritingPage() {
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: '0 auto' }}>
-      <h2>Writing — nộp bài và chấm bằng AI</h2>
+    <div>
+      <h2>Writing</h2>
+      <p className="muted" style={{ marginBottom: 24 }}>
+        Nộp bài luận để AI chấm theo 4 tiêu chí IELTS và đưa nhận xét chi tiết.
+      </p>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 32, padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-        <div>
-          <label>Dạng bài</label><br />
-          <select value={taskType} onChange={(e) => setTaskType(e.target.value)}>
-            <option value="Task 1">Task 1</option>
-            <option value="Task 2">Task 2</option>
-          </select>
+      <form onSubmit={handleSubmit} className="card" style={{ marginBottom: 32 }}>
+        <div className="field">
+          <label className="label">Dạng bài</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['Task 1', 'Task 2'].map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTaskType(t)}
+                className="badge"
+                style={{
+                  cursor: 'pointer',
+                  border: 'none',
+                  fontFamily: 'var(--font-sans)',
+                  padding: '8px 20px',
+                  background: taskType === t ? 'var(--primary)' : 'var(--primary-light)',
+                  color: taskType === t ? 'white' : 'var(--primary)',
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
-        <div style={{ marginTop: 8 }}>
-          <label>Đề bài</label><br />
-          <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} required style={{ width: '100%' }} rows={2} />
-        </div>
-        <div style={{ marginTop: 8 }}>
-          <label>Bài làm ({wordCount} từ)</label><br />
+
+        <div className="field">
+          <label className="label">Đề bài</label>
           <textarea
+            className="input"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            required
+            rows={2}
+            placeholder="Dán đề bài vào đây..."
+          />
+        </div>
+
+        <div className="field">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <label className="label">Bài làm</label>
+            <span
+              className="badge"
+              style={{
+                background: enoughWords ? 'var(--success-light)' : 'var(--accent-light)',
+                color: enoughWords ? 'var(--success)' : 'var(--accent)',
+              }}
+            >
+              {wordCount} / {minWords} từ
+            </span>
+          </div>
+          <textarea
+            className="input"
             value={essayText}
             onChange={(e) => setEssayText(e.target.value)}
             required
-            style={{ width: '100%' }}
-            rows={12}
+            rows={14}
+            style={{ lineHeight: 1.8 }}
           />
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={grading} style={{ marginTop: 12 }}>
-          {grading ? 'Đang chấm bài (10-20 giây)...' : 'Nộp bài'}
+
+        {error && <p className="error-text">{error}</p>}
+        <button type="submit" disabled={grading} className="btn btn-primary">
+          {grading ? 'AI đang chấm bài (10-20 giây)...' : 'Nộp bài chấm điểm'}
         </button>
       </form>
 
       <h3>Lịch sử bài đã nộp</h3>
       {loading ? (
-        <p>Đang tải...</p>
+        <p className="muted">Đang tải...</p>
       ) : submissions.length === 0 ? (
-        <p>Chưa có bài nào.</p>
+        <p className="muted">Chưa có bài nào.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div>
           {submissions.map((s) => (
-            <li key={s.id} style={{ padding: 16, border: '1px solid #eee', borderRadius: 8, marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <strong>{s.taskType} — {new Date(s.submittedAt).toLocaleDateString('vi-VN')}</strong>
+            <div key={s.id} className="list-item">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <span className="badge badge-primary">{s.taskType}</span>
+                  <span className="muted" style={{ marginLeft: 10 }}>
+                    {new Date(s.submittedAt).toLocaleDateString('vi-VN')}
+                  </span>
+                </div>
                 {s.estimatedBand != null && (
-                  <span style={{ fontWeight: 'bold', fontSize: 18, color: '#2980b9' }}>Band {s.estimatedBand}</span>
+                  <span className="band-score">Band {s.estimatedBand}</span>
                 )}
               </div>
-              <p style={{ margin: '8px 0', color: '#666' }}>{s.prompt}</p>
+              <p className="muted" style={{ margin: '10px 0' }}>{s.prompt}</p>
               {s.feedback && (
-                <div style={{ background: '#f7f7f7', padding: 12, borderRadius: 6, marginTop: 8 }}>
-                  <strong>Nhận xét AI:</strong>
-                  <p style={{ whiteSpace: 'pre-wrap', margin: '4px 0 0' }}>{s.feedback}</p>
+                <div
+                  style={{
+                    background: 'var(--primary-light)',
+                    padding: 16,
+                    borderRadius: 'var(--radius-sm)',
+                    marginTop: 8,
+                  }}
+                >
+                  <p className="label" style={{ color: 'var(--primary)' }}>Nhận xét từ AI</p>
+                  <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{s.feedback}</p>
                 </div>
               )}
-              <button onClick={() => handleDelete(s.id)} style={{ marginTop: 8 }}>Xóa</button>
-            </li>
+              <button
+                onClick={() => handleDelete(s.id)}
+                className="btn btn-ghost"
+                style={{ padding: '6px 14px', fontSize: 13, marginTop: 12 }}
+              >
+                Xóa
+              </button>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

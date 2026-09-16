@@ -16,7 +16,11 @@ import TestsPage from './pages/TestsPage';
 import CoursesPage from './pages/CoursesPage';
 import SpeakingPage from './pages/SpeakingPage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminLayout from './components/AdminLayout';
+import AdminOverviewPage from './pages/admin/AdminOverviewPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminCoursesPage from './pages/admin/AdminCoursesPage';
+import AdminTestsPage from './pages/admin/AdminTestsPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -32,6 +36,8 @@ function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Khu vực học viên/giáo viên */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/" element={<HomePage />} />
         <Route path="/lessons" element={<LessonLogsPage />} />
@@ -39,10 +45,17 @@ function AppRoutes() {
         <Route path="/errors" element={<ErrorLogsPage />} />
         <Route path="/writing" element={<WritingPage />} />
         <Route path="/tests" element={<TestsPage />} />
-        <Route path="/courses" element={<CoursesPage />} /> 
-        <Route path="/speaking" element={<SpeakingPage />} />     
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/speaking" element={<SpeakingPage />} />
         <Route path="/teacher" element={<TeacherDashboardPage />} />
-        <Route path="/admin" element={<AdminDashboardPage />} />
+      </Route>
+
+      {/* Khu vực quản trị — layout riêng, có sidebar */}
+      <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+        <Route path="/admin" element={<AdminOverviewPage />} />
+        <Route path="/admin/users" element={<AdminUsersPage />} />
+        <Route path="/admin/courses" element={<AdminCoursesPage />} />
+        <Route path="/admin/tests" element={<AdminTestsPage />} />
       </Route>
     </Routes>
   );

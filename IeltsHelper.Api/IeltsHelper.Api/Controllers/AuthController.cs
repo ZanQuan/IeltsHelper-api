@@ -168,6 +168,7 @@ public class AuthController : ControllerBase
             try
             {
                 await _emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu - Whale English", html);
+                Console.WriteLine($"[ForgotPassword] Đã gửi email thành công tới {user.Email}");
             }
             catch (Exception ex)
             {

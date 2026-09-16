@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import logo from '../assets/logo.png';
 
@@ -6,17 +6,16 @@ export default function Layout() {
   const { user, logout } = useAuth();
 
   const navItems = [
-  { to: '/', label: 'Trang chủ' },
-  { to: '/lessons', label: 'Buổi học' },
-  { to: '/vocabulary', label: 'Từ vựng' },
-  { to: '/errors', label: 'Lỗi sai' },
-  { to: '/writing', label: 'Writing' },
-  { to: '/tests', label: 'Listening & Reading' },
-  { to: '/courses', label: 'Khóa học' },
-  { to: '/speaking', label: 'Speaking' },
-  { to: '/teacher', label: user?.role === 'Student' ? 'Giáo viên' : 'Học viên' },
-  ...(user?.role === 'Admin' ? [{ to: '/admin', label: 'Quản trị' }] : []),
-];
+    { to: '/', label: 'Trang chủ' },
+    { to: '/lessons', label: 'Buổi học' },
+    { to: '/vocabulary', label: 'Từ vựng' },
+    { to: '/errors', label: 'Lỗi sai' },
+    { to: '/writing', label: 'Writing' },
+    { to: '/tests', label: 'Listening & Reading' },
+    { to: '/courses', label: 'Khóa học' },
+    { to: '/speaking', label: 'Speaking' },
+    { to: '/teacher', label: user?.role === 'Student' ? 'Giáo viên' : 'Học viên' },
+  ];
 
   return (
     <div>
@@ -40,6 +39,7 @@ export default function Layout() {
             Whale English
           </span>
         </span>
+
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -58,13 +58,37 @@ export default function Layout() {
             {item.label}
           </NavLink>
         ))}
-        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: 14, whiteSpace: 'nowrap' }}>
-          {user?.name}
+
+        <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12, whiteSpace: 'nowrap' }}>
+          {user?.role === 'Admin' && (
+            <>
+              <Link
+                to="/admin"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  background: '#141826',
+                  color: 'white',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                }}
+              >
+                🛡️ Khu vực quản trị
+              </Link>
+              <span style={{ width: 1, height: 22, background: 'var(--border)' }} />
+            </>
+          )}
+          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>{user?.name}</span>
+          <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: 13 }}>
+            Đăng xuất
+          </button>
         </span>
-        <button onClick={logout} className="btn btn-ghost" style={{ marginLeft: 12, padding: '8px 16px', fontSize: 13 }}>
-          Đăng xuất
-        </button>
       </nav>
+
       <div className="page">
         <Outlet />
       </div>

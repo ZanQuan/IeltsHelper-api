@@ -121,58 +121,101 @@ export default function CoursesPage() {
     }
   }
 
-  if (loading) return <p>Đang tải...</p>;
+  if (loading) return <p className="muted">Đang tải...</p>;
 
   if (selectedId && detail) {
     return (
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <button onClick={() => { setSelectedId(null); setDetail(null); }}>← Quay lại danh sách</button>
+      <div>
+        <button
+          onClick={() => { setSelectedId(null); setDetail(null); }}
+          className="btn btn-ghost"
+          style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}
+        >
+          ← Quay lại danh sách
+        </button>
+
         <h2>{detail.title}</h2>
-        <p style={{ color: '#666' }}>Giáo viên: {detail.teacherName} · Band mục tiêu: {detail.targetBand}</p>
+        <div style={{ marginBottom: 12 }}>
+          <span className="badge badge-primary">Band {detail.targetBand}</span>
+          <span className="muted" style={{ marginLeft: 10 }}>Giáo viên: {detail.teacherName}</span>
+        </div>
         <p>{detail.description}</p>
 
         {!detail.isEnrolled ? (
-          <div style={{ padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-            <p>Giá: {detail.price.toLocaleString('vi-VN')} đ</p>
-            <button onClick={handleEnroll} disabled={enrolling}>
+          <div className="card" style={{ textAlign: 'center' }}>
+            <p className="label">Học phí</p>
+            <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--primary)', margin: '0 0 16px' }}>
+              {detail.price.toLocaleString('vi-VN')} đ
+            </p>
+            <button onClick={handleEnroll} disabled={enrolling} className="btn btn-primary">
               {enrolling ? 'Đang xử lý...' : 'Ghi danh học ngay'}
             </button>
-            <p style={{ fontSize: 12, color: '#999', marginTop: 8 }}>
-              (Thanh toán VNPay đang tạm dừng — ghi danh miễn phí để test.)
+            <p className="muted" style={{ fontSize: 12, marginTop: 12, marginBottom: 0 }}>
+              Thanh toán VNPay đang tạm dừng — ghi danh miễn phí để test.
             </p>
           </div>
         ) : (
           <div>
-            <h3>Danh sách bài học</h3>
+            <h3 style={{ marginTop: 24 }}>Danh sách bài học</h3>
+            {detail.lessons.length === 0 && <p className="muted">Khóa học chưa có bài nào.</p>}
             {detail.lessons.map((l) => (
-              <div key={l.id} style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, marginBottom: 8 }}>
-                <strong>Bài {l.orderIndex}: {l.title}</strong>
-                {l.content && <p style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{l.content}</p>}
-                {l.videoUrl && <p><a href={l.videoUrl} target="_blank" rel="noreferrer">Xem video bài học</a></p>}
+              <div key={l.id} className="list-item">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      background: 'var(--primary-light)',
+                      color: 'var(--primary)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {l.orderIndex}
+                  </span>
+                  <strong>{l.title}</strong>
+                </div>
+                {l.content && <p style={{ marginTop: 10, whiteSpace: 'pre-wrap' }}>{l.content}</p>}
+                {l.videoUrl && (
+                  <p style={{ marginBottom: 0 }}>
+                    <a href={l.videoUrl} target="_blank" rel="noreferrer">Xem video bài học →</a>
+                  </p>
+                )}
               </div>
             ))}
 
             {isTeacher && (
-              <div style={{ marginTop: 16 }}>
-                <button onClick={() => setShowAddLesson((v) => !v)}>
+              <div style={{ marginTop: 20 }}>
+                <button onClick={() => setShowAddLesson((v) => !v)} className="btn btn-ghost">
                   {showAddLesson ? 'Đóng' : '+ Thêm bài học'}
                 </button>
                 {showAddLesson && (
-                  <form onSubmit={handleAddLesson} style={{ marginTop: 8, padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-                    <div>
-                      <label>Tên bài học</label><br />
-                      <input value={lessonTitle} onChange={(e) => setLessonTitle(e.target.value)} required style={{ width: '100%' }} />
+                  <form onSubmit={handleAddLesson} className="card" style={{ marginTop: 12 }}>
+                    <div className="field">
+                      <label className="label">Tên bài học</label>
+                      <input className="input" value={lessonTitle} onChange={(e) => setLessonTitle(e.target.value)} required />
                     </div>
-                    <div style={{ marginTop: 8 }}>
-                      <label>Nội dung</label><br />
-                      <textarea value={lessonContent} onChange={(e) => setLessonContent(e.target.value)} required style={{ width: '100%' }} rows={4} />
+                    <div className="field">
+                      <label className="label">Nội dung</label>
+                      <textarea
+                        className="input"
+                        value={lessonContent}
+                        onChange={(e) => setLessonContent(e.target.value)}
+                        required
+                        rows={4}
+                      />
                     </div>
-                    <div style={{ marginTop: 8 }}>
-                      <label>Link video (không bắt buộc)</label><br />
-                      <input value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)} style={{ width: '100%' }} />
+                    <div className="field">
+                      <label className="label">Link video (không bắt buộc)</label>
+                      <input className="input" value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)} />
                     </div>
-                    {lessonError && <p style={{ color: 'red' }}>{lessonError}</p>}
-                    <button type="submit" disabled={addingLesson} style={{ marginTop: 8 }}>
+                    {lessonError && <p className="error-text">{lessonError}</p>}
+                    <button type="submit" disabled={addingLesson} className="btn btn-primary">
                       {addingLesson ? 'Đang thêm...' : 'Thêm bài học'}
                     </button>
                   </form>
@@ -186,33 +229,44 @@ export default function CoursesPage() {
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto' }}>
+    <div>
       <h2>Khóa học</h2>
+      <p className="muted" style={{ marginBottom: 24 }}>
+        Các khóa học có nội dung bài giảng chi tiết, ghi danh để mở khóa toàn bộ bài học.
+      </p>
 
       {isTeacher && (
         <div style={{ marginBottom: 24 }}>
-          <button onClick={() => setShowCreateForm((v) => !v)}>
+          <button onClick={() => setShowCreateForm((v) => !v)} className="btn btn-primary">
             {showCreateForm ? 'Đóng' : '+ Tạo khóa học mới'}
           </button>
           {showCreateForm && (
-            <form onSubmit={handleCreateCourse} style={{ marginTop: 12, padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-              <div>
-                <label>Tên khóa học</label><br />
-                <input value={title} onChange={(e) => setTitle(e.target.value)} required style={{ width: '100%' }} />
+            <form onSubmit={handleCreateCourse} className="card" style={{ marginTop: 12 }}>
+              <div className="field">
+                <label className="label">Tên khóa học</label>
+                <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
-              <div style={{ marginTop: 8 }}>
-                <label>Mô tả</label><br />
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} required style={{ width: '100%' }} rows={2} />
+              <div className="field">
+                <label className="label">Mô tả</label>
+                <textarea
+                  className="input"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                  rows={2}
+                />
               </div>
-              <div style={{ marginTop: 8 }}>
-                <label>Band mục tiêu</label><br />
-                <input value={targetBand} onChange={(e) => setTargetBand(e.target.value)} placeholder="vd: 6.5-7.5" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="field">
+                  <label className="label">Band mục tiêu</label>
+                  <input className="input" value={targetBand} onChange={(e) => setTargetBand(e.target.value)} placeholder="vd: 6.5-7.5" />
+                </div>
+                <div className="field">
+                  <label className="label">Giá (đ)</label>
+                  <input className="input" type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
+                </div>
               </div>
-              <div style={{ marginTop: 8 }}>
-                <label>Giá (đ)</label><br />
-                <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
-              </div>
-              <button type="submit" disabled={creating} style={{ marginTop: 12 }}>
+              <button type="submit" disabled={creating} className="btn btn-primary">
                 {creating ? 'Đang tạo...' : 'Tạo khóa học'}
               </button>
             </form>
@@ -221,23 +275,28 @@ export default function CoursesPage() {
       )}
 
       {courses.length === 0 ? (
-        <p>Chưa có khóa học nào.</p>
+        <p className="muted">Chưa có khóa học nào.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div>
           {courses.map((c) => (
-            <li
-              key={c.id}
-              style={{ padding: 16, border: '1px solid #eee', borderRadius: 8, marginBottom: 12, cursor: 'pointer' }}
-              onClick={() => openCourse(c.id)}
-            >
-              <strong>{c.title}</strong>
-              <p style={{ margin: '4px 0', color: '#666' }}>{c.description}</p>
-              <p style={{ fontSize: 13, color: '#999' }}>
-                Giáo viên: {c.teacherName} · {c.lessonCount} bài học · {c.price.toLocaleString('vi-VN')} đ
-              </p>
-            </li>
+            <div key={c.id} className="list-item clickable" onClick={() => openCourse(c.id)}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                <div>
+                  <strong style={{ fontSize: 16 }}>{c.title}</strong>
+                  <p className="muted" style={{ margin: '6px 0' }}>{c.description}</p>
+                  <div>
+                    <span className="badge badge-primary">Band {c.targetBand}</span>
+                    <span className="badge badge-accent" style={{ marginLeft: 6 }}>{c.lessonCount} bài học</span>
+                  </div>
+                  <p className="muted" style={{ fontSize: 13, margin: '8px 0 0' }}>Giáo viên: {c.teacherName}</p>
+                </div>
+                <span style={{ fontWeight: 800, color: 'var(--primary)', whiteSpace: 'nowrap' }}>
+                  {c.price.toLocaleString('vi-VN')} đ
+                </span>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

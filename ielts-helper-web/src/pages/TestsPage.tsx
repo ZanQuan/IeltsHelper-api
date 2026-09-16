@@ -87,55 +87,104 @@ export default function TestsPage() {
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
-  if (loading) return <p>Đang tải...</p>;
+  if (loading) return <p className="muted">Đang tải...</p>;
 
   if (result) {
+    const percent = result.total === 0 ? 0 : Math.round((result.score / result.total) * 100);
     return (
-      <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
+      <div className="card" style={{ textAlign: 'center', padding: 48, maxWidth: 480, margin: '0 auto' }}>
         <h2>Kết quả</h2>
-        <p style={{ fontSize: 32, fontWeight: 'bold' }}>{result.score} / {result.total}</p>
-        <p>Thời gian làm bài: {result.elapsedMinutes} phút</p>
-        <button onClick={backToList} style={{ marginTop: 16 }}>Quay lại danh sách đề</button>
+        <p style={{ fontSize: 48, fontWeight: 800, color: 'var(--primary)', margin: '16px 0 4px' }}>
+          {result.score}<span style={{ fontSize: 24, color: 'var(--text-muted)' }}>/{result.total}</span>
+        </p>
+        <span className="badge badge-success" style={{ marginBottom: 16 }}>{percent}% chính xác</span>
+        <p className="muted">Thời gian làm bài: {result.elapsedMinutes} phút</p>
+        <button onClick={backToList} className="btn btn-primary" style={{ marginTop: 16 }}>
+          Quay lại danh sách đề
+        </button>
       </div>
     );
   }
 
   if (attempt) {
+    const answeredCount = Object.keys(answers).length;
+    const lowTime = secondsLeft < 60;
+
     return (
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>{attempt.testTitle}</h2>
-          <span style={{ fontSize: 20, fontWeight: 'bold', color: secondsLeft < 60 ? 'red' : 'black' }}>
-            ⏱ {formatTime(secondsLeft)}
+      <div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 70,
+            background: 'var(--bg)',
+            padding: '12px 0',
+            zIndex: 5,
+          }}
+        >
+          <div>
+            <h2 style={{ marginBottom: 2 }}>{attempt.testTitle}</h2>
+            <span className="muted">Đã trả lời {answeredCount}/{attempt.questions.length} câu</span>
+          </div>
+          <span
+            className="badge"
+            style={{
+              fontSize: 18,
+              padding: '10px 20px',
+              background: lowTime ? 'var(--danger-light)' : 'var(--primary-light)',
+              color: lowTime ? 'var(--danger)' : 'var(--primary)',
+            }}
+          >
+            {formatTime(secondsLeft)}
           </span>
         </div>
 
-        <div style={{ padding: 12, background: '#f7f7f7', borderRadius: 8, marginBottom: 16, whiteSpace: 'pre-wrap' }}>
+        <div className="card" style={{ marginBottom: 20, whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>
           {attempt.passageOrTranscript}
         </div>
 
         {attempt.questions.map((q, idx) => {
           const options: string[] = q.optionsJson ? JSON.parse(q.optionsJson) : [];
           return (
-            <div key={q.id} style={{ marginBottom: 16, padding: 12, border: '1px solid #eee', borderRadius: 8 }}>
-              <p><strong>Câu {idx + 1}:</strong> {q.questionText}</p>
-              {options.map((opt) => (
-                <label key={opt} style={{ display: 'block', marginTop: 4 }}>
-                  <input
-                    type="radio"
-                    name={q.id}
-                    value={opt}
-                    checked={answers[q.id] === opt}
-                    onChange={() => selectAnswer(q.id, opt)}
-                  />{' '}
-                  {opt}
-                </label>
-              ))}
+            <div key={q.id} className="card" style={{ marginBottom: 16 }}>
+              <p style={{ fontWeight: 700, marginTop: 0 }}>Câu {idx + 1}: {q.questionText}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {options.map((opt) => {
+                  const selected = answers[q.id] === opt;
+                  return (
+                    <label
+                      key={opt}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '12px 16px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: selected ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+                        background: selected ? 'var(--primary-light)' : 'var(--surface)',
+                        cursor: 'pointer',
+                        fontWeight: selected ? 600 : 400,
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name={q.id}
+                        value={opt}
+                        checked={selected}
+                        onChange={() => selectAnswer(q.id, opt)}
+                      />
+                      {opt}
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           );
         })}
 
-        <button onClick={handleSubmit} disabled={submitting}>
+        <button onClick={handleSubmit} disabled={submitting} className="btn btn-primary">
           {submitting ? 'Đang nộp...' : 'Nộp bài'}
         </button>
       </div>
@@ -143,21 +192,36 @@ export default function TestsPage() {
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto' }}>
-      <h2>Listening & Reading</h2>
+    <div>
+      <h2>Listening &amp; Reading</h2>
+      <p className="muted" style={{ marginBottom: 24 }}>
+        Luyện đề có tính giờ giống thi thật, chấm điểm tự động ngay khi nộp.
+      </p>
       {tests.length === 0 ? (
-        <p>Chưa có đề nào — tạo thử 1 đề bằng API (xem bước 4 bên dưới).</p>
+        <div className="card">
+          <p className="muted" style={{ margin: 0 }}>
+            Chưa có đề nào. Tài khoản giáo viên có thể tạo đề qua API.
+          </p>
+        </div>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div>
           {tests.map((t) => (
-            <li key={t.id} style={{ padding: 16, border: '1px solid #eee', borderRadius: 8, marginBottom: 12 }}>
-              <strong>{t.title}</strong> <span style={{ color: '#666' }}>({t.skill}, {t.timeLimitMinutes} phút)</span>
-              <div>
-                <button onClick={() => startTest(t.id)} style={{ marginTop: 8 }}>Bắt đầu làm bài</button>
+            <div key={t.id} className="list-item">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                <div>
+                  <strong style={{ fontSize: 16 }}>{t.title}</strong>
+                  <div style={{ marginTop: 6 }}>
+                    <span className="badge badge-primary">{t.skill}</span>
+                    <span className="badge badge-accent" style={{ marginLeft: 6 }}>{t.timeLimitMinutes} phút</span>
+                  </div>
+                </div>
+                <button onClick={() => startTest(t.id)} className="btn btn-primary">
+                  Bắt đầu làm bài
+                </button>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

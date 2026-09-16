@@ -59,25 +59,28 @@ export default function ErrorLogsPage() {
   const maxCount = Math.max(1, ...stats.map((s) => s.count));
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto' }}>
+    <div>
       <h2>Nhật ký lỗi sai</h2>
+      <p className="muted" style={{ marginBottom: 24 }}>
+        Ghi lại lỗi giáo viên chỉ ra để biết mình đang yếu chỗ nào và lặp lại lỗi gì nhiều nhất.
+      </p>
 
       {stats.length > 0 && (
-        <div style={{ marginBottom: 24, padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
-          <h3>Thống kê lỗi hay lặp lại</h3>
+        <div className="card" style={{ marginBottom: 24 }}>
+          <h3>Lỗi hay lặp lại</h3>
           {stats.map((s) => (
-            <div key={s.errorType} style={{ marginBottom: 6 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                <span>{s.errorType}</span>
-                <span>{s.count}</span>
+            <div key={s.errorType} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 4 }}>
+                <span style={{ fontWeight: 600 }}>{s.errorType}</span>
+                <span className="muted">{s.count} lần</span>
               </div>
-              <div style={{ background: '#eee', borderRadius: 4, height: 8 }}>
+              <div style={{ background: 'var(--border)', borderRadius: 999, height: 8 }}>
                 <div
                   style={{
                     width: `${(s.count / maxCount) * 100}%`,
-                    background: '#e67e22',
+                    background: 'var(--accent)',
                     height: 8,
-                    borderRadius: 4,
+                    borderRadius: 999,
                   }}
                 />
               </div>
@@ -86,47 +89,68 @@ export default function ErrorLogsPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 32, padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>
+      <form onSubmit={handleSubmit} className="card" style={{ marginBottom: 32 }}>
         <h3>Ghi lỗi sai mới</h3>
-        <div>
-          <label>Loại lỗi</label><br />
-          <select value={errorType} onChange={(e) => setErrorType(e.target.value)}>
+        <div className="field">
+          <label className="label">Loại lỗi</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {ERROR_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <button
+                key={t}
+                type="button"
+                onClick={() => setErrorType(t)}
+                className="badge"
+                style={{
+                  cursor: 'pointer',
+                  border: 'none',
+                  fontFamily: 'var(--font-sans)',
+                  padding: '8px 16px',
+                  background: errorType === t ? 'var(--primary)' : 'var(--primary-light)',
+                  color: errorType === t ? 'white' : 'var(--primary)',
+                }}
+              >
+                {t}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
-        <div style={{ marginTop: 8 }}>
-          <label>Mô tả lỗi</label><br />
+        <div className="field">
+          <label className="label">Mô tả lỗi</label>
           <textarea
+            className="input"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
-            style={{ width: '100%' }}
             rows={2}
             placeholder="Ví dụ: Quên dùng 'the' trước danh từ đã xác định"
           />
         </div>
-        <button type="submit" disabled={submitting} style={{ marginTop: 12 }}>
+        <button type="submit" disabled={submitting} className="btn btn-primary">
           {submitting ? 'Đang lưu...' : 'Lưu lỗi sai'}
         </button>
       </form>
 
       <h3>Danh sách lỗi sai</h3>
       {loading ? (
-        <p>Đang tải...</p>
+        <p className="muted">Đang tải...</p>
       ) : errors.length === 0 ? (
-        <p>Chưa có lỗi sai nào được ghi lại.</p>
+        <p className="muted">Chưa có lỗi sai nào được ghi lại.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div>
           {errors.map((err) => (
-            <li key={err.id} style={{ padding: 12, border: '1px solid #eee', borderRadius: 8, marginBottom: 8 }}>
-              <strong>{err.errorType}</strong>
-              <p style={{ margin: '4px 0' }}>{err.description}</p>
-              <button onClick={() => handleDelete(err.id)}>Xóa</button>
-            </li>
+            <div key={err.id} className="list-item">
+              <span className="badge badge-accent">{err.errorType}</span>
+              <p style={{ margin: '10px 0 8px' }}>{err.description}</p>
+              <button
+                onClick={() => handleDelete(err.id)}
+                className="btn btn-ghost"
+                style={{ padding: '6px 14px', fontSize: 13 }}
+              >
+                Xóa
+              </button>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
