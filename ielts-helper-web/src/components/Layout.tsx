@@ -6,7 +6,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { to: '/', label: 'Trang chủ' },
+    { to: '/dashboard', label: 'Trang chủ' },
     { to: '/lessons', label: 'Buổi học' },
     { to: '/vocabulary', label: 'Từ vựng' },
     { to: '/errors', label: 'Lỗi sai' },
@@ -14,6 +14,7 @@ export default function Layout() {
     { to: '/tests', label: 'Listening & Reading' },
     { to: '/courses', label: 'Khóa học' },
     { to: '/speaking', label: 'Speaking' },
+    { to: '/assignments', label: 'Bài tập' },
     { to: '/teacher', label: user?.role === 'Student' ? 'Giáo viên' : 'Học viên' },
   ];
 
@@ -44,7 +45,7 @@ export default function Layout() {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
+            end={item.to === '/dashboard'}
             style={({ isActive }) => ({
               color: isActive ? 'var(--primary)' : 'var(--text-muted)',
               background: isActive ? 'var(--primary-light)' : 'transparent',

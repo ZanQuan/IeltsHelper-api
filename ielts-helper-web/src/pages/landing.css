@@ -1,0 +1,412 @@
+/* Style riêng cho trang chủ công khai (trước khi đăng nhập).
+   Toàn bộ được scope trong .landing để không ảnh hưởng tới giao diện dashboard. */
+
+.landing {
+  --navy: #0F1B3D;
+  --navy-deep: #0A1330;
+  --ocean: #38BDF8;
+  --wave-fill: #F7F8FC; /* = var(--bg) của app, dùng làm màu phần thân trang */
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--wave-fill);
+  overflow-x: hidden;
+}
+
+.landing a { text-decoration: none; }
+
+.landing .lp-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Nav ---------- */
+
+.lp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(15, 27, 61, 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lp-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 14px 0;
+}
+
+.lp-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+}
+
+.lp-nav-brand img { height: 32px; width: 32px; object-fit: contain; }
+
+.lp-nav-brand span {
+  font-weight: 800;
+  font-size: 17px;
+  color: white;
+  letter-spacing: -0.01em;
+}
+
+.lp-nav-links { display: flex; gap: 28px; }
+
+.lp-nav-links a {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  font-weight: 600;
+}
+.lp-nav-links a:hover { color: white; }
+
+.lp-nav-actions { display: flex; align-items: center; gap: 10px; }
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lp-btn-primary { background: var(--primary); color: white; }
+.lp-btn-primary:hover { background: var(--primary-hover); }
+
+.lp-btn-ghost-light { background: transparent; color: white; border: 1.5px solid rgba(255, 255, 255, 0.35); }
+.lp-btn-ghost-light:hover { border-color: white; }
+
+.lp-btn-lg { padding: 14px 28px; font-size: 15px; }
+
+/* ---------- Hero ---------- */
+
+.lp-hero {
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color: white;
+  padding: 72px 0 0;
+}
+
+.lp-hero-inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+  padding-bottom: 88px;
+}
+
+.lp-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ocean);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.lp-hero h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+  max-width: 15ch;
+}
+
+.lp-hero p.lp-lead {
+  font-size: 17px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 46ch;
+  margin: 0 0 30px;
+}
+
+.lp-hero-cta { display: flex; gap: 12px; margin-bottom: 34px; }
+
+.lp-chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.lp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.lp-chip svg { flex-shrink: 0; }
+
+/* ---- hero mockup (mô phỏng kết quả chấm bài AI, không cần ảnh thật) ---- */
+
+.lp-hero-visual { position: relative; height: 100%; min-height: 340px; }
+
+.lp-mock-card {
+  background: var(--surface);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  padding: 22px;
+  color: var(--text);
+  width: 340px;
+}
+
+.lp-mock-writing {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  animation: lp-float 6s ease-in-out infinite;
+}
+
+.lp-mock-speaking {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 230px;
+  animation: lp-float 6s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+@keyframes lp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-mock-writing, .lp-mock-speaking { animation: none; }
+}
+
+.lp-mock-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.lp-mock-band { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1; }
+.lp-mock-band-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+.lp-mock-essay {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+
+.lp-mock-flag {
+  text-decoration: underline wavy var(--accent);
+  text-underline-offset: 3px;
+}
+
+.lp-mock-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: var(--primary-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: var(--primary-hover);
+  margin-bottom: 14px;
+}
+
+.lp-mock-scores { display: flex; gap: 6px; flex-wrap: wrap; }
+.lp-mock-scores span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 9px;
+}
+
+.lp-mock-caption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+.lp-mock-waveform { display: flex; align-items: flex-end; gap: 3px; height: 34px; margin: 10px 0 12px; }
+.lp-mock-waveform span {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--primary);
+  opacity: 0.85;
+}
+
+/* ---------- Wave divider ---------- */
+
+.lp-wave { display: block; width: 100%; height: auto; margin-bottom: -1px; }
+
+/* ---------- Sections ---------- */
+
+.lp-section { padding: 88px 0; }
+.lp-section-tight { padding: 72px 0; }
+
+.lp-section-head { max-width: 60ch; margin-bottom: 44px; }
+.lp-section-head h2 { font-size: 30px; margin: 0 0 12px; letter-spacing: -0.01em; }
+.lp-section-head p { font-size: 15.5px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+
+/* Features grid */
+
+.lp-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.lp-feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.lp-feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.lp-feature-card h3 { margin: 0 0 6px; font-size: 16px; }
+.lp-feature-card p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.55; }
+
+/* How it works */
+
+.lp-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  position: relative;
+}
+
+.lp-step-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.lp-step h3 { margin: 0 0 8px; font-size: 16.5px; }
+.lp-step p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+/* Why us */
+
+.lp-why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.lp-why-item h3 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-why-item svg { color: var(--primary); flex-shrink: 0; }
+.lp-why-item p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+/* About / photo placeholder */
+
+.lp-about {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.lp-photo-placeholder {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  border: 1.5px dashed var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.lp-photo-placeholder span { font-size: 13px; font-weight: 600; }
+
+.lp-about h2 { font-size: 28px; margin: 0 0 14px; }
+.lp-about p { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin: 0 0 14px; }
+
+/* Final CTA */
+
+.lp-cta-band {
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color: white;
+  text-align: center;
+  padding: 8px 0 84px;
+}
+
+.lp-cta-band h2 { font-size: 30px; margin: 0 0 12px; }
+.lp-cta-band p { font-size: 15.5px; color: rgba(255, 255, 255, 0.75); margin: 0 0 28px; }
+
+/* Footer */
+
+.lp-footer { background: var(--navy-deep); color: rgba(255, 255, 255, 0.6); padding: 40px 0; }
+
+.lp-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.lp-footer-brand { display: flex; align-items: center; gap: 10px; }
+.lp-footer-brand img { height: 26px; width: 26px; object-fit: contain; }
+.lp-footer-brand span { color: white; font-weight: 800; font-size: 15px; }
+
+.lp-footer-links { display: flex; gap: 22px; }
+.lp-footer-links a { color: rgba(255, 255, 255, 0.6); font-size: 13.5px; }
+.lp-footer-links a:hover { color: white; }
+
+.lp-footer-copy { font-size: 12.5px; color: rgba(255, 255, 255, 0.4); margin-top: 24px; }
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .lp-nav-links { display: none; }
+  .lp-hero-inner { grid-template-columns: 1fr; padding-bottom: 60px; }
+  .lp-hero h1 { font-size: 34px; max-width: none; }
+  .lp-hero-visual { min-height: 300px; margin-top: 24px; }
+  .lp-mock-writing { position: static; width: 100%; margin-bottom: 16px; }
+  .lp-mock-speaking { position: static; width: 100%; }
+  .lp-feature-grid, .lp-steps, .lp-why-grid { grid-template-columns: 1fr; }
+  .lp-about { grid-template-columns: 1fr; }
+  .lp-section { padding: 56px 0; }
+}

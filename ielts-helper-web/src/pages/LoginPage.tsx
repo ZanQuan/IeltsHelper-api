@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError('');
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch {
       setError('Email hoặc mật khẩu không đúng.');
     }
@@ -27,7 +27,7 @@ export default function LoginPage() {
     try {
       if (!response.credential) throw new Error('Thiếu credential');
       await loginWithGoogle(response.credential);
-      navigate('/');
+      navigate('/dashboard');
     } catch {
       setError('Đăng nhập bằng Google thất bại.');
     }

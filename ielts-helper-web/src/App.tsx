@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import LessonLogsPage from './pages/LessonLogsPage';
 import Layout from './components/Layout';
@@ -16,6 +17,7 @@ import TestsPage from './pages/TestsPage';
 import CoursesPage from './pages/CoursesPage';
 import SpeakingPage from './pages/SpeakingPage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
+import AssignmentsPage from './pages/AssignmentsPage';
 import AdminLayout from './components/AdminLayout';
 import AdminOverviewPage from './pages/admin/AdminOverviewPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
@@ -29,9 +31,18 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// "/" hiện trang chủ công khai nếu chưa đăng nhập, hoặc chuyển vào dashboard nếu đã đăng nhập
+function RootRoute() {
+  const { user, loading } = useAuth();
+  if (loading) return <p>Đang tải...</p>;
+  if (user) return <Navigate to="/dashboard" />;
+  return <LandingPage />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<RootRoute />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -39,7 +50,7 @@ function AppRoutes() {
 
       {/* Khu vực học viên/giáo viên */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/dashboard" element={<HomePage />} />
         <Route path="/lessons" element={<LessonLogsPage />} />
         <Route path="/vocabulary" element={<VocabularyPage />} />
         <Route path="/errors" element={<ErrorLogsPage />} />
@@ -47,6 +58,7 @@ function AppRoutes() {
         <Route path="/tests" element={<TestsPage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/speaking" element={<SpeakingPage />} />
+        <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/teacher" element={<TeacherDashboardPage />} />
       </Route>
 

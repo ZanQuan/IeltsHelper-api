@@ -23,6 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<CourseLesson> CourseLessons => Set<CourseLesson>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Assignment> Assignments => Set<Assignment>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TeacherStudentLink>()
@@ -40,6 +41,18 @@ public class AppDbContext : DbContext
             .HasOne(c => c.Teacher)
             .WithMany()
             .HasForeignKey(c => c.TeacherId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Assignment>()
+            .HasOne(a => a.Teacher)
+            .WithMany()
+            .HasForeignKey(a => a.TeacherId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Assignment>()
+            .HasOne(a => a.Student)
+            .WithMany()
+            .HasForeignKey(a => a.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

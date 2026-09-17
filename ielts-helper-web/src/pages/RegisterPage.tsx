@@ -17,7 +17,7 @@ export default function RegisterPage() {
     setError('');
     try {
       await register(name, email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch {
       setError('Đăng ký thất bại — email có thể đã được dùng.');
     }
@@ -28,7 +28,7 @@ export default function RegisterPage() {
     try {
       if (!response.credential) throw new Error('Thiếu credential');
       await loginWithGoogle(response.credential);
-      navigate('/');
+      navigate('/dashboard');
     } catch {
       setError('Đăng ký bằng Google thất bại.');
     }
