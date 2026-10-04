@@ -11,4 +11,4 @@ dist-ssr/
 *.local
 
 # Editor
-.vscode/
+.vscode/ielts-helper-web/.env
