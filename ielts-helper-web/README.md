@@ -1,32 +1,53 @@
-# React + TypeScript + Vite
+# Whale English – Web (React + TypeScript + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Cần file `.env`:
+
+```
+VITE_API_URL=http://localhost:5119
+VITE_GOOGLE_CLIENT_ID=...
+```
+
+## Bản đồ thư mục – "muốn sửa X thì mở đâu?"
+
+```
+src/
+├── main.tsx                 Điểm vào của ứng dụng
+├── app/
+│   └── App.tsx              Khai báo toàn bộ route + bảo vệ đăng nhập
+├── api/
+│   └── client.ts            axios dùng chung (tự gắn token)
+├── styles/
+│   └── index.css            CSS toàn cục (màu, nút, card, badge...)
+├── components/              Thành phần DÙNG CHUNG nhiều nơi
+│   ├── layout/
+│   │   ├── Layout.tsx       Thanh menu của học viên/giáo viên
+│   │   └── AdminLayout.tsx  Sidebar khu quản trị
+│   └── WhaleMascot/         Linh vật cá voi (tsx + css)
+└── features/                MỖI TÍNH NĂNG MỘT THƯ MỤC
+    ├── auth/                Đăng nhập, đăng ký, quên/đặt lại mật khẩu, AuthContext
+    ├── landing/             Trang giới thiệu (chưa đăng nhập)
+    ├── dashboard/           Trang chủ sau đăng nhập (/dashboard)
+    ├── lessons/             Nhật ký buổi học          (/lessons)
+    ├── vocabulary/          Từ vựng                   (/vocabulary)
+    ├── errors/              Sổ lỗi sai                (/errors)
+    ├── writing/             Writing + chấm AI         (/writing)
+    ├── speaking/            Speaking                  (/speaking)
+    ├── tests/               Listening & Reading       (/tests)
+    ├── courses/             Khóa học + thanh toán     (/courses)
+    ├── assignments/         Bài tập giáo viên giao    (/assignments)
+    ├── teacher/             Quản lý học viên          (/teacher)
+    ├── settings/            Hồ sơ cá nhân             (/settings)
+    └── admin/               Tổng quan, người dùng, khóa học, đề thi (/admin/*)
+```
+
+**Quy tắc:** file chỉ dùng trong một tính năng thì để trong thư mục tính năng đó.
+Khi một thứ (component, kiểu dữ liệu, hàm) bắt đầu được dùng ở 2 tính năng trở lên
+thì mới đưa lên `components/` (giao diện) hoặc `src/types/` (kiểu dữ liệu).
+
+**Import:** dùng alias `@/` trỏ tới `src/`, ví dụ `import apiClient from '@/api/client'`.
