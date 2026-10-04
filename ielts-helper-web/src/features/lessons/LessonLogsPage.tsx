@@ -1,18 +1,7 @@
 import { useState, useEffect, Fragment, type FormEvent } from 'react';
 import { FaBook, FaFileWord, FaNoteSticky, FaSpellCheck } from 'react-icons/fa6';
 import apiClient from '@/api/client';
-
-interface LessonLog {
-  id: string;
-  lessonDate: string;
-  skillFocus: string;
-  summary: string;
-  homework: string | null;
-  selfRating: number;
-  newVocabulary: string | null;
-  grammarNotes: string | null;
-  otherNotes: string | null;
-}
+import type { LessonLog } from '@/types';
 
 export default function LessonLogsPage() {
   const [logs, setLogs] = useState<LessonLog[]>([]);

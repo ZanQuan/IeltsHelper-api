@@ -1,15 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { FaCircleCheck } from 'react-icons/fa6';
 import apiClient from '@/api/client';
-
-interface Vocabulary {
-  id: string;
-  word: string;
-  meaning: string;
-  srsLevel: number;
-  intervalDays: number;
-  nextReviewDate: string | null;
-}
+import type { Vocabulary } from '@/types';
 
 export default function VocabularyPage() {
   const [dueWords, setDueWords] = useState<Vocabulary[]>([]);

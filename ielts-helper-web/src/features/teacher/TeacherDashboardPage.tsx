@@ -2,26 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import axios from 'axios';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/AuthContext';
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface LessonLog {
-  id: string;
-  lessonDate: string;
-  skillFocus: string;
-  summary: string;
-  selfRating: number;
-}
-
-interface ErrorLog {
-  id: string;
-  errorType: string;
-  description: string;
-}
+import type { ErrorLog, LessonLog, Student } from '@/types';
 
 export default function TeacherDashboardPage() {
   const { user } = useAuth();

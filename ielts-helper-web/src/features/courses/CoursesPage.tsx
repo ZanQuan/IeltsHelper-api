@@ -1,16 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/AuthContext';
-
-interface CourseSummary {
-  id: string;
-  title: string;
-  description: string;
-  targetBand: string;
-  price: number;
-  teacherName: string;
-  lessonCount: number;
-}
+import type { CourseSummary } from '@/types';
 
 interface CourseLesson {
   id: string;

@@ -2,37 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import axios from 'axios';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/AuthContext';
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface Assignment {
-  id: string;
-  studentId: string;
-  title: string;
-  instructions: string;
-  skill: string;
-  dueDate: string | null;
-  createdAt: string;
-  answerText: string | null;
-  submittedAt: string | null;
-  score: number | null;
-  feedback: string | null;
-  gradedAt: string | null;
-}
-
-interface ToGradeItem {
-  id: string;
-  title: string;
-  skill: string;
-  submittedAt: string;
-  dueDate: string | null;
-  studentId: string;
-  studentName: string;
-}
+import type { Assignment, Student, ToGradeItem } from '@/types';
 
 const SKILLS = ['General', 'Writing', 'Speaking', 'Reading', 'Listening', 'Vocabulary'];
 

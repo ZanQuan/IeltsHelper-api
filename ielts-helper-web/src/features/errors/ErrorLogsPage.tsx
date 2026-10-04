@@ -1,11 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
-
-interface ErrorLog {
-  id: string;
-  errorType: string;
-  description: string;
-}
+import type { ErrorLog } from '@/types';
 
 interface ErrorStat {
   errorType: string;

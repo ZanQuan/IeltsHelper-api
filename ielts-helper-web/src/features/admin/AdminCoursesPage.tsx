@@ -1,15 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
-
-interface CourseSummary {
-  id: string;
-  title: string;
-  description: string;
-  targetBand: string;
-  price: number;
-  teacherName: string;
-  lessonCount: number;
-}
+import type { CourseSummary } from '@/types';
 
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<CourseSummary[]>([]);

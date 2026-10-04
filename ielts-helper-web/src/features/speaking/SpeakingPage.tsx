@@ -1,16 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaMicrophone, FaStop } from 'react-icons/fa6';
 import apiClient from '@/api/client';
-
-interface SpeakingSubmission {
-  id: string;
-  partType: string;
-  prompt: string;
-  transcript: string | null;
-  estimatedBand: number | null;
-  feedback: string | null;
-  submittedAt: string;
-}
+import type { SpeakingSubmission } from '@/types';
 
 export default function SpeakingPage() {
   const [submissions, setSubmissions] = useState<SpeakingSubmission[]>([]);

@@ -3,58 +3,7 @@ import { FaBook, FaBookOpen, FaCalendarDays, FaCircleCheck, FaClipboardCheck, Fa
 import { Link } from 'react-router-dom';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/AuthContext';
-
-interface LessonLog {
-  id: string;
-  lessonDate: string;
-  skillFocus: string;
-  summary: string;
-  selfRating: number;
-}
-
-interface Vocabulary {
-  id: string;
-}
-
-interface Assignment {
-  id: string;
-  title: string;
-  skill: string;
-  dueDate: string | null;
-  submittedAt: string | null;
-  score: number | null;
-  gradedAt: string | null;
-}
-
-interface WritingSubmission {
-  id: string;
-  taskType: string;
-  estimatedBand: number | null;
-  submittedAt: string;
-}
-
-interface SpeakingSubmission {
-  id: string;
-  partType: string;
-  estimatedBand: number | null;
-  submittedAt: string;
-}
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface ToGradeItem {
-  id: string;
-  title: string;
-  skill: string;
-  submittedAt: string;
-  dueDate: string | null;
-  studentId: string;
-  studentName: string;
-}
+import type { Assignment, LessonLog, SpeakingSubmission, Student, ToGradeItem, Vocabulary, WritingSubmission } from '@/types';
 
 function QuickStat({
   icon,

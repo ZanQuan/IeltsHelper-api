@@ -1,12 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
-
-interface TestSummary {
-  id: string;
-  skill: string;
-  title: string;
-  timeLimitMinutes: number;
-}
+import type { TestSummary } from '@/types';
 
 export default function AdminTestsPage() {
   const [tests, setTests] = useState<TestSummary[]>([]);

@@ -1,15 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
-
-interface WritingSubmission {
-  id: string;
-  taskType: string;
-  prompt: string;
-  essayText: string;
-  submittedAt: string;
-  estimatedBand: number | null;
-  feedback: string | null;
-}
+import type { WritingSubmission } from '@/types';
 
 export default function WritingPage() {
   const [submissions, setSubmissions] = useState<WritingSubmission[]>([]);
