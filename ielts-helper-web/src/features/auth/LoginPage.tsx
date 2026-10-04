@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from './AuthContext';
 import WhaleMascot from '@/components/WhaleMascot/WhaleMascot';
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const expired = useSearchParams()[0].get('expired') === '1';
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -55,6 +56,9 @@ export default function LoginPage() {
           <p style={{ textAlign: 'right', margin: '-8px 0 12px' }}>
             <Link to="/forgot-password" style={{ fontSize: 13 }}>Quên mật khẩu?</Link>
           </p>
+          {expired && !error && (
+            <p className="error-text">Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.</p>
+          )}
           {error && <p className="error-text">{error}</p>}
           <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>Đăng nhập</button>
         </form>

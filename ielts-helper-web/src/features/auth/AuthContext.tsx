@@ -25,9 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = localStorage.getItem('user');
-    if (saved) {
-      setUser(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      if (saved && token) {
+        setUser(JSON.parse(saved));
+      } else {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    } catch {
+      // Dữ liệu trong localStorage bị hỏng -> coi như chưa đăng nhập
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
     setLoading(false);
   }, []);
