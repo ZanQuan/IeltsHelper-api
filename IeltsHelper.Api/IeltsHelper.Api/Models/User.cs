@@ -10,7 +10,7 @@ public class User
     public string? PasswordResetTokenHash { get; set; }
     public DateTime? PasswordResetTokenExpiresAt { get; set; }
     public string? GoogleId { get; set; }
-
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<LessonLog> LessonLogs { get; set; } = new List<LessonLog>();
     public ICollection<Vocabulary> Vocabularies { get; set; } = new List<Vocabulary>();
     public ICollection<ErrorLog> ErrorLogs { get; set; } = new List<ErrorLog>();

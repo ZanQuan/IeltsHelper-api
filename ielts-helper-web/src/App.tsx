@@ -23,6 +23,7 @@ import AdminOverviewPage from './pages/admin/AdminOverviewPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminCoursesPage from './pages/admin/AdminCoursesPage';
 import AdminTestsPage from './pages/admin/AdminTestsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -31,7 +32,6 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-// "/" hiện trang chủ công khai nếu chưa đăng nhập, hoặc chuyển vào dashboard nếu đã đăng nhập
 function RootRoute() {
   const { user, loading } = useAuth();
   if (loading) return <p>Đang tải...</p>;
@@ -60,9 +60,10 @@ function AppRoutes() {
         <Route path="/speaking" element={<SpeakingPage />} />
         <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/teacher" element={<TeacherDashboardPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
-      {/* Khu vực quản trị — layout riêng, có sidebar */}
+      {/* Khu vực quản trị - layout riêng, có sidebar */}
       <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
         <Route path="/admin" element={<AdminOverviewPage />} />
         <Route path="/admin/users" element={<AdminUsersPage />} />
@@ -76,7 +77,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
+      <BrowserRouter useTransitions={false}>
         <AuthProvider>
           <AppRoutes />
         </AuthProvider>

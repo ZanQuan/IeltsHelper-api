@@ -1,12 +1,16 @@
+import type { ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { FaBookOpen, FaChartPie, FaFileLines, FaHouse, FaRightFromBracket, FaUsers } from 'react-icons/fa6';
 import { useAuth } from '../auth/AuthContext';
 
 interface NavItem {
   to: string;
   label: string;
-  icon: string;
+  icon: ReactNode;
   end?: boolean;
 }
+
+const iconBox = { fontSize: 15, width: 18, display: 'inline-flex', justifyContent: 'center' } as const;
 
 interface NavSection {
   title: string;
@@ -16,14 +20,14 @@ interface NavSection {
 const SECTIONS: NavSection[] = [
   {
     title: 'Tổng quan',
-    items: [{ to: '/admin', label: 'Dashboard', icon: '📊', end: true }],
+    items: [{ to: '/admin', label: 'Dashboard', icon: <FaChartPie />, end: true }],
   },
   {
     title: 'Quản lý',
     items: [
-      { to: '/admin/users', label: 'Người dùng', icon: '👥' },
-      { to: '/admin/courses', label: 'Khoá học', icon: '📚' },
-      { to: '/admin/tests', label: 'Đề thi', icon: '📝' },
+      { to: '/admin/users', label: 'Người dùng', icon: <FaUsers /> },
+      { to: '/admin/courses', label: 'Khoá học', icon: <FaBookOpen /> },
+      { to: '/admin/tests', label: 'Đề thi', icon: <FaFileLines /> },
     ],
   },
 ];
@@ -100,7 +104,7 @@ export default function AdminLayout() {
               </div>
               {section.items.map((item) => (
                 <NavLink key={item.to} to={item.to} end={item.end} style={linkStyle}>
-                  <span style={{ fontSize: 15 }}>{item.icon}</span>
+                  <span style={iconBox}>{item.icon}</span>
                   {item.label}
                 </NavLink>
               ))}
@@ -121,7 +125,7 @@ export default function AdminLayout() {
               Điều hướng
             </div>
             <NavLink to="/" style={linkStyle}>
-              <span style={{ fontSize: 15 }}>🏠</span>
+              <span style={iconBox}><FaHouse /></span>
               Về trang học viên
             </NavLink>
             <button
@@ -143,7 +147,7 @@ export default function AdminLayout() {
                 textAlign: 'left',
               }}
             >
-              <span style={{ fontSize: 15 }}>🚪</span>
+              <span style={iconBox}><FaRightFromBracket /></span>
               Đăng xuất
             </button>
           </div>

@@ -117,6 +117,7 @@
   line-height: 1.15;
   font-weight: 800;
   letter-spacing: -0.02em;
+  color: #ffffff;
   margin: 0 0 20px;
   max-width: 15ch;
 }
@@ -372,7 +373,7 @@
   padding: 8px 0 84px;
 }
 
-.lp-cta-band h2 { font-size: 30px; margin: 0 0 12px; }
+.lp-cta-band h2 { font-size: 30px; margin: 0 0 12px; color: #ffffff; }
 .lp-cta-band p { font-size: 15.5px; color: rgba(255, 255, 255, 0.75); margin: 0 0 28px; }
 
 /* Footer */

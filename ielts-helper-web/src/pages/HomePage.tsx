@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { FaBook, FaBookOpen, FaCalendarDays, FaCircleCheck, FaClipboardCheck, FaClipboardList, FaHeadphones, FaHourglassHalf, FaMicrophone, FaPenNib, FaPenToSquare, FaUsers } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../auth/AuthContext';
@@ -61,7 +62,7 @@ function QuickStat({
   value,
   color,
 }: {
-  icon: string;
+  icon: ReactNode;
   label: string;
   value: string | number;
   color: string;
@@ -71,7 +72,7 @@ function QuickStat({
       <div style={{ height: 4, background: color }} />
       <div style={{ padding: '16px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-          <span style={{ fontSize: 16 }}>{icon}</span>
+          <span style={{ fontSize: 16, color, display: 'inline-flex' }}>{icon}</span>
           <span className="label" style={{ margin: 0 }}>{label}</span>
         </div>
         <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>{value}</div>
@@ -88,7 +89,7 @@ function ActionCard({
   color,
 }: {
   to: string;
-  icon: string;
+  icon: ReactNode;
   title: string;
   desc: string;
   color: string;
@@ -184,7 +185,7 @@ function StudentHome() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 2 }}>{greeting()}, {user?.name} 👋</h2>
+      <h2 style={{ marginBottom: 2 }}>{greeting()}, {user?.name}</h2>
       <p className="muted" style={{ marginBottom: 24 }}>Đây là những gì đang chờ bạn hôm nay.</p>
 
       <div
@@ -195,16 +196,16 @@ function StudentHome() {
           marginBottom: 32,
         }}
       >
-        <QuickStat icon="📖" label="Từ vựng cần ôn" value={dueCount} color="var(--primary)" />
+        <QuickStat icon={<FaBook />} label="Từ vựng cần ôn" value={dueCount} color="var(--primary)" />
         <QuickStat
-          icon="📝"
+          icon={<FaClipboardList />}
           label="Bài tập chưa nộp"
           value={overdueCount > 0 ? `${pendingAssignments.length} (${overdueCount} quá hạn)` : pendingAssignments.length}
           color={overdueCount > 0 ? 'var(--danger)' : 'var(--accent)'}
         />
-        <QuickStat icon="🗓️" label="Buổi học đã ghi" value={logs.length > 0 ? logs.length : 0} color="var(--success)" />
+        <QuickStat icon={<FaCalendarDays />} label="Buổi học đã ghi" value={logs.length > 0 ? logs.length : 0} color="var(--success)" />
         <QuickStat
-          icon="✍️"
+          icon={<FaPenNib />}
           label="Band Writing gần nhất"
           value={latestWriting?.estimatedBand ?? '—'}
           color="var(--primary)"
@@ -220,12 +221,12 @@ function StudentHome() {
           marginBottom: 32,
         }}
       >
-        <ActionCard to="/lessons" icon="🗒️" title="Ghi buổi học hôm nay" desc="Lưu lại nội dung vừa học với giáo viên" color="#6366F1" />
-        <ActionCard to="/vocabulary" icon="📖" title={`Ôn từ vựng (${dueCount})`} desc="Ôn theo lịch giãn cách thông minh" color="#4F46E5" />
-        <ActionCard to="/assignments" icon="📝" title="Bài tập được giao" desc={`${pendingAssignments.length} bài chưa nộp`} color="#FB7A3C" />
-        <ActionCard to="/writing" icon="✍️" title="Luyện Writing" desc="Nộp bài, AI chấm band ngay lập tức" color="#0EA5E9" />
-        <ActionCard to="/speaking" icon="🎙️" title="Luyện Speaking" desc="Ghi âm, AI chuyển văn bản và chấm điểm" color="#F43F5E" />
-        <ActionCard to="/tests" icon="🎧" title="Đề Listening & Reading" desc="Luyện đề có tính giờ, chấm tự động" color="#16A34A" />
+        <ActionCard to="/lessons" icon={<FaPenToSquare />} title="Ghi buổi học hôm nay" desc="Lưu lại nội dung vừa học với giáo viên" color="#6366F1" />
+        <ActionCard to="/vocabulary" icon={<FaBook />} title={`Ôn từ vựng (${dueCount})`} desc="Ôn theo lịch giãn cách thông minh" color="#4F46E5" />
+        <ActionCard to="/assignments" icon={<FaClipboardList />} title="Bài tập được giao" desc={`${pendingAssignments.length} bài chưa nộp`} color="#FB7A3C" />
+        <ActionCard to="/writing" icon={<FaPenNib />} title="Luyện Writing" desc="Nộp bài, AI chấm band ngay lập tức" color="#0EA5E9" />
+        <ActionCard to="/speaking" icon={<FaMicrophone />} title="Luyện Speaking" desc="Ghi âm, AI chuyển văn bản và chấm điểm" color="#F43F5E" />
+        <ActionCard to="/tests" icon={<FaHeadphones />} title="Đề Listening & Reading" desc="Luyện đề có tính giờ, chấm tự động" color="#16A34A" />
       </div>
 
       {(latestWriting || latestSpeaking) && (
@@ -307,7 +308,7 @@ function TeacherHome() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 2 }}>{greeting()}, {user?.name} 👋</h2>
+      <h2 style={{ marginBottom: 2 }}>{greeting()}, {user?.name}</h2>
       <p className="muted" style={{ marginBottom: 24 }}>Tổng quan lớp học của bạn.</p>
 
       <div
@@ -318,9 +319,9 @@ function TeacherHome() {
           marginBottom: 32,
         }}
       >
-        <QuickStat icon="👥" label="Học viên đang theo dõi" value={students.length} color="var(--primary)" />
+        <QuickStat icon={<FaUsers />} label="Học viên đang theo dõi" value={students.length} color="var(--primary)" />
         <QuickStat
-          icon="⏳"
+          icon={<FaHourglassHalf />}
           label="Bài chờ chấm"
           value={toGrade.length}
           color={toGrade.length > 0 ? 'var(--accent)' : 'var(--success)'}
@@ -336,16 +337,16 @@ function TeacherHome() {
           marginBottom: 32,
         }}
       >
-        <ActionCard to="/teacher" icon="👥" title="Học viên của tôi" desc="Xem nhật ký học và lỗi sai từng học viên" color="#6366F1" />
-        <ActionCard to="/assignments" icon="📝" title={`Chấm bài (${toGrade.length})`} desc="Bài học viên đã nộp, đang chờ chấm" color="#FB7A3C" />
-        <ActionCard to="/courses" icon="📚" title="Khóa học" desc="Tạo khoá học và thêm bài giảng" color="#16A34A" />
-        <ActionCard to="/tests" icon="🎧" title="Đề Listening & Reading" desc="Xem và luyện thử các đề đã tạo" color="#0EA5E9" />
+        <ActionCard to="/teacher" icon={<FaUsers />} title="Học viên của tôi" desc="Xem nhật ký học và lỗi sai từng học viên" color="#6366F1" />
+        <ActionCard to="/assignments" icon={<FaClipboardCheck />} title={`Chấm bài (${toGrade.length})`} desc="Bài học viên đã nộp, đang chờ chấm" color="#FB7A3C" />
+        <ActionCard to="/courses" icon={<FaBookOpen />} title="Khóa học" desc="Tạo khoá học và thêm bài giảng" color="#16A34A" />
+        <ActionCard to="/tests" icon={<FaHeadphones />} title="Đề Listening & Reading" desc="Xem và luyện thử các đề đã tạo" color="#0EA5E9" />
       </div>
 
       <h3>Bài đang chờ chấm</h3>
       {toGrade.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>Không có bài nào đang chờ chấm — mọi thứ đã xong! 🎉</p>
+          <p className="muted" style={{ margin: 0 }}><FaCircleCheck className="ico" style={{ color: 'var(--success)' }} />Không có bài nào đang chờ chấm — mọi thứ đã xong!</p>
         </div>
       ) : (
         <div>

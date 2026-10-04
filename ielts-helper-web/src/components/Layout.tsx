@@ -1,4 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
+import { FaShieldHalved } from 'react-icons/fa6';
 import { useAuth } from '../auth/AuthContext';
 import logo from '../assets/logo.png';
 
@@ -34,12 +35,22 @@ export default function Layout() {
           zIndex: 10,
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 10, marginRight: 20, whiteSpace: 'nowrap' }}>
+        <Link
+          to="/"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            marginRight: 20,
+            whiteSpace: 'nowrap',
+            textDecoration: 'none',
+          }}
+        >
           <img src={logo} alt="Whale English" style={{ height: 34, width: 34, objectFit: 'contain' }} />
           <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--primary)', lineHeight: 1.1 }}>
             Whale English
           </span>
-        </span>
+        </Link>
 
         {navItems.map((item) => (
           <NavLink
@@ -78,12 +89,14 @@ export default function Layout() {
                   textDecoration: 'none',
                 }}
               >
-                🛡️ Khu vực quản trị
+                <FaShieldHalved className="ico" />Khu vực quản trị
               </Link>
               <span style={{ width: 1, height: 22, background: 'var(--border)' }} />
             </>
           )}
-          <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>{user?.name}</span>
+          <Link to="/settings" style={{ color: 'var(--text-muted)', fontSize: 14 }}> 
+          {user?.name}
+          </Link>
           <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: 13 }}>
             Đăng xuất
           </button>

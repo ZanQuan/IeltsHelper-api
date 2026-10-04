@@ -2,13 +2,14 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from '../auth/AuthContext';
-import logo from '../assets/logo.png';
+import WhaleMascot from '../components/WhaleMascot';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
@@ -37,7 +38,7 @@ export default function RegisterPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
       <div className="card" style={{ width: 360 }}>
-        <img src={logo} alt="Whale English" style={{ height: 64, width: 64, objectFit: 'contain', display: 'block', margin: '0 auto 8px' }} />
+        <WhaleMascot email={email} isPasswordFocused={passwordFocused} />
         <h1 style={{ fontSize: 26, textAlign: 'center' }}>Đăng ký</h1>
         <form onSubmit={handleSubmit}>
           <div className="field">
@@ -50,7 +51,10 @@ export default function RegisterPage() {
           </div>
           <div className="field">
             <label className="label">Mật khẩu</label>
-            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
+              required />
           </div>
           {error && <p className="error-text">{error}</p>}
           <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>Đăng ký</button>

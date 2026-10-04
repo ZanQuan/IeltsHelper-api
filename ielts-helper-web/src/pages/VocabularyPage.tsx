@@ -1,4 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
+import { FaCircleCheck } from 'react-icons/fa6';
 import apiClient from '../api/client';
 
 interface Vocabulary {
@@ -71,7 +72,7 @@ export default function VocabularyPage() {
         <p className="muted">Đang tải...</p>
       ) : !currentCard ? (
         <div className="card" style={{ textAlign: 'center', padding: 40 }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>🎉</div>
+          <div style={{ fontSize: 40, marginBottom: 8, color: 'var(--success)' }}><FaCircleCheck /></div>
           <h3 style={{ marginBottom: 4 }}>Đã ôn xong tất cả từ đến hạn hôm nay!</h3>
           <p className="muted" style={{ margin: 0 }}>Thêm từ mới bên dưới, hoặc quay lại vào ngày mai.</p>
         </div>

@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.InkML;
+using IeltsHelper.Api.Data;
+using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using System.Security.Cryptography;
-using IeltsHelper.Api.Data;
-using IeltsHelper.Api.Models;
-using IeltsHelper.Api.Services;
+using System.Text;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -41,6 +43,11 @@ public class GoogleLoginRequest
 {
     // ID token (JWT credential) returned by Google Identity Services on the frontend
     public string Credential { get; set; } = string.Empty;
+}
+public class ChangePasswordRequest
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
 }
 
 [ApiController]
@@ -216,6 +223,45 @@ public class AuthController : ControllerBase
         return Convert.ToHexString(bytes);
     }
 
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<ActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
+        if (result == PasswordVerificationResult.Failed)
+            return BadRequest(new { error = "Mật khẩu hiện tại không đúng." });
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+            return BadRequest(new { error = "Mật khẩu mới phải có ít nhất 6 ký tự." });
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Đổi mật khẩu thành công." });
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult> Me()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        return Ok(new
+        {
+            id = user.Id,
+            name = user.Name,
+            email = user.Email,
+            role = user.Role,
+            createdAt = user.CreatedAt,
+            isGoogleLinked = user.GoogleId != null
+        });
+    }
     private string GenerateJwtToken(User user)
     {
         var claims = new[]

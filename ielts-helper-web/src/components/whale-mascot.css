@@ -1,0 +1,51 @@
+.whale-mascot {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.whale-body { fill: var(--primary); }
+.whale-belly { fill: var(--primary-light); }
+
+.whale-spout path {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0.8;
+}
+
+.eye-white { fill: white; }
+.eye-pupil {
+  fill: var(--text);
+  transition: transform 0.15s ease-out;
+}
+
+.whale-cheek { fill: var(--accent); opacity: 0.35; }
+
+.whale-mouth {
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0.6;
+}
+
+.whale-flipper-left { transform-origin: 30px 115px; transform: rotate(0deg); }
+.whale-flipper-right { transform-origin: 190px 115px; transform: rotate(0deg); }
+
+.whale-flipper path {
+  fill: var(--primary-hover);
+}
+
+.whale-flipper-left,
+.whale-flipper-right {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.whale-mascot.is-shy .whale-flipper-left {
+  transform: rotate(35deg) translate(35px, -45px);
+}
+.whale-mascot.is-shy .whale-flipper-right {
+  transform: rotate(-35deg) translate(-35px, -45px);
+}

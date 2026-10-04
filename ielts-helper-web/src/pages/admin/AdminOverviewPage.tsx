@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { FaBookOpen, FaChalkboardUser, FaHourglassHalf, FaMoneyBillWave, FaShieldHalved, FaUserGraduate, FaUserPlus, FaUsers } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import apiClient from '../../api/client';
 
@@ -21,14 +22,14 @@ function StatCard({
   label: string;
   value: string | number;
   color: string;
-  icon: string;
+  icon: ReactNode;
 }) {
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
       <div style={{ height: 4, background: color }} />
       <div style={{ padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-          <span style={{ fontSize: 16 }}>{icon}</span>
+          <span style={{ fontSize: 16, color, display: 'inline-flex' }}>{icon}</span>
           <span className="label" style={{ margin: 0 }}>{label}</span>
         </div>
         <div style={{ fontSize: 28, fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
@@ -66,10 +67,10 @@ export default function AdminOverviewPage() {
           marginBottom: 14,
         }}
       >
-        <StatCard label="Tổng người dùng" value={totalUsers} color="var(--text)" icon="👥" />
-        <StatCard label="Học viên" value={stats.totalStudents} color="var(--primary)" icon="🎓" />
-        <StatCard label="Giáo viên" value={stats.totalTeachers} color="var(--accent)" icon="🧑‍🏫" />
-        <StatCard label="Quản trị viên" value={stats.totalAdmins} color="var(--success)" icon="🛡️" />
+        <StatCard label="Tổng người dùng" value={totalUsers} color="var(--text)" icon={<FaUsers />} />
+        <StatCard label="Học viên" value={stats.totalStudents} color="var(--primary)" icon={<FaUserGraduate />} />
+        <StatCard label="Giáo viên" value={stats.totalTeachers} color="var(--accent)" icon={<FaChalkboardUser />} />
+        <StatCard label="Quản trị viên" value={stats.totalAdmins} color="var(--success)" icon={<FaShieldHalved />} />
       </div>
 
       <div
@@ -80,15 +81,15 @@ export default function AdminOverviewPage() {
           marginBottom: 32,
         }}
       >
-        <StatCard label="Khoá học" value={stats.totalCourses} color="var(--primary)" icon="📚" />
-        <StatCard label="Lượt ghi danh" value={stats.totalEnrollments} color="var(--primary)" icon="✍️" />
+        <StatCard label="Khoá học" value={stats.totalCourses} color="var(--primary)" icon={<FaBookOpen />} />
+        <StatCard label="Lượt ghi danh" value={stats.totalEnrollments} color="var(--primary)" icon={<FaUserPlus />} />
         <StatCard
           label="Doanh thu"
           value={`${stats.revenue.toLocaleString('vi-VN')}đ`}
           color="var(--success)"
-          icon="💰"
+          icon={<FaMoneyBillWave />}
         />
-        <StatCard label="Bài chờ chấm" value={stats.pendingGrading} color="var(--accent)" icon="⏳" />
+        <StatCard label="Bài chờ chấm" value={stats.pendingGrading} color="var(--accent)" icon={<FaHourglassHalf />} />
       </div>
 
       <h3>Truy cập nhanh</h3>

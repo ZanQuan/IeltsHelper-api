@@ -1,4 +1,5 @@
 import { useState, useEffect, Fragment, type FormEvent } from 'react';
+import { FaBook, FaFileWord, FaNoteSticky, FaSpellCheck } from 'react-icons/fa6';
 import apiClient from '../api/client';
 
 interface LessonLog {
@@ -133,7 +134,7 @@ export default function LessonLogsPage() {
           </p>
 
           <div className="field">
-            <label className="label">📖 Từ vựng mới</label>
+            <label className="label"><FaBook className="ico" />Từ vựng mới</label>
             <textarea
               className="input"
               value={newVocabulary}
@@ -144,7 +145,7 @@ export default function LessonLogsPage() {
           </div>
 
           <div className="field">
-            <label className="label">🔤 Ngữ pháp / Cấu trúc</label>
+            <label className="label"><FaSpellCheck className="ico" />Ngữ pháp / Cấu trúc</label>
             <textarea
               className="input"
               value={grammarNotes}
@@ -155,7 +156,7 @@ export default function LessonLogsPage() {
           </div>
 
           <div className="field">
-            <label className="label">📝 Ghi chú khác</label>
+            <label className="label"><FaNoteSticky className="ico" />Ghi chú khác</label>
             <textarea
               className="input"
               value={otherNotes}
@@ -184,7 +185,7 @@ export default function LessonLogsPage() {
             className="btn btn-accent"
             style={{ padding: '8px 18px', fontSize: 13 }}
           >
-            {exportingId === 'all' ? 'Đang xuất...' : '📄 Xuất tất cả ra Word'}
+            {exportingId === 'all' ? 'Đang xuất...' : <><FaFileWord className="ico" />Xuất tất cả ra Word</>}
           </button>
         )}
       </div>
@@ -234,19 +235,19 @@ export default function LessonLogsPage() {
                         )}
                         {log.newVocabulary && (
                           <div style={{ marginBottom: 12 }}>
-                            <p className="label">📖 Từ vựng mới</p>
+                            <p className="label"><FaBook className="ico" />Từ vựng mới</p>
                             <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{log.newVocabulary}</p>
                           </div>
                         )}
                         {log.grammarNotes && (
                           <div style={{ marginBottom: 12 }}>
-                            <p className="label">🔤 Ngữ pháp / Cấu trúc</p>
+                            <p className="label"><FaSpellCheck className="ico" />Ngữ pháp / Cấu trúc</p>
                             <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{log.grammarNotes}</p>
                           </div>
                         )}
                         {log.otherNotes && (
                           <div style={{ marginBottom: 12 }}>
-                            <p className="label">📝 Ghi chú khác</p>
+                            <p className="label"><FaNoteSticky className="ico" />Ghi chú khác</p>
                             <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{log.otherNotes}</p>
                           </div>
                         )}
@@ -260,7 +261,7 @@ export default function LessonLogsPage() {
                             className="btn btn-ghost"
                             style={{ padding: '6px 14px', fontSize: 13 }}
                           >
-                            {exportingId === log.id ? 'Đang xuất...' : '📄 Xuất Word'}
+                            {exportingId === log.id ? 'Đang xuất...' : <><FaFileWord className="ico" />Xuất Word</>}
                           </button>
                           <button onClick={() => handleDelete(log.id)} className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: 13 }}>
                             Xóa

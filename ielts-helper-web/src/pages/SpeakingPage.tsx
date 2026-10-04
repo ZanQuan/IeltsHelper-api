@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { FaMicrophone, FaStop } from 'react-icons/fa6';
 import apiClient from '../api/client';
 
 interface SpeakingSubmission {
@@ -166,7 +167,7 @@ export default function SpeakingPage() {
               className="btn"
               style={{ background: 'var(--danger)', color: 'white', padding: '14px 32px', fontSize: 16 }}
             >
-              🎙 Bắt đầu ghi âm
+              <FaMicrophone className="ico" />Bắt đầu ghi âm
             </button>
           )}
 
@@ -202,7 +203,7 @@ export default function SpeakingPage() {
                   className="btn"
                   style={{ background: 'var(--text)', color: 'white', padding: '14px 32px', fontSize: 16 }}
                 >
-                  ⏹ Dừng ghi âm
+                  <FaStop className="ico" />Dừng ghi âm
                 </button>
               </div>
             </div>

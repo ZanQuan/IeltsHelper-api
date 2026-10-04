@@ -54,7 +54,7 @@ export default function AssignmentsPage() {
   return isTeacher ? <TeacherAssignments /> : <StudentAssignments />;
 }
 
-/* ---------------- Học viên ---------------- */
+//Học viên
 
 function StudentAssignments() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -180,7 +180,7 @@ function StudentAssignments() {
   );
 }
 
-/* ---------------- Giáo viên ---------------- */
+//Giáo viên
 
 function TeacherAssignments() {
   const [students, setStudents] = useState<Student[]>([]);
