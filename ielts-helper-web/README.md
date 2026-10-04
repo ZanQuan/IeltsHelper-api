@@ -24,6 +24,7 @@ src/
 │   └── client.ts            axios dùng chung (tự gắn token)
 ├── styles/
 │   └── index.css            CSS toàn cục (màu, nút, card, badge...)
+├── types/                   Kiểu dữ liệu dùng chung (Student, Assignment, LessonLog...)
 ├── components/              Thành phần DÙNG CHUNG nhiều nơi
 │   ├── layout/
 │   │   ├── Layout.tsx       Thanh menu của học viên/giáo viên
@@ -33,6 +34,10 @@ src/
     ├── auth/                Đăng nhập, đăng ký, quên/đặt lại mật khẩu, AuthContext
     ├── landing/             Trang giới thiệu (chưa đăng nhập)
     ├── dashboard/           Trang chủ sau đăng nhập (/dashboard)
+    │   ├── HomePage.tsx         Chỉ chọn giao diện theo vai trò
+    │   ├── StudentHome.tsx      Trang chủ học viên
+    │   ├── TeacherHome.tsx      Trang chủ giáo viên
+    │   └── QuickStat / ActionCard / greeting   Phần dùng chung
     ├── lessons/             Nhật ký buổi học          (/lessons)
     ├── vocabulary/          Từ vựng                   (/vocabulary)
     ├── errors/              Sổ lỗi sai                (/errors)
@@ -41,6 +46,10 @@ src/
     ├── tests/               Listening & Reading       (/tests)
     ├── courses/             Khóa học + thanh toán     (/courses)
     ├── assignments/         Bài tập giáo viên giao    (/assignments)
+    │   ├── AssignmentsPage.tsx      Chỉ chọn giao diện theo vai trò
+    │   ├── StudentAssignments.tsx   Học viên xem và nộp bài
+    │   ├── TeacherAssignments.tsx   Giáo viên giao và chấm bài
+    │   └── StatusBadge / fmtDate    Phần dùng chung
     ├── teacher/             Quản lý học viên          (/teacher)
     ├── settings/            Hồ sơ cá nhân             (/settings)
     └── admin/               Tổng quan, người dùng, khóa học, đề thi (/admin/*)
