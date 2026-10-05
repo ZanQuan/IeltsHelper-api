@@ -1,4 +1,4 @@
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 import StudentHome from './StudentHome';
 import TeacherHome from './TeacherHome';
 

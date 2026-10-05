@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { FaBookOpen, FaChartPie, FaFileLines, FaHouse, FaRightFromBracket, FaUsers } from 'react-icons/fa6';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 
 interface NavItem {
   to: string;

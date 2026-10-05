@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 import WhaleMascot from '@/components/WhaleMascot/WhaleMascot';
 
 export default function RegisterPage() {

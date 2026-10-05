@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider, useAuth } from '@/features/auth/AuthContext';
+import { AuthProvider } from '@/features/auth/AuthProvider';
+import { useAuth } from '@/features/auth/useAuth';
 import LoginPage from '@/features/auth/LoginPage';
 import RegisterPage from '@/features/auth/RegisterPage';
 import ForgotPasswordPage from '@/features/auth/ForgotPasswordPage';
@@ -26,15 +27,13 @@ import AdminTestsPage from '@/features/admin/AdminTestsPage';
 import SettingsPage from '@/features/settings/SettingsPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
-  if (loading) return <p>Đang tải...</p>;
+  const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
   return <>{children}</>;
 }
 
 function RootRoute() {
-  const { user, loading } = useAuth();
-  if (loading) return <p>Đang tải...</p>;
+  const { user } = useAuth();
   if (user) return <Navigate to="/dashboard" />;
   return <LandingPage />;
 }

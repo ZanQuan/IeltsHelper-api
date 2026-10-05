@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 
 interface AdminUser {
   id: string;
@@ -23,6 +23,11 @@ const ROLE_BADGE: Record<string, string> = {
   Admin: 'badge-success',
 };
 
+const fetchUsers = (role: string) =>
+  apiClient
+    .get<AdminUser[]>('/api/Admin/users', { params: role ? { role } : {} })
+    .then((res) => res.data);
+
 export default function AdminUsersPage() {
   const { user } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -31,17 +36,24 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
 
+  // Dùng sau khi đổi vai trò / xoá tài khoản: hiện lại "Đang tải..."
   async function loadUsers() {
     setLoading(true);
-    const res = await apiClient.get<AdminUser[]>('/api/Admin/users', {
-      params: roleFilter ? { role: roleFilter } : {},
-    });
-    setUsers(res.data);
+    setUsers(await fetchUsers(roleFilter));
     setLoading(false);
   }
 
+  // Tải lại mỗi khi đổi bộ lọc vai trò ("ignore" bỏ kết quả cũ nếu đổi lọc nhanh)
   useEffect(() => {
-    loadUsers();
+    let ignore = false;
+    fetchUsers(roleFilter).then((data) => {
+      if (ignore) return;
+      setUsers(data);
+      setLoading(false);
+    });
+    return () => {
+      ignore = true;
+    };
   }, [roleFilter]);
 
   const filteredUsers = useMemo(() => {
@@ -104,7 +116,10 @@ export default function AdminUsersPage() {
             className="input"
             style={{ width: 170 }}
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
+            onChange={(e) => {
+              setRoleFilter(e.target.value);
+              setLoading(true);
+            }}
           >
             <option value="">Tất cả vai trò</option>
             <option value="Student">Học viên</option>

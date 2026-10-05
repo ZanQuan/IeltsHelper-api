@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 import type { CourseSummary } from '@/types';
 
 interface CourseLesson {
@@ -21,6 +21,8 @@ interface CourseDetail {
   isEnrolled: boolean;
   lessons: CourseLesson[];
 }
+
+const fetchCourses = () => apiClient.get<CourseSummary[]>('/api/Courses').then((res) => res.data);
 
 export default function CoursesPage() {
   const { user } = useAuth();
@@ -48,13 +50,15 @@ export default function CoursesPage() {
 
   async function loadCourses() {
     setLoading(true);
-    const res = await apiClient.get<CourseSummary[]>('/api/Courses');
-    setCourses(res.data);
+    setCourses(await fetchCourses());
     setLoading(false);
   }
 
   useEffect(() => {
-    loadCourses();
+    fetchCourses().then((data) => {
+      setCourses(data);
+      setLoading(false);
+    });
   }, []);
 
   async function openCourse(id: string) {

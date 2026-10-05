@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { FaShieldHalved } from 'react-icons/fa6';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 import logo from '@/assets/logo.png';
 
 export default function Layout() {

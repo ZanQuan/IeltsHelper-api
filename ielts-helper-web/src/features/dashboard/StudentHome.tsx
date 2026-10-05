@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaBook, FaCalendarDays, FaClipboardList, FaHeadphones, FaMicrophone, FaPenNib, FaPenToSquare } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import apiClient from '@/api/client';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 import type { Assignment, LessonLog, SpeakingSubmission, Vocabulary, WritingSubmission } from '@/types';
 import QuickStat from './QuickStat';
 import ActionCard from './ActionCard';

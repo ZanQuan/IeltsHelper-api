@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import axios from 'axios';
 import apiClient from '@/api/client';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 import type { ErrorLog, LessonLog, Student } from '@/types';
 
 export default function TeacherDashboardPage() {
@@ -35,7 +35,7 @@ export default function TeacherDashboardPage() {
   }
 
   const [students, setStudents] = useState<Student[]>([]);
-  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [loadingStudents, setLoadingStudents] = useState(isTeacher);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [studentLogs, setStudentLogs] = useState<LessonLog[]>([]);
   const [studentErrors, setStudentErrors] = useState<ErrorLog[]>([]);
@@ -43,7 +43,6 @@ export default function TeacherDashboardPage() {
 
   useEffect(() => {
     if (!isTeacher) return;
-    setLoadingStudents(true);
     apiClient.get<Student[]>('/api/TeacherLinks/my-students').then((res) => {
       setStudents(res.data);
       setLoadingStudents(false);

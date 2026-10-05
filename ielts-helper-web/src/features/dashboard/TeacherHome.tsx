@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaBookOpen, FaCircleCheck, FaClipboardCheck, FaHeadphones, FaHourglassHalf, FaUsers } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import apiClient from '@/api/client';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useAuth } from '@/features/auth/useAuth';
 import type { Student, ToGradeItem } from '@/types';
 import QuickStat from './QuickStat';
 import ActionCard from './ActionCard';
