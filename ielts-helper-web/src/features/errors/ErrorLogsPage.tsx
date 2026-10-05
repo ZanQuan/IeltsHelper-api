@@ -9,6 +9,14 @@ interface ErrorStat {
 
 const ERROR_TYPES = ['Tense', 'Article', 'Collocation', 'Preposition', 'Word Order', 'Pronunciation', 'Khác'];
 
+async function fetchErrorData() {
+  const [errorsRes, statsRes] = await Promise.all([
+    apiClient.get<ErrorLog[]>('/api/ErrorLogs'),
+    apiClient.get<ErrorStat[]>('/api/ErrorLogs/stats'),
+  ]);
+  return { errors: errorsRes.data, stats: statsRes.data };
+}
+
 export default function ErrorLogsPage() {
   const [errors, setErrors] = useState<ErrorLog[]>([]);
   const [stats, setStats] = useState<ErrorStat[]>([]);
@@ -20,17 +28,18 @@ export default function ErrorLogsPage() {
 
   async function loadData() {
     setLoading(true);
-    const [errorsRes, statsRes] = await Promise.all([
-      apiClient.get<ErrorLog[]>('/api/ErrorLogs'),
-      apiClient.get<ErrorStat[]>('/api/ErrorLogs/stats'),
-    ]);
-    setErrors(errorsRes.data);
-    setStats(statsRes.data);
+    const data = await fetchErrorData();
+    setErrors(data.errors);
+    setStats(data.stats);
     setLoading(false);
   }
 
   useEffect(() => {
-    loadData();
+    fetchErrorData().then((data) => {
+      setErrors(data.errors);
+      setStats(data.stats);
+      setLoading(false);
+    });
   }, []);
 
   async function handleSubmit(e: FormEvent) {

@@ -3,6 +3,8 @@ import { FaMicrophone, FaStop } from 'react-icons/fa6';
 import apiClient from '@/api/client';
 import type { SpeakingSubmission } from '@/types';
 
+const fetchSubmissions = () => apiClient.get<SpeakingSubmission[]>('/api/SpeakingSubmissions').then((res) => res.data);
+
 export default function SpeakingPage() {
   const [submissions, setSubmissions] = useState<SpeakingSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,13 +24,15 @@ export default function SpeakingPage() {
 
   async function loadSubmissions() {
     setLoading(true);
-    const res = await apiClient.get<SpeakingSubmission[]>('/api/SpeakingSubmissions');
-    setSubmissions(res.data);
+    setSubmissions(await fetchSubmissions());
     setLoading(false);
   }
 
   useEffect(() => {
-    loadSubmissions();
+    fetchSubmissions().then((data) => {
+      setSubmissions(data);
+      setLoading(false);
+    });
   }, []);
 
   useEffect(() => {

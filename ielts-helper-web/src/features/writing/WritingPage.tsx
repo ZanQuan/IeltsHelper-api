@@ -2,6 +2,8 @@ import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import type { WritingSubmission } from '@/types';
 
+const fetchSubmissions = () => apiClient.get<WritingSubmission[]>('/api/WritingSubmissions').then((res) => res.data);
+
 export default function WritingPage() {
   const [submissions, setSubmissions] = useState<WritingSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,13 +16,15 @@ export default function WritingPage() {
 
   async function loadSubmissions() {
     setLoading(true);
-    const res = await apiClient.get<WritingSubmission[]>('/api/WritingSubmissions');
-    setSubmissions(res.data);
+    setSubmissions(await fetchSubmissions());
     setLoading(false);
   }
 
   useEffect(() => {
-    loadSubmissions();
+    fetchSubmissions().then((data) => {
+      setSubmissions(data);
+      setLoading(false);
+    });
   }, []);
 
   const wordCount = essayText.trim().split(/\s+/).filter(Boolean).length;

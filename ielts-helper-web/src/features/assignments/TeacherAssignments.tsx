@@ -7,6 +7,14 @@ import { fmtDate } from './fmtDate';
 
 const SKILLS = ['General', 'Writing', 'Speaking', 'Reading', 'Listening', 'Vocabulary'];
 
+async function fetchOverview() {
+  const [studentsRes, toGradeRes] = await Promise.all([
+    apiClient.get<Student[]>('/api/TeacherLinks/my-students'),
+    apiClient.get<ToGradeItem[]>('/api/Assignments/to-grade'),
+  ]);
+  return { students: studentsRes.data, toGrade: toGradeRes.data };
+}
+
 export default function TeacherAssignments() {
   const [students, setStudents] = useState<Student[]>([]);
   const [toGrade, setToGrade] = useState<ToGradeItem[]>([]);
@@ -31,17 +39,18 @@ export default function TeacherAssignments() {
 
   async function loadOverview() {
     setLoading(true);
-    const [studentsRes, toGradeRes] = await Promise.all([
-      apiClient.get<Student[]>('/api/TeacherLinks/my-students'),
-      apiClient.get<ToGradeItem[]>('/api/Assignments/to-grade'),
-    ]);
-    setStudents(studentsRes.data);
-    setToGrade(toGradeRes.data);
+    const data = await fetchOverview();
+    setStudents(data.students);
+    setToGrade(data.toGrade);
     setLoading(false);
   }
 
   useEffect(() => {
-    loadOverview();
+    fetchOverview().then((data) => {
+      setStudents(data.students);
+      setToGrade(data.toGrade);
+      setLoading(false);
+    });
   }, []);
 
   async function openStudent(s: Student) {

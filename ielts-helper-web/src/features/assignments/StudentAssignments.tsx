@@ -5,6 +5,8 @@ import type { Assignment } from '@/types';
 import StatusBadge from './StatusBadge';
 import { fmtDate } from './fmtDate';
 
+const fetchAssignments = () => apiClient.get<Assignment[]>('/api/Assignments').then((res) => res.data);
+
 export default function StudentAssignments() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,13 +17,15 @@ export default function StudentAssignments() {
 
   async function load() {
     setLoading(true);
-    const res = await apiClient.get<Assignment[]>('/api/Assignments');
-    setAssignments(res.data);
+    setAssignments(await fetchAssignments());
     setLoading(false);
   }
 
   useEffect(() => {
-    load();
+    fetchAssignments().then((data) => {
+      setAssignments(data);
+      setLoading(false);
+    });
   }, []);
 
   function open(a: Assignment) {

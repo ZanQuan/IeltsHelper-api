@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
 import type { TestSummary } from '@/types';
 
+const fetchTests = () => apiClient.get<TestSummary[]>('/api/Tests').then((res) => res.data);
+
 export default function AdminTestsPage() {
   const [tests, setTests] = useState<TestSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -10,13 +12,15 @@ export default function AdminTestsPage() {
 
   async function loadTests() {
     setLoading(true);
-    const res = await apiClient.get<TestSummary[]>('/api/Tests');
-    setTests(res.data);
+    setTests(await fetchTests());
     setLoading(false);
   }
 
   useEffect(() => {
-    loadTests();
+    fetchTests().then((data) => {
+      setTests(data);
+      setLoading(false);
+    });
   }, []);
 
   const filtered = useMemo(() => {

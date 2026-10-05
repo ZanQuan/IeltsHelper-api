@@ -3,6 +3,8 @@ import { FaBook, FaFileWord, FaNoteSticky, FaSpellCheck } from 'react-icons/fa6'
 import apiClient from '@/api/client';
 import type { LessonLog } from '@/types';
 
+const fetchLogs = () => apiClient.get<LessonLog[]>('/api/LessonLogs').then((res) => res.data);
+
 export default function LessonLogsPage() {
   const [logs, setLogs] = useState<LessonLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,8 +23,7 @@ export default function LessonLogsPage() {
 
   async function loadLogs() {
     setLoading(true);
-    const res = await apiClient.get<LessonLog[]>('/api/LessonLogs');
-    setLogs(res.data);
+    setLogs(await fetchLogs());
     setLoading(false);
   }
 
@@ -44,7 +45,10 @@ export default function LessonLogsPage() {
   }
 
   useEffect(() => {
-    loadLogs();
+    fetchLogs().then((data) => {
+      setLogs(data);
+      setLoading(false);
+    });
   }, []);
 
   async function handleSubmit(e: FormEvent) {

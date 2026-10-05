@@ -3,6 +3,8 @@ import { FaCircleCheck } from 'react-icons/fa6';
 import apiClient from '@/api/client';
 import type { Vocabulary } from '@/types';
 
+const fetchDue = () => apiClient.get<Vocabulary[]>('/api/Vocabularies/due').then((res) => res.data);
+
 export default function VocabularyPage() {
   const [dueWords, setDueWords] = useState<Vocabulary[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -16,15 +18,17 @@ export default function VocabularyPage() {
 
   async function loadDue() {
     setLoadingDue(true);
-    const res = await apiClient.get<Vocabulary[]>('/api/Vocabularies/due');
-    setDueWords(res.data);
+    setDueWords(await fetchDue());
     setCurrentIndex(0);
     setRevealed(false);
     setLoadingDue(false);
   }
 
   useEffect(() => {
-    loadDue();
+    fetchDue().then((data) => {
+      setDueWords(data);
+      setLoadingDue(false);
+    });
   }, []);
 
   const currentCard = dueWords[currentIndex];

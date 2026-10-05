@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
 import type { CourseSummary } from '@/types';
 
+const fetchCourses = () => apiClient.get<CourseSummary[]>('/api/Courses').then((res) => res.data);
+
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<CourseSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -9,13 +11,15 @@ export default function AdminCoursesPage() {
 
   async function loadCourses() {
     setLoading(true);
-    const res = await apiClient.get<CourseSummary[]>('/api/Courses');
-    setCourses(res.data);
+    setCourses(await fetchCourses());
     setLoading(false);
   }
 
   useEffect(() => {
-    loadCourses();
+    fetchCourses().then((data) => {
+      setCourses(data);
+      setLoading(false);
+    });
   }, []);
 
   const filtered = useMemo(() => {
