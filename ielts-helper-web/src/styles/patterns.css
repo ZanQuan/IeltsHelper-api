@@ -1,0 +1,185 @@
+/* ============================================================
+   MẪU BỐ CỤC DÙNG CHUNG – nhiều thuộc tính gộp thành một tên dễ hiểu
+   (hàng ngang, lưới, nút nhỏ, hộp thông tin...). Sửa ở đây là đổi cho mọi trang dùng nó.
+   Cũng được nạp CUỐI CÙNG (xem main.tsx).
+   ============================================================ */
+
+.avatar-40 {
+  align-items: center;
+  background: var(--primary-light);
+  border-radius: 50%;
+  color: var(--primary);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 800;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+}
+
+.btn-back {
+  font-size: 14px;
+  margin-bottom: 16px;
+  padding: 8px 16px;
+}
+
+.btn-danger-soft {
+  background: var(--danger-light);
+  color: var(--danger);
+  font-size: 13px;
+  padding: 6px 14px;
+}
+
+.btn-full {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.btn-sm {
+  font-size: 13px;
+  padding: 6px 14px;
+}
+
+.card-flush {
+  overflow: hidden;
+  padding: 0;
+}
+
+.card-grid-180 {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 32px;
+}
+
+.card-grid-240 {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-bottom: 32px;
+}
+
+.center-screen {
+  align-items: center;
+  background: var(--paper);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.container-700 {
+  margin: 0 auto;
+  max-width: 700px;
+}
+
+.divider-line {
+  background: #e5e5e5;
+  flex: 1;
+  height: 1px;
+}
+
+.divider-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.grid-2col {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.info-box {
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  margin-top: 8px;
+  padding: 16px;
+}
+
+.logo-64 {
+  display: block;
+  height: 64px;
+  margin: 0 auto 8px;
+  object-fit: contain;
+  width: 64px;
+}
+
+.pre-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.row-between {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+}
+
+.row-between-gap {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.row-center-10 {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.row-center-14 {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.row-center-8-mb-6 {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.row-gap-8 {
+  display: flex;
+  gap: 8px;
+}
+
+.row-justify-center {
+  display: flex;
+  justify-content: center;
+}
+
+.row-wrap-10 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sidebar-group-label {
+  color: rgba(255,255,255,0.35);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0 20px 8px;
+  text-transform: uppercase;
+}
+
+.toolbar {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* Chỉ dùng cho thẻ <a>/<Link>: "a." giúp thắng a:hover (đổi màu khi rê chuột) như style inline trước đây */
+a.link-plain {
+  color: inherit;
+  text-decoration: none;
+}
