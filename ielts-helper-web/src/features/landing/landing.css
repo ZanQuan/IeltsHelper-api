@@ -411,3 +411,9 @@
   .lp-about { grid-template-columns: 1fr; }
   .lp-section { padding: 56px 0; }
 }
+
+/* ---- style chuyển từ inline (LandingPage.tsx) ---- */
+.lp-section-surface {
+  background: var(--surface);
+  border-radius: var(--radius);
+}

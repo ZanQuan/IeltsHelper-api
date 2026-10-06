@@ -1,0 +1,54 @@
+/* ============================================================
+   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
+   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
+   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
+   ============================================================ */
+
+/* ---- TestsPage.tsx ---- */
+.test-result-card {
+  text-align: center;
+  padding: 48px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.test-score {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 16px 0 4px;
+}
+.test-score-total {
+  font-size: 24px;
+  color: var(--text-muted);
+}
+.test-sticky-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 70px;
+  background: var(--bg);
+  padding: 12px 0;
+  z-index: 5;
+}
+.test-passage {
+  margin-bottom: 20px;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+.test-question {
+  font-weight: 700;
+  margin-top: 0;
+}
+.test-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.test-footer-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}

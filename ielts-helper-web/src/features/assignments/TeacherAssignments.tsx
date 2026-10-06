@@ -4,6 +4,7 @@ import apiClient from '@/api/client';
 import type { Assignment, Student, ToGradeItem } from '@/types';
 import StatusBadge from './StatusBadge';
 import { fmtDate } from './fmtDate';
+import './assignments.css';
 
 const SKILLS = ['General', 'Writing', 'Speaking', 'Reading', 'Listening', 'Vocabulary'];
 
@@ -133,42 +134,42 @@ export default function TeacherAssignments() {
   // Xem chi tiết 1 bài (chấm điểm)
   if (selected) {
     return (
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <button onClick={() => setSelected(null)} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}>
+      <div className="container-700">
+        <button onClick={() => setSelected(null)} className="btn btn-ghost btn-back">
           ← Quay lại
         </button>
 
-        <div className="card" style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+        <div className="card mb-20">
+          <div className="row-between-gap">
             <div>
-              <span className="badge badge-primary" style={{ marginBottom: 10 }}>{selected.skill}</span>
-              <h2 style={{ margin: '8px 0 4px' }}>{selected.title}</h2>
-              <p className="muted" style={{ margin: 0 }}>
+              <span className="badge badge-primary mb-10">{selected.skill}</span>
+              <h2 className="m-8-0-4">{selected.title}</h2>
+              <p className="muted m-0">
                 Học viên: {students.find((s) => s.id === selected.studentId)?.name ?? selectedStudent?.name}
               </p>
             </div>
             <StatusBadge assignment={selected} />
           </div>
-          {selected.instructions && <p style={{ marginTop: 16, whiteSpace: 'pre-wrap' }}>{selected.instructions}</p>}
-          <button onClick={() => handleDelete(selected.id)} className="btn btn-ghost" style={{ marginTop: 16, color: 'var(--danger)', fontSize: 13, padding: '6px 14px' }}>
+          {selected.instructions && <p className="mt-16 ws-pre-wrap">{selected.instructions}</p>}
+          <button onClick={() => handleDelete(selected.id)} className="btn btn-ghost assign-delete-btn">
             Xóa bài tập
           </button>
         </div>
 
         {!selected.submittedAt ? (
           <div className="card">
-            <p className="muted" style={{ margin: 0 }}>Học viên chưa nộp bài này.</p>
+            <p className="muted m-0">Học viên chưa nộp bài này.</p>
           </div>
         ) : (
           <>
-            <div className="card" style={{ marginBottom: 20 }}>
-              <h3 style={{ marginTop: 0 }}>Bài làm của học viên</h3>
-              <p className="muted" style={{ marginBottom: 10 }}>Nộp lúc: {new Date(selected.submittedAt).toLocaleString('vi-VN')}</p>
-              <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{selected.answerText}</p>
+            <div className="card mb-20">
+              <h3 className="mt-0">Bài làm của học viên</h3>
+              <p className="muted mb-10">Nộp lúc: {new Date(selected.submittedAt).toLocaleString('vi-VN')}</p>
+              <p className="pre-text">{selected.answerText}</p>
             </div>
 
             <form onSubmit={handleGrade} className="card">
-              <h3 style={{ marginTop: 0 }}>{selected.gradedAt ? 'Sửa điểm' : 'Chấm điểm'}</h3>
+              <h3 className="mt-0">{selected.gradedAt ? 'Sửa điểm' : 'Chấm điểm'}</h3>
               <div className="field">
                 <label className="label">Điểm (/10)</label>
                 <input
@@ -201,20 +202,20 @@ export default function TeacherAssignments() {
   if (selectedStudent) {
     return (
       <div>
-        <button onClick={() => setSelectedStudent(null)} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}>
+        <button onClick={() => setSelectedStudent(null)} className="btn btn-ghost btn-back">
           ← Quay lại danh sách học viên
         </button>
 
         <h2>Bài tập của {selectedStudent.name}</h2>
 
-        <form onSubmit={handleCreate} className="card" style={{ margin: '20px 0 28px' }}>
-          <h3 style={{ marginTop: 0 }}>Giao bài mới</h3>
+        <form onSubmit={handleCreate} className="card m-20-0-28">
+          <h3 className="mt-0">Giao bài mới</h3>
           <div className="field">
             <label className="label">Tiêu đề</label>
             <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="VD: Viết Writing Task 2 chủ đề môi trường" />
           </div>
-          <div style={{ display: 'flex', gap: 16 }}>
-            <div className="field" style={{ flex: 1 }}>
+          <div className="assign-form-row">
+            <div className="field flex-1">
               <label className="label">Kỹ năng</label>
               <select className="input" value={skill} onChange={(e) => setSkill(e.target.value)}>
                 {SKILLS.map((s) => (
@@ -222,7 +223,7 @@ export default function TeacherAssignments() {
                 ))}
               </select>
             </div>
-            <div className="field" style={{ flex: 1 }}>
+            <div className="field flex-1">
               <label className="label">Hạn nộp (không bắt buộc)</label>
               <input className="input" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </div>
@@ -239,16 +240,16 @@ export default function TeacherAssignments() {
 
         {assignments.length === 0 ? (
           <div className="card">
-            <p className="muted" style={{ margin: 0 }}>Chưa giao bài tập nào cho học viên này.</p>
+            <p className="muted m-0">Chưa giao bài tập nào cho học viên này.</p>
           </div>
         ) : (
           assignments.map((a) => (
             <div key={a.id} className="list-item clickable" onClick={() => openAssignment(a.id)}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+              <div className="row-between-gap">
                 <div>
-                  <span className="badge badge-primary" style={{ marginRight: 8 }}>{a.skill}</span>
+                  <span className="badge badge-primary mr-8">{a.skill}</span>
                   <strong>{a.title}</strong>
-                  {a.dueDate && <p className="muted" style={{ margin: '6px 0 0' }}>Hạn nộp: {fmtDate(a.dueDate)}</p>}
+                  {a.dueDate && <p className="muted m-6-0-0">Hạn nộp: {fmtDate(a.dueDate)}</p>}
                 </div>
                 <StatusBadge assignment={a} />
               </div>
@@ -263,21 +264,21 @@ export default function TeacherAssignments() {
   return (
     <div>
       <h2>Bài tập</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>Giao bài tập cho học viên và chấm điểm bài đã nộp.</p>
+      <p className="muted mb-24">Giao bài tập cho học viên và chấm điểm bài đã nộp.</p>
 
       {!loading && toGrade.length > 0 && (
         <>
           <h3>Cần chấm ({toGrade.length})</h3>
-          <div style={{ marginBottom: 28 }}>
+          <div className="mb-28">
             {toGrade.map((t) => (
               <div key={t.id} className="list-item clickable" onClick={() => openAssignment(t.id)}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <div className="assign-pending-row">
                   <div>
-                    <span className="badge badge-accent" style={{ marginRight: 8 }}>{t.skill}</span>
+                    <span className="badge badge-accent mr-8">{t.skill}</span>
                     <strong>{t.title}</strong>
-                    <p className="muted" style={{ margin: '6px 0 0' }}>{t.studentName}</p>
+                    <p className="muted m-6-0-0">{t.studentName}</p>
                   </div>
-                  <span className="muted" style={{ fontSize: 13 }}>Nộp lúc {new Date(t.submittedAt).toLocaleDateString('vi-VN')}</span>
+                  <span className="muted fs-13">Nộp lúc {new Date(t.submittedAt).toLocaleDateString('vi-VN')}</span>
                 </div>
               </div>
             ))}
@@ -290,20 +291,20 @@ export default function TeacherAssignments() {
         <p className="muted">Đang tải...</p>
       ) : students.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             Chưa có học viên nào liên kết với bạn. Bảo học viên vào mục "Giáo viên" trong tài khoản của họ và nhập email của bạn.
           </p>
         </div>
       ) : (
         students.map((s) => (
           <div key={s.id} className="list-item clickable" onClick={() => openStudent(s)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, flexShrink: 0 }}>
+            <div className="row-center-14">
+              <span className="avatar-40">
                 {initials(s.name)}
               </span>
               <div>
                 <strong>{s.name}</strong>
-                <p className="muted" style={{ margin: 0 }}>{s.email}</p>
+                <p className="muted m-0">{s.email}</p>
               </div>
             </div>
           </div>

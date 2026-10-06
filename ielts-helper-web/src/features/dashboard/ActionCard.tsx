@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import './dashboard.css';
 
 export default function ActionCard({
   to,
@@ -17,15 +18,7 @@ export default function ActionCard({
   return (
     <Link
       to={to}
-      className="card"
-      style={{
-        textDecoration: 'none',
-        color: 'inherit',
-        display: 'flex',
-        gap: 14,
-        alignItems: 'flex-start',
-        transition: 'box-shadow 0.15s, transform 0.15s',
-      }}
+      className="card action-card"
       onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = ''; }}
     >
@@ -46,8 +39,8 @@ export default function ActionCard({
         {icon}
       </span>
       <div>
-        <strong style={{ fontSize: 15 }}>{title}</strong>
-        <p className="muted" style={{ margin: '4px 0 0', fontSize: 13.5 }}>{desc}</p>
+        <strong className="fs-15">{title}</strong>
+        <p className="muted action-card-desc">{desc}</p>
       </div>
     </Link>
   );

@@ -177,10 +177,10 @@ export default function LandingPage() {
             <div className="lp-mock-card lp-mock-writing">
               <div className="lp-mock-head">
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 13 }}>Writing Task 2</div>
+                  <div className="fs-13 fw-700">Writing Task 2</div>
                   <div className="lp-mock-band-label">Chấm bởi AI</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div className="text-right">
                   <div className="lp-mock-band">7.5</div>
                   <div className="lp-mock-band-label">Overall</div>
                 </div>
@@ -202,12 +202,12 @@ export default function LandingPage() {
             </div>
 
             <div className="lp-mock-card lp-mock-speaking">
-              <div className="lp-mock-head" style={{ marginBottom: 4 }}>
+              <div className="lp-mock-head mb-4">
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 13 }}>Speaking Part 2</div>
+                  <div className="fs-13 fw-700">Speaking Part 2</div>
                   <div className="lp-mock-band-label">Đang chấm...</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div className="text-right">
                   <div className="lp-mock-band">7.0</div>
                   <div className="lp-mock-band-label">Ước tính</div>
                 </div>
@@ -258,7 +258,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="why-us" className="lp-section lp-shell" style={{ background: 'var(--surface)', borderRadius: 'var(--radius)' }}>
+      <section id="why-us" className="lp-section lp-shell lp-section-surface">
         <div className="lp-section-head">
           <h2>Vì sao chọn Whale English</h2>
           <p>Không chỉ là một app luyện đề — là nơi giáo viên và AI cùng đồng hành với bạn.</p>

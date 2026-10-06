@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '@/api/client';
 import logo from '@/assets/logo.png';
+import './auth.css';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -25,11 +26,11 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
-      <div className="card" style={{ width: 360 }}>
-        <img src={logo} alt="Whale English" style={{ height: 64, width: 64, objectFit: 'contain', display: 'block', margin: '0 auto 8px' }} />
-        <h1 style={{ fontSize: 24, textAlign: 'center' }}>Quên mật khẩu</h1>
-        <p className="muted" style={{ textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
+    <div className="center-screen">
+      <div className="card w-360">
+        <img className="logo-64" src={logo} alt="Whale English" />
+        <h1 className="fs-24 text-center">Quên mật khẩu</h1>
+        <p className="muted auth-subtitle">
           Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.
         </p>
         <form onSubmit={handleSubmit}>
@@ -45,14 +46,14 @@ export default function ForgotPasswordPage() {
             />
           </div>
           {error && <p className="error-text">{error}</p>}
-          {message && <p style={{ color: 'var(--success)', fontSize: 14 }}>{message}</p>}
+          {message && <p className="auth-success">{message}</p>}
           {!message && (
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+            <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
               {loading ? 'Đang gửi...' : 'Gửi liên kết đặt lại'}
             </button>
           )}
         </form>
-        <p className="muted" style={{ textAlign: 'center', marginTop: 16 }}>
+        <p className="muted mt-16 text-center">
           <Link to="/login">Quay lại đăng nhập</Link>
         </p>
       </div>

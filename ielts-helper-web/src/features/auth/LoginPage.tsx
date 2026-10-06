@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from './useAuth';
 import WhaleMascot from '@/components/WhaleMascot/WhaleMascot';
+import './auth.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -36,10 +37,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
-      <div className="card" style={{ width: 360 }}>
+    <div className="center-screen">
+      <div className="card w-360">
         <WhaleMascot email={email} isPasswordFocused={passwordFocused} />
-        <h1 style={{ fontSize: 26, textAlign: 'center' }}>Đăng nhập</h1>
+        <h1 className="fs-26 text-center">Đăng nhập</h1>
         <form onSubmit={handleSubmit}>
           <div className="field">
             <label className="label">Email</label>
@@ -53,24 +54,24 @@ export default function LoginPage() {
               onBlur={() => setPasswordFocused(false)}
               required />
           </div>
-          <p style={{ textAlign: 'right', margin: '-8px 0 12px' }}>
-            <Link to="/forgot-password" style={{ fontSize: 13 }}>Quên mật khẩu?</Link>
+          <p className="auth-forgot-row">
+            <Link className="fs-13" to="/forgot-password">Quên mật khẩu?</Link>
           </p>
           {expired && !error && (
             <p className="error-text">Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.</p>
           )}
           {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>Đăng nhập</button>
+          <button type="submit" className="btn btn-primary btn-full">Đăng nhập</button>
         </form>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '16px 0' }}>
-          <div style={{ flex: 1, height: 1, background: '#e5e5e5' }} />
-          <span className="muted" style={{ fontSize: 12 }}>hoặc</span>
-          <div style={{ flex: 1, height: 1, background: '#e5e5e5' }} />
+        <div className="divider-row">
+          <div className="divider-line" />
+          <span className="muted fs-12">hoặc</span>
+          <div className="divider-line" />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="row-justify-center">
           <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Đăng nhập bằng Google thất bại.')} />
         </div>
-        <p className="muted" style={{ textAlign: 'center', marginTop: 16 }}>
+        <p className="muted mt-16 text-center">
           Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
         </p>
       </div>

@@ -1,0 +1,49 @@
+/* ============================================================
+   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
+   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
+   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
+   ============================================================ */
+
+/* ---- AdminCoursesPage.tsx ---- */
+.admin-price-cell {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---- AdminOverviewPage.tsx ---- */
+.admin-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.admin-link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* ---- AdminUsersPage.tsx ---- */
+.admin-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.admin-role-select {
+  padding: 7px 10px;
+  font-size: 14px;
+}

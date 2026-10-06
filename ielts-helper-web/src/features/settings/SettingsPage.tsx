@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import axios from 'axios';
 import apiClient from '@/api/client';
+import './settings.css';
 
 interface Profile {
   id: string;
@@ -86,61 +87,46 @@ export default function SettingsPage() {
   if (loading || !profile) return <p className="muted">Đang tải...</p>;
 
   return (
-    <div style={{ maxWidth: 560, margin: '0 auto' }}>
+    <div className="settings-page">
       <h2>Tài khoản của tôi</h2>
 
-      <div className="card" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-          <span
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              background: 'var(--primary)',
-              color: 'white',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: 20,
-              flexShrink: 0,
-            }}
-          >
+      <div className="card mb-24">
+        <div className="settings-profile-head">
+          <span className="settings-avatar">
             {initials(profile.name)}
           </span>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 18 }}>{profile.name}</div>
+            <div className="settings-name">{profile.name}</div>
             <span className={`badge ${ROLE_BADGE[profile.role] ?? 'badge-primary'}`}>
               {ROLE_LABEL[profile.role] ?? profile.role}
             </span>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gap: 14 }}>
+        <div className="settings-field-grid">
           <div>
-            <p className="label" style={{ marginBottom: 3 }}>Email</p>
-            <p style={{ margin: 0 }}>
+            <p className="label mb-3">Email</p>
+            <p className="m-0">
               {profile.email}
               {profile.isGoogleLinked && (
-                <span className="badge badge-success" style={{ marginLeft: 8 }}>Đã liên kết Google</span>
+                <span className="badge badge-success ml-8">Đã liên kết Google</span>
               )}
             </p>
           </div>
 
           <div>
-            <p className="label" style={{ marginBottom: 3 }}>Tham gia từ</p>
-            <p style={{ margin: 0 }}>{new Date(profile.createdAt).toLocaleDateString('vi-VN')}</p>
+            <p className="label mb-3">Tham gia từ</p>
+            <p className="m-0">{new Date(profile.createdAt).toLocaleDateString('vi-VN')}</p>
           </div>
 
           <div>
-            <p className="label" style={{ marginBottom: 3 }}>Mật khẩu</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ letterSpacing: 3, fontSize: 16 }}>••••••••</span>
+            <p className="label mb-3">Mật khẩu</p>
+            <div className="settings-password-row">
+              <span className="settings-password-dots">••••••••</span>
               <button
                 type="button"
                 onClick={() => { setShowChangeForm((v) => !v); setMessage(''); }}
-                className="btn btn-ghost"
-                style={{ padding: '6px 16px', fontSize: 13 }}
+                className="btn btn-ghost settings-toggle-btn"
               >
                 {showChangeForm ? 'Đóng' : 'Đổi mật khẩu'}
               </button>
@@ -169,7 +155,7 @@ export default function SettingsPage() {
             {submitting ? 'Đang lưu...' : 'Lưu mật khẩu mới'}
           </button>
           {profile.isGoogleLinked && (
-            <p className="muted" style={{ fontSize: 13, marginTop: 10, marginBottom: 0 }}>
+            <p className="muted settings-hint">
               Nếu bạn chưa từng đặt mật khẩu (chỉ đăng nhập bằng Google), dùng{' '}
               <a href="/forgot-password">quên mật khẩu</a> để thiết lập lần đầu thay vì đổi ở đây.
             </p>

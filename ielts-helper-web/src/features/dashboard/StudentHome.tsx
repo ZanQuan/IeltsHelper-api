@@ -7,6 +7,7 @@ import type { Assignment, LessonLog, SpeakingSubmission, Vocabulary, WritingSubm
 import QuickStat from './QuickStat';
 import ActionCard from './ActionCard';
 import { greeting } from './greeting';
+import './dashboard.css';
 
 export default function StudentHome() {
   const { user } = useAuth();
@@ -43,17 +44,10 @@ export default function StudentHome() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 2 }}>{greeting()}, {user?.name}</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>Đây là những gì đang chờ bạn hôm nay.</p>
+      <h2 className="mb-2">{greeting()}, {user?.name}</h2>
+      <p className="muted mb-24">Đây là những gì đang chờ bạn hôm nay.</p>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 14,
-          marginBottom: 32,
-        }}
-      >
+      <div className="card-grid-180">
         <QuickStat icon={<FaBook />} label="Từ vựng cần ôn" value={dueCount} color="var(--primary)" />
         <QuickStat
           icon={<FaClipboardList />}
@@ -71,14 +65,7 @@ export default function StudentHome() {
       </div>
 
       <h3>Việc cần làm</h3>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 14,
-          marginBottom: 32,
-        }}
-      >
+      <div className="card-grid-240">
         <ActionCard to="/lessons" icon={<FaPenToSquare />} title="Ghi buổi học hôm nay" desc="Lưu lại nội dung vừa học với giáo viên" color="#6366F1" />
         <ActionCard to="/vocabulary" icon={<FaBook />} title={`Ôn từ vựng (${dueCount})`} desc="Ôn theo lịch giãn cách thông minh" color="#4F46E5" />
         <ActionCard to="/assignments" icon={<FaClipboardList />} title="Bài tập được giao" desc={`${pendingAssignments.length} bài chưa nộp`} color="#FB7A3C" />
@@ -90,11 +77,11 @@ export default function StudentHome() {
       {(latestWriting || latestSpeaking) && (
         <>
           <h3>Điểm gần nhất</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 32 }}>
+          <div className="dash-grid-220">
             {latestWriting && (
               <div className="list-item">
                 <span className="badge badge-primary">Writing · {latestWriting.taskType}</span>
-                <div className="band-score" style={{ fontSize: 26, marginTop: 8 }}>
+                <div className="band-score fs-26 mt-8">
                   {latestWriting.estimatedBand ?? '—'}
                 </div>
                 <span className="muted">{new Date(latestWriting.submittedAt).toLocaleDateString('vi-VN')}</span>
@@ -103,7 +90,7 @@ export default function StudentHome() {
             {latestSpeaking && (
               <div className="list-item">
                 <span className="badge badge-accent">Speaking · {latestSpeaking.partType}</span>
-                <div className="band-score" style={{ fontSize: 26, marginTop: 8 }}>
+                <div className="band-score fs-26 mt-8">
                   {latestSpeaking.estimatedBand ?? '—'}
                 </div>
                 <span className="muted">{new Date(latestSpeaking.submittedAt).toLocaleDateString('vi-VN')}</span>
@@ -116,7 +103,7 @@ export default function StudentHome() {
       <h3>Buổi học gần đây</h3>
       {logs.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             Chưa có buổi học nào. <Link to="/lessons">Ghi buổi học đầu tiên →</Link>
           </p>
         </div>
@@ -124,17 +111,17 @@ export default function StudentHome() {
         <div>
           {logs.map((log) => (
             <div key={log.id} className="list-item">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div className="row-between">
                 <div>
                   <strong>{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</strong>
-                  <span className="badge badge-primary" style={{ marginLeft: 10 }}>{log.skillFocus}</span>
+                  <span className="badge badge-primary ml-10">{log.skillFocus}</span>
                 </div>
                 <span className="badge badge-success">Hiểu bài: {log.selfRating}/5</span>
               </div>
-              <p style={{ margin: '10px 0 0' }}>{log.summary}</p>
+              <p className="m-10-0-0">{log.summary}</p>
             </div>
           ))}
-          <Link to="/lessons" className="muted" style={{ fontSize: 14 }}>Xem tất cả buổi học →</Link>
+          <Link to="/lessons" className="muted fs-14">Xem tất cả buổi học →</Link>
         </div>
       )}
     </div>

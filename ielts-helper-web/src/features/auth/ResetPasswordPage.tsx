@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import apiClient from '@/api/client';
 import logo from '@/assets/logo.png';
+import './auth.css';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -39,8 +40,8 @@ export default function ResetPasswordPage() {
 
   if (!email || !token) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
-        <div className="card" style={{ width: 360, textAlign: 'center' }}>
+      <div className="center-screen">
+        <div className="card auth-card-message">
           <p className="error-text">Liên kết không hợp lệ hoặc đã thiếu thông tin.</p>
           <Link to="/forgot-password">Yêu cầu liên kết mới</Link>
         </div>
@@ -49,12 +50,12 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
-      <div className="card" style={{ width: 360 }}>
-        <img src={logo} alt="Whale English" style={{ height: 64, width: 64, objectFit: 'contain', display: 'block', margin: '0 auto 8px' }} />
-        <h1 style={{ fontSize: 24, textAlign: 'center' }}>Đặt lại mật khẩu</h1>
+    <div className="center-screen">
+      <div className="card w-360">
+        <img className="logo-64" src={logo} alt="Whale English" />
+        <h1 className="fs-24 text-center">Đặt lại mật khẩu</h1>
         {done ? (
-          <p style={{ color: 'var(--success)', textAlign: 'center', marginTop: 12 }}>
+          <p className="auth-success-center">
             Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập...
           </p>
         ) : (
@@ -82,7 +83,7 @@ export default function ResetPasswordPage() {
               />
             </div>
             {error && <p className="error-text">{error}</p>}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+            <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
               {loading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
             </button>
           </form>

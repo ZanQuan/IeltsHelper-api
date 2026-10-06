@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { FaBookOpen, FaChartPie, FaFileLines, FaHouse, FaRightFromBracket, FaUsers } from 'react-icons/fa6';
 import { useAuth } from '@/features/auth/useAuth';
+import './layout.css';
 
 interface NavItem {
   to: string;
@@ -64,42 +65,21 @@ export default function AdminLayout() {
   });
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
-      <aside
-        style={{
-          width: 240,
-          flexShrink: 0,
-          background: '#141826',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflowY: 'auto',
-        }}
-      >
-        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ color: 'white', fontWeight: 800, fontSize: 17, lineHeight: 1.2 }}>
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-head">
+          <div className="admin-sidebar-title">
             Whale English
           </div>
-          <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em' }}>
+          <div className="admin-sidebar-subtitle">
             KHU VỰC QUẢN TRỊ
           </div>
         </div>
 
-        <nav style={{ flex: 1, paddingTop: 12 }}>
+        <nav className="admin-nav">
           {SECTIONS.map((section) => (
-            <div key={section.title} style={{ marginBottom: 18 }}>
-              <div
-                style={{
-                  padding: '0 20px 8px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.35)',
-                }}
-              >
+            <div className="mb-18" key={section.title}>
+              <div className="sidebar-group-label">
                 {section.title}
               </div>
               {section.items.map((item) => (
@@ -111,41 +91,16 @@ export default function AdminLayout() {
             </div>
           ))}
 
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                padding: '0 20px 8px',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.35)',
-              }}
-            >
+          <div className="mb-18">
+            <div className="sidebar-group-label">
               Điều hướng
             </div>
             <NavLink to="/" style={linkStyle}>
               <span style={iconBox}><FaHouse /></span>
               Về trang học viên
             </NavLink>
-            <button
+            <button className="admin-logout-btn"
               onClick={logout}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '11px 20px',
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                borderLeft: '3px solid transparent',
-                color: '#F87171',
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: 'var(--font-sans)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
             >
               <span style={iconBox}><FaRightFromBracket /></span>
               Đăng xuất
@@ -153,20 +108,13 @@ export default function AdminLayout() {
           </div>
         </nav>
 
-        <div
-          style={{
-            padding: '14px 20px',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 13,
-          }}
-        >
-          <div style={{ color: 'white', fontWeight: 600 }}>{user?.name}</div>
-          <div style={{ fontSize: 12 }}>Quản trị viên</div>
+        <div className="admin-sidebar-user">
+          <div className="admin-sidebar-user-name">{user?.name}</div>
+          <div className="fs-12">Quản trị viên</div>
         </div>
       </aside>
 
-      <main style={{ flex: 1, minWidth: 0, padding: '28px 32px 60px' }}>
+      <main className="admin-main">
         <Outlet />
       </main>
     </div>

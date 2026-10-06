@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { FaBookOpen, FaChalkboardUser, FaHourglassHalf, FaMoneyBillWave, FaShieldHalved, FaUserGraduate, FaUserPlus, FaUsers } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import apiClient from '@/api/client';
+import './admin.css';
 
 interface Stats {
   totalStudents: number;
@@ -25,14 +26,14 @@ function StatCard({
   icon: ReactNode;
 }) {
   return (
-    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+    <div className="card card-flush">
       <div style={{ height: 4, background: color }} />
-      <div style={{ padding: '16px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+      <div className="p-16-20">
+        <div className="row-center-8-mb-6">
           <span style={{ fontSize: 16, color, display: 'inline-flex' }}>{icon}</span>
-          <span className="label" style={{ margin: 0 }}>{label}</span>
+          <span className="label m-0">{label}</span>
         </div>
-        <div style={{ fontSize: 28, fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
+        <div className="admin-stat-value">{value}</div>
       </div>
     </div>
   );
@@ -57,30 +58,16 @@ export default function AdminOverviewPage() {
   return (
     <div>
       <h2>Dashboard</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>Tổng quan số liệu toàn hệ thống.</p>
+      <p className="muted mb-24">Tổng quan số liệu toàn hệ thống.</p>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 14,
-          marginBottom: 14,
-        }}
-      >
+      <div className="admin-stat-grid">
         <StatCard label="Tổng người dùng" value={totalUsers} color="var(--text)" icon={<FaUsers />} />
         <StatCard label="Học viên" value={stats.totalStudents} color="var(--primary)" icon={<FaUserGraduate />} />
         <StatCard label="Giáo viên" value={stats.totalTeachers} color="var(--accent)" icon={<FaChalkboardUser />} />
         <StatCard label="Quản trị viên" value={stats.totalAdmins} color="var(--success)" icon={<FaShieldHalved />} />
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 14,
-          marginBottom: 32,
-        }}
-      >
+      <div className="card-grid-180">
         <StatCard label="Khoá học" value={stats.totalCourses} color="var(--primary)" icon={<FaBookOpen />} />
         <StatCard label="Lượt ghi danh" value={stats.totalEnrollments} color="var(--primary)" icon={<FaUserPlus />} />
         <StatCard
@@ -93,18 +80,18 @@ export default function AdminOverviewPage() {
       </div>
 
       <h3>Truy cập nhanh</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-        <Link to="/admin/users" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <div className="admin-link-grid">
+        <Link to="/admin/users" className="card link-plain">
           <strong>Quản lý người dùng →</strong>
-          <p className="muted" style={{ margin: '6px 0 0' }}>Đổi vai trò, xoá tài khoản</p>
+          <p className="muted m-6-0-0">Đổi vai trò, xoá tài khoản</p>
         </Link>
-        <Link to="/admin/courses" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to="/admin/courses" className="card link-plain">
           <strong>Quản lý khoá học →</strong>
-          <p className="muted" style={{ margin: '6px 0 0' }}>Xem và gỡ khoá học khỏi hệ thống</p>
+          <p className="muted m-6-0-0">Xem và gỡ khoá học khỏi hệ thống</p>
         </Link>
-        <Link to="/admin/tests" className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to="/admin/tests" className="card link-plain">
           <strong>Quản lý đề thi →</strong>
-          <p className="muted" style={{ margin: '6px 0 0' }}>Xem và gỡ đề Listening/Reading</p>
+          <p className="muted m-6-0-0">Xem và gỡ đề Listening/Reading</p>
         </Link>
       </div>
     </div>

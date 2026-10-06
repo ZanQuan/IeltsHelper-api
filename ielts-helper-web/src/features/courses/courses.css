@@ -1,0 +1,44 @@
+/* ============================================================
+   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
+   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
+   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
+   ============================================================ */
+
+/* ---- CoursesPage.tsx ---- */
+.course-price-lg {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 16px;
+}
+.course-note {
+  font-size: 12px;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+.course-lesson-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.course-lesson-content {
+  margin-top: 10px;
+  white-space: pre-wrap;
+}
+.course-teacher {
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+.course-price {
+  font-weight: 800;
+  color: var(--primary);
+  white-space: nowrap;
+}

@@ -31,17 +31,10 @@ export default function TeacherHome() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 2 }}>{greeting()}, {user?.name}</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>Tổng quan lớp học của bạn.</p>
+      <h2 className="mb-2">{greeting()}, {user?.name}</h2>
+      <p className="muted mb-24">Tổng quan lớp học của bạn.</p>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 14,
-          marginBottom: 32,
-        }}
-      >
+      <div className="card-grid-180">
         <QuickStat icon={<FaUsers />} label="Học viên đang theo dõi" value={students.length} color="var(--primary)" />
         <QuickStat
           icon={<FaHourglassHalf />}
@@ -52,14 +45,7 @@ export default function TeacherHome() {
       </div>
 
       <h3>Truy cập nhanh</h3>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 14,
-          marginBottom: 32,
-        }}
-      >
+      <div className="card-grid-240">
         <ActionCard to="/teacher" icon={<FaUsers />} title="Học viên của tôi" desc="Xem nhật ký học và lỗi sai từng học viên" color="#6366F1" />
         <ActionCard to="/assignments" icon={<FaClipboardCheck />} title={`Chấm bài (${toGrade.length})`} desc="Bài học viên đã nộp, đang chờ chấm" color="#FB7A3C" />
         <ActionCard to="/courses" icon={<FaBookOpen />} title="Khóa học" desc="Tạo khoá học và thêm bài giảng" color="#16A34A" />
@@ -69,24 +55,24 @@ export default function TeacherHome() {
       <h3>Bài đang chờ chấm</h3>
       {toGrade.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}><FaCircleCheck className="ico" style={{ color: 'var(--success)' }} />Không có bài nào đang chờ chấm — mọi thứ đã xong!</p>
+          <p className="muted m-0"><FaCircleCheck className="ico" style={{ color: 'var(--success)' }} />Không có bài nào đang chờ chấm — mọi thứ đã xong!</p>
         </div>
       ) : (
         <div>
           {toGrade.slice(0, 5).map((item) => (
-            <Link key={item.id} to="/assignments" className="list-item clickable" style={{ display: 'block' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Link key={item.id} to="/assignments" className="list-item clickable d-block">
+              <div className="row-between">
                 <div>
                   <strong>{item.title}</strong>
-                  <span className="badge badge-primary" style={{ marginLeft: 10 }}>{item.skill}</span>
+                  <span className="badge badge-primary ml-10">{item.skill}</span>
                 </div>
                 <span className="muted">{new Date(item.submittedAt).toLocaleDateString('vi-VN')}</span>
               </div>
-              <p className="muted" style={{ margin: '8px 0 0' }}>Học viên: {item.studentName}</p>
+              <p className="muted m-8-0-0">Học viên: {item.studentName}</p>
             </Link>
           ))}
           {toGrade.length > 5 && (
-            <Link to="/assignments" className="muted" style={{ fontSize: 14 }}>
+            <Link to="/assignments" className="muted fs-14">
               Xem tất cả {toGrade.length} bài →
             </Link>
           )}

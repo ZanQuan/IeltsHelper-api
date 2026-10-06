@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import type { ErrorLog } from '@/types';
+import './errors.css';
 
 interface ErrorStat {
   errorType: string;
@@ -65,20 +66,20 @@ export default function ErrorLogsPage() {
   return (
     <div>
       <h2>Nhật ký lỗi sai</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Ghi lại lỗi giáo viên chỉ ra để biết mình đang yếu chỗ nào và lặp lại lỗi gì nhiều nhất.
       </p>
 
       {stats.length > 0 && (
-        <div className="card" style={{ marginBottom: 24 }}>
+        <div className="card mb-24">
           <h3>Lỗi hay lặp lại</h3>
           {stats.map((s) => (
-            <div key={s.errorType} style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 4 }}>
-                <span style={{ fontWeight: 600 }}>{s.errorType}</span>
+            <div className="mb-12" key={s.errorType}>
+              <div className="err-stat-head">
+                <span className="fw-600">{s.errorType}</span>
                 <span className="muted">{s.count} lần</span>
               </div>
-              <div style={{ background: 'var(--border)', borderRadius: 999, height: 8 }}>
+              <div className="err-stat-track">
                 <div
                   style={{
                     width: `${(s.count / maxCount) * 100}%`,
@@ -93,11 +94,11 @@ export default function ErrorLogsPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="card" style={{ marginBottom: 32 }}>
+      <form onSubmit={handleSubmit} className="card mb-32">
         <h3>Ghi lỗi sai mới</h3>
         <div className="field">
           <label className="label">Loại lỗi</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <div className="err-type-buttons">
             {ERROR_TYPES.map((t) => (
               <button
                 key={t}
@@ -144,11 +145,10 @@ export default function ErrorLogsPage() {
           {errors.map((err) => (
             <div key={err.id} className="list-item">
               <span className="badge badge-accent">{err.errorType}</span>
-              <p style={{ margin: '10px 0 8px' }}>{err.description}</p>
+              <p className="m-10-0-8">{err.description}</p>
               <button
                 onClick={() => handleDelete(err.id)}
-                className="btn btn-ghost"
-                style={{ padding: '6px 14px', fontSize: 13 }}
+                className="btn btn-ghost btn-sm"
               >
                 Xóa
               </button>

@@ -4,6 +4,7 @@ import apiClient from '@/api/client';
 import type { Assignment } from '@/types';
 import StatusBadge from './StatusBadge';
 import { fmtDate } from './fmtDate';
+import './assignments.css';
 
 const fetchAssignments = () => apiClient.get<Assignment[]>('/api/Assignments').then((res) => res.data);
 
@@ -53,30 +54,30 @@ export default function StudentAssignments() {
   if (selected) {
     const graded = !!selected.gradedAt;
     return (
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <button onClick={() => setSelected(null)} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}>
+      <div className="container-700">
+        <button onClick={() => setSelected(null)} className="btn btn-ghost btn-back">
           ← Quay lại danh sách bài tập
         </button>
 
-        <div className="card" style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+        <div className="card mb-20">
+          <div className="row-between-gap">
             <div>
-              <span className="badge badge-primary" style={{ marginBottom: 10 }}>{selected.skill}</span>
-              <h2 style={{ margin: '8px 0 4px' }}>{selected.title}</h2>
-              {selected.dueDate && <p className="muted" style={{ margin: 0 }}>Hạn nộp: {fmtDate(selected.dueDate)}</p>}
+              <span className="badge badge-primary mb-10">{selected.skill}</span>
+              <h2 className="m-8-0-4">{selected.title}</h2>
+              {selected.dueDate && <p className="muted m-0">Hạn nộp: {fmtDate(selected.dueDate)}</p>}
             </div>
             <StatusBadge assignment={selected} />
           </div>
           {selected.instructions && (
-            <p style={{ marginTop: 16, whiteSpace: 'pre-wrap' }}>{selected.instructions}</p>
+            <p className="mt-16 ws-pre-wrap">{selected.instructions}</p>
           )}
         </div>
 
         {graded && (
-          <div className="card" style={{ marginBottom: 20, background: 'var(--success-light)', border: '1px solid var(--success)' }}>
-            <h3 style={{ marginTop: 0 }}>Kết quả</h3>
-            <p className="band-score" style={{ margin: '0 0 10px' }}>{selected.score}/10</p>
-            {selected.feedback && <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{selected.feedback}</p>}
+          <div className="card assign-result-card">
+            <h3 className="mt-0">Kết quả</h3>
+            <p className="band-score m-0-0-10">{selected.score}/10</p>
+            {selected.feedback && <p className="pre-text">{selected.feedback}</p>}
           </div>
         )}
 
@@ -107,22 +108,22 @@ export default function StudentAssignments() {
   return (
     <div>
       <h2>Bài tập</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>Bài tập giáo viên giao cho bạn.</p>
+      <p className="muted mb-24">Bài tập giáo viên giao cho bạn.</p>
 
       {loading ? (
         <p className="muted">Đang tải...</p>
       ) : assignments.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>Bạn chưa có bài tập nào.</p>
+          <p className="muted m-0">Bạn chưa có bài tập nào.</p>
         </div>
       ) : (
         assignments.map((a) => (
           <div key={a.id} className="list-item clickable" onClick={() => open(a)}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+            <div className="row-between-gap">
               <div>
-                <span className="badge badge-primary" style={{ marginRight: 8 }}>{a.skill}</span>
+                <span className="badge badge-primary mr-8">{a.skill}</span>
                 <strong>{a.title}</strong>
-                {a.dueDate && <p className="muted" style={{ margin: '6px 0 0' }}>Hạn nộp: {fmtDate(a.dueDate)}</p>}
+                {a.dueDate && <p className="muted m-6-0-0">Hạn nộp: {fmtDate(a.dueDate)}</p>}
               </div>
               <StatusBadge assignment={a} />
             </div>

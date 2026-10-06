@@ -3,6 +3,7 @@ import axios from 'axios';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
 import type { ErrorLog, LessonLog, Student } from '@/types';
+import './teacher.css';
 
 export default function TeacherDashboardPage() {
   const { user } = useAuth();
@@ -67,9 +68,9 @@ export default function TeacherDashboardPage() {
 
   if (!isTeacher) {
     return (
-      <div style={{ maxWidth: 520, margin: '0 auto' }}>
+      <div className="teacher-link-page">
         <h2>Liên kết giáo viên</h2>
-        <p className="muted" style={{ marginBottom: 20 }}>
+        <p className="muted mb-20">
           Thêm giáo viên đang dạy bạn để họ xem được nhật ký buổi học và lỗi sai của bạn.
         </p>
         <form onSubmit={handleAddTeacher} className="card">
@@ -109,31 +110,17 @@ export default function TeacherDashboardPage() {
       <div>
         <button
           onClick={() => setSelectedStudent(null)}
-          className="btn btn-ghost"
-          style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}
+          className="btn btn-ghost btn-back"
         >
           ← Quay lại danh sách học viên
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
-          <span
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              background: 'var(--primary)',
-              color: 'white',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: 17,
-            }}
-          >
+        <div className="teacher-student-head">
+          <span className="teacher-student-avatar">
             {initials(selectedStudent.name)}
           </span>
           <div>
-            <h2 style={{ margin: 0 }}>{selectedStudent.name}</h2>
+            <h2 className="m-0">{selectedStudent.name}</h2>
             <span className="muted">{selectedStudent.email}</span>
           </div>
         </div>
@@ -146,17 +133,17 @@ export default function TeacherDashboardPage() {
             {studentLogs.length === 0 ? (
               <p className="muted">Chưa có buổi học nào.</p>
             ) : (
-              <div style={{ marginBottom: 28 }}>
+              <div className="mb-28">
                 {studentLogs.map((log) => (
                   <div key={log.id} className="list-item">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div className="row-between">
                       <div>
                         <strong>{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</strong>
-                        <span className="badge badge-primary" style={{ marginLeft: 10 }}>{log.skillFocus}</span>
+                        <span className="badge badge-primary ml-10">{log.skillFocus}</span>
                       </div>
                       <span className="badge badge-success">Hiểu bài: {log.selfRating}/5</span>
                     </div>
-                    <p style={{ margin: '10px 0 0' }}>{log.summary}</p>
+                    <p className="m-10-0-0">{log.summary}</p>
                   </div>
                 ))}
               </div>
@@ -170,7 +157,7 @@ export default function TeacherDashboardPage() {
                 {studentErrors.map((err) => (
                   <div key={err.id} className="list-item">
                     <span className="badge badge-accent">{err.errorType}</span>
-                    <p style={{ margin: '10px 0 0' }}>{err.description}</p>
+                    <p className="m-10-0-0">{err.description}</p>
                   </div>
                 ))}
               </div>
@@ -184,7 +171,7 @@ export default function TeacherDashboardPage() {
   return (
     <div>
       <h2>Học viên của tôi</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Bấm vào từng học viên để xem nhật ký buổi học và lỗi sai họ đã ghi lại.
       </p>
 
@@ -192,7 +179,7 @@ export default function TeacherDashboardPage() {
         <p className="muted">Đang tải...</p>
       ) : students.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             Chưa có học viên nào liên kết với bạn. Bảo học viên vào mục "Giáo viên" trong tài khoản của họ và nhập
             email của bạn.
           </p>
@@ -201,27 +188,13 @@ export default function TeacherDashboardPage() {
         <div>
           {students.map((s) => (
             <div key={s.id} className="list-item clickable" onClick={() => viewStudent(s)}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <span
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: 'var(--primary-light)',
-                    color: 'var(--primary)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 800,
-                    fontSize: 14,
-                    flexShrink: 0,
-                  }}
-                >
+              <div className="row-center-14">
+                <span className="avatar-40">
                   {initials(s.name)}
                 </span>
                 <div>
                   <strong>{s.name}</strong>
-                  <p className="muted" style={{ margin: 0 }}>{s.email}</p>
+                  <p className="muted m-0">{s.email}</p>
                 </div>
               </div>
             </div>

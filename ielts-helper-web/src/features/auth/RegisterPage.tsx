@@ -36,10 +36,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper)' }}>
-      <div className="card" style={{ width: 360 }}>
+    <div className="center-screen">
+      <div className="card w-360">
         <WhaleMascot email={email} isPasswordFocused={passwordFocused} />
-        <h1 style={{ fontSize: 26, textAlign: 'center' }}>Đăng ký</h1>
+        <h1 className="fs-26 text-center">Đăng ký</h1>
         <form onSubmit={handleSubmit}>
           <div className="field">
             <label className="label">Tên</label>
@@ -57,17 +57,17 @@ export default function RegisterPage() {
               required />
           </div>
           {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>Đăng ký</button>
+          <button type="submit" className="btn btn-primary btn-full">Đăng ký</button>
         </form>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '16px 0' }}>
-          <div style={{ flex: 1, height: 1, background: '#e5e5e5' }} />
-          <span className="muted" style={{ fontSize: 12 }}>hoặc</span>
-          <div style={{ flex: 1, height: 1, background: '#e5e5e5' }} />
+        <div className="divider-row">
+          <div className="divider-line" />
+          <span className="muted fs-12">hoặc</span>
+          <div className="divider-line" />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="row-justify-center">
           <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Đăng ký bằng Google thất bại.')} />
         </div>
-        <p className="muted" style={{ textAlign: 'center', marginTop: 16 }}>
+        <p className="muted mt-16 text-center">
           Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
         </p>
       </div>

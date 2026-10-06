@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import type { WritingSubmission } from '@/types';
+import './writing.css';
 
 const fetchSubmissions = () => apiClient.get<WritingSubmission[]>('/api/WritingSubmissions').then((res) => res.data);
 
@@ -56,14 +57,14 @@ export default function WritingPage() {
   return (
     <div>
       <h2>Writing</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Nộp bài luận để AI chấm theo 4 tiêu chí IELTS và đưa nhận xét chi tiết.
       </p>
 
-      <form onSubmit={handleSubmit} className="card" style={{ marginBottom: 32 }}>
+      <form onSubmit={handleSubmit} className="card mb-32">
         <div className="field">
           <label className="label">Dạng bài</label>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="row-gap-8">
             {['Task 1', 'Task 2'].map((t) => (
               <button
                 key={t}
@@ -98,7 +99,7 @@ export default function WritingPage() {
         </div>
 
         <div className="field">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div className="writing-label-row">
             <label className="label">Bài làm</label>
             <span
               className="badge"
@@ -111,12 +112,11 @@ export default function WritingPage() {
             </span>
           </div>
           <textarea
-            className="input"
+            className="input lh-1_8"
             value={essayText}
             onChange={(e) => setEssayText(e.target.value)}
             required
             rows={14}
-            style={{ lineHeight: 1.8 }}
           />
         </div>
 
@@ -135,10 +135,10 @@ export default function WritingPage() {
         <div>
           {submissions.map((s) => (
             <div key={s.id} className="list-item">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div className="row-between">
                 <div>
                   <span className="badge badge-primary">{s.taskType}</span>
-                  <span className="muted" style={{ marginLeft: 10 }}>
+                  <span className="muted ml-10">
                     {new Date(s.submittedAt).toLocaleDateString('vi-VN')}
                   </span>
                 </div>
@@ -146,24 +146,16 @@ export default function WritingPage() {
                   <span className="band-score">Band {s.estimatedBand}</span>
                 )}
               </div>
-              <p className="muted" style={{ margin: '10px 0' }}>{s.prompt}</p>
+              <p className="muted m-10-0">{s.prompt}</p>
               {s.feedback && (
-                <div
-                  style={{
-                    background: 'var(--primary-light)',
-                    padding: 16,
-                    borderRadius: 'var(--radius-sm)',
-                    marginTop: 8,
-                  }}
-                >
-                  <p className="label" style={{ color: 'var(--primary)' }}>Nhận xét từ AI</p>
-                  <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{s.feedback}</p>
+                <div className="info-box">
+                  <p className="label c-primary">Nhận xét từ AI</p>
+                  <p className="pre-text">{s.feedback}</p>
                 </div>
               )}
               <button
                 onClick={() => handleDelete(s.id)}
-                className="btn btn-ghost"
-                style={{ padding: '6px 14px', fontSize: 13, marginTop: 12 }}
+                className="btn btn-ghost btn-sm mt-12"
               >
                 Xóa
               </button>

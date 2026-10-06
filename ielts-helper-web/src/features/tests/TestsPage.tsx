@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import apiClient from '@/api/client';
 import type { TestSummary } from '@/types';
+import './tests.css';
 
 interface AttemptQuestion {
   id: string;
@@ -86,14 +87,14 @@ export default function TestsPage() {
   if (result) {
     const percent = result.total === 0 ? 0 : Math.round((result.score / result.total) * 100);
     return (
-      <div className="card" style={{ textAlign: 'center', padding: 48, maxWidth: 480, margin: '0 auto' }}>
+      <div className="card test-result-card">
         <h2>Kết quả</h2>
-        <p style={{ fontSize: 48, fontWeight: 800, color: 'var(--primary)', margin: '16px 0 4px' }}>
-          {result.score}<span style={{ fontSize: 24, color: 'var(--text-muted)' }}>/{result.total}</span>
+        <p className="test-score">
+          {result.score}<span className="test-score-total">/{result.total}</span>
         </p>
-        <span className="badge badge-success" style={{ marginBottom: 16 }}>{percent}% chính xác</span>
+        <span className="badge badge-success mb-16">{percent}% chính xác</span>
         <p className="muted">Thời gian làm bài: {result.elapsedMinutes} phút</p>
-        <button onClick={backToList} className="btn btn-primary" style={{ marginTop: 16 }}>
+        <button onClick={backToList} className="btn btn-primary mt-16">
           Quay lại danh sách đề
         </button>
       </div>
@@ -106,20 +107,9 @@ export default function TestsPage() {
 
     return (
       <div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            position: 'sticky',
-            top: 70,
-            background: 'var(--bg)',
-            padding: '12px 0',
-            zIndex: 5,
-          }}
-        >
+        <div className="test-sticky-bar">
           <div>
-            <h2 style={{ marginBottom: 2 }}>{attempt.testTitle}</h2>
+            <h2 className="mb-2">{attempt.testTitle}</h2>
             <span className="muted">Đã trả lời {answeredCount}/{attempt.questions.length} câu</span>
           </div>
           <span
@@ -135,16 +125,16 @@ export default function TestsPage() {
           </span>
         </div>
 
-        <div className="card" style={{ marginBottom: 20, whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>
+        <div className="card test-passage">
           {attempt.passageOrTranscript}
         </div>
 
         {attempt.questions.map((q, idx) => {
           const options: string[] = q.optionsJson ? JSON.parse(q.optionsJson) : [];
           return (
-            <div key={q.id} className="card" style={{ marginBottom: 16 }}>
-              <p style={{ fontWeight: 700, marginTop: 0 }}>Câu {idx + 1}: {q.questionText}</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div key={q.id} className="card mb-16">
+              <p className="test-question">Câu {idx + 1}: {q.questionText}</p>
+              <div className="test-options">
                 {options.map((opt) => {
                   const selected = answers[q.id] === opt;
                   return (
@@ -188,12 +178,12 @@ export default function TestsPage() {
   return (
     <div>
       <h2>Listening &amp; Reading</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Luyện đề có tính giờ giống thi thật, chấm điểm tự động ngay khi nộp.
       </p>
       {tests.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             Chưa có đề nào. Tài khoản giáo viên có thể tạo đề qua API.
           </p>
         </div>
@@ -201,12 +191,12 @@ export default function TestsPage() {
         <div>
           {tests.map((t) => (
             <div key={t.id} className="list-item">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <div className="test-footer-bar">
                 <div>
-                  <strong style={{ fontSize: 16 }}>{t.title}</strong>
-                  <div style={{ marginTop: 6 }}>
+                  <strong className="fs-16">{t.title}</strong>
+                  <div className="mt-6">
                     <span className="badge badge-primary">{t.skill}</span>
-                    <span className="badge badge-accent" style={{ marginLeft: 6 }}>{t.timeLimitMinutes} phút</span>
+                    <span className="badge badge-accent ml-6">{t.timeLimitMinutes} phút</span>
                   </div>
                 </div>
                 <button onClick={() => startTest(t.id)} className="btn btn-primary">

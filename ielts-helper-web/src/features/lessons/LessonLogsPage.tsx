@@ -2,6 +2,7 @@ import { useState, useEffect, Fragment, type FormEvent } from 'react';
 import { FaBook, FaFileWord, FaNoteSticky, FaSpellCheck } from 'react-icons/fa6';
 import apiClient from '@/api/client';
 import type { LessonLog } from '@/types';
+import './lessons.css';
 
 const fetchLogs = () => apiClient.get<LessonLog[]>('/api/LessonLogs').then((res) => res.data);
 
@@ -93,13 +94,13 @@ export default function LessonLogsPage() {
   return (
     <div>
       <h2>Nhật ký buổi học</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Ghi lại mỗi buổi học với giáo viên — cả tóm tắt lẫn nội dung chi tiết đã học, để xem lại bất cứ lúc nào.
       </p>
 
-      <form onSubmit={handleSubmit} className="card" style={{ marginBottom: 32 }}>
+      <form onSubmit={handleSubmit} className="card mb-32">
         <h3>Ghi buổi học mới</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="grid-2col">
           <div className="field">
             <label className="label">Ngày học</label>
             <input className="input" type="date" value={lessonDate} onChange={(e) => setLessonDate(e.target.value)} required />
@@ -121,8 +122,8 @@ export default function LessonLogsPage() {
           <textarea className="input" value={summary} onChange={(e) => setSummary(e.target.value)} required rows={2} />
         </div>
 
-        <div style={{ borderTop: '1px solid var(--border)', margin: '20px 0 16px', paddingTop: 16 }}>
-          <p className="label" style={{ fontSize: 14, marginBottom: 12 }}>
+        <div className="lesson-details-block">
+          <p className="label lesson-details-label">
             Nội dung chi tiết đã học (không bắt buộc, nhưng nên ghi ngay sau buổi học để nhớ lâu)
           </p>
 
@@ -160,7 +161,7 @@ export default function LessonLogsPage() {
           </div>
         </div>
 
-        <div className="field" style={{ maxWidth: 160 }}>
+        <div className="field maxw-160">
           <label className="label">Tự đánh giá hiểu bài (1-5)</label>
           <input className="input" type="number" min={1} max={5} value={selfRating} onChange={(e) => setSelfRating(Number(e.target.value))} />
         </div>
@@ -169,14 +170,13 @@ export default function LessonLogsPage() {
         </button>
       </form>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 style={{ margin: 0 }}>Danh sách buổi học</h3>
+      <div className="lesson-list-head">
+        <h3 className="m-0">Danh sách buổi học</h3>
         {logs.length > 0 && (
           <button
             onClick={() => downloadWord('/api/LessonLogs/export-word', `NhatKyBuoiHoc_${Date.now()}.docx`, 'all')}
             disabled={exportingId === 'all'}
-            className="btn btn-accent"
-            style={{ padding: '8px 18px', fontSize: 13 }}
+            className="btn btn-accent lesson-export-btn"
           >
             {exportingId === 'all' ? 'Đang xuất...' : <><FaFileWord className="ico" />Xuất tất cả ra Word</>}
           </button>
@@ -203,18 +203,17 @@ export default function LessonLogsPage() {
               {logs.map((log) => (
                 <Fragment key={log.id}>
                   <tr className="clickable" onClick={() => toggleExpand(log.id)}>
-                    <td style={{ whiteSpace: 'nowrap' }}>{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</td>
+                    <td className="ws-nowrap">{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</td>
                     <td><span className="badge badge-primary">{log.skillFocus}</span></td>
                     <td>
                       {log.summary}
-                      {hasNotes(log) && <span className="badge badge-accent" style={{ marginLeft: 6 }}>Có ghi chú</span>}
+                      {hasNotes(log) && <span className="badge badge-accent ml-6">Có ghi chú</span>}
                     </td>
                     <td><span className="badge badge-success">{log.selfRating}/5</span></td>
-                    <td style={{ whiteSpace: 'nowrap' }}>
+                    <td className="ws-nowrap">
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleExpand(log.id); }}
-                        className="btn btn-ghost"
-                        style={{ padding: '5px 12px', fontSize: 12 }}
+                        className="btn btn-ghost lesson-toggle-btn"
                       >
                         {expandedId === log.id ? 'Thu gọn' : 'Chi tiết'}
                       </button>
@@ -222,41 +221,40 @@ export default function LessonLogsPage() {
                   </tr>
                   {expandedId === log.id && (
                     <tr>
-                      <td colSpan={5} style={{ background: 'var(--bg)' }}>
+                      <td className="bg-bg" colSpan={5}>
                         {log.homework && (
-                          <p className="muted" style={{ fontStyle: 'italic', margin: '0 0 10px' }}>Bài tập: {log.homework}</p>
+                          <p className="muted lesson-homework">Bài tập: {log.homework}</p>
                         )}
                         {log.newVocabulary && (
-                          <div style={{ marginBottom: 12 }}>
+                          <div className="mb-12">
                             <p className="label"><FaBook className="ico" />Từ vựng mới</p>
-                            <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{log.newVocabulary}</p>
+                            <p className="pre-text">{log.newVocabulary}</p>
                           </div>
                         )}
                         {log.grammarNotes && (
-                          <div style={{ marginBottom: 12 }}>
+                          <div className="mb-12">
                             <p className="label"><FaSpellCheck className="ico" />Ngữ pháp / Cấu trúc</p>
-                            <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{log.grammarNotes}</p>
+                            <p className="pre-text">{log.grammarNotes}</p>
                           </div>
                         )}
                         {log.otherNotes && (
-                          <div style={{ marginBottom: 12 }}>
+                          <div className="mb-12">
                             <p className="label"><FaNoteSticky className="ico" />Ghi chú khác</p>
-                            <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{log.otherNotes}</p>
+                            <p className="pre-text">{log.otherNotes}</p>
                           </div>
                         )}
                         {!hasNotes(log) && !log.homework && (
-                          <p className="muted" style={{ margin: 0 }}>Buổi học này chưa có ghi chú chi tiết.</p>
+                          <p className="muted m-0">Buổi học này chưa có ghi chú chi tiết.</p>
                         )}
-                        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                        <div className="lesson-actions">
                           <button
                             onClick={() => downloadWord(`/api/LessonLogs/${log.id}/export-word`, `BuoiHoc_${log.lessonDate}.docx`, log.id)}
                             disabled={exportingId === log.id}
-                            className="btn btn-ghost"
-                            style={{ padding: '6px 14px', fontSize: 13 }}
+                            className="btn btn-ghost btn-sm"
                           >
                             {exportingId === log.id ? 'Đang xuất...' : <><FaFileWord className="ico" />Xuất Word</>}
                           </button>
-                          <button onClick={() => handleDelete(log.id)} className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: 13 }}>
+                          <button onClick={() => handleDelete(log.id)} className="btn btn-ghost btn-sm">
                             Xóa
                           </button>
                         </div>

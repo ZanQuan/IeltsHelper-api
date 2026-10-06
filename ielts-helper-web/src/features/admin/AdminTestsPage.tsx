@@ -45,32 +45,21 @@ export default function AdminTestsPage() {
   return (
     <div>
       <h2>Đề thi</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Ngân hàng đề Listening &amp; Reading dùng chung cho toàn hệ thống.
       </p>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          gap: 16,
-          flexWrap: 'wrap',
-          marginBottom: 16,
-        }}
-      >
+      <div className="toolbar">
         <span className="muted">{filtered.length} đề thi</span>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <div className="row-wrap-10">
           <input
-            className="input"
-            style={{ width: 240 }}
+            className="input w-240"
             placeholder="Tìm theo tên đề..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="input"
-            style={{ width: 160 }}
+            className="input w-160"
             value={skillFilter}
             onChange={(e) => setSkillFilter(e.target.value)}
           >
@@ -85,7 +74,7 @@ export default function AdminTestsPage() {
         <p className="muted">Đang tải...</p>
       ) : filtered.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             {search || skillFilter ? 'Không tìm thấy đề thi nào khớp bộ lọc.' : 'Chưa có đề thi nào.'}
           </p>
         </div>
@@ -97,26 +86,20 @@ export default function AdminTestsPage() {
                 <th>Tên đề</th>
                 <th>Kỹ năng</th>
                 <th>Thời gian</th>
-                <th style={{ width: 90 }}></th>
+                <th className="w-90"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((t) => (
                 <tr key={t.id}>
-                  <td style={{ fontWeight: 600 }}>{t.title}</td>
+                  <td className="fw-600">{t.title}</td>
                   <td>
                     <span className="badge badge-primary">{t.skill}</span>
                   </td>
                   <td className="muted">{t.timeLimitMinutes} phút</td>
                   <td>
                     <button
-                      className="btn"
-                      style={{
-                        padding: '6px 14px',
-                        fontSize: 13,
-                        background: 'var(--danger-light)',
-                        color: 'var(--danger)',
-                      }}
+                      className="btn btn-danger-soft"
                       onClick={() => handleDelete(t.id, t.title)}
                     >
                       Xoá

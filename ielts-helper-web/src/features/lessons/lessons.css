@@ -1,0 +1,39 @@
+/* ============================================================
+   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
+   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
+   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
+   ============================================================ */
+
+/* ---- LessonLogsPage.tsx ---- */
+.lesson-details-block {
+  border-top: 1px solid var(--border);
+  margin: 20px 0 16px;
+  padding-top: 16px;
+}
+.lesson-details-label {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.lesson-list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.lesson-export-btn {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+.lesson-toggle-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+.lesson-homework {
+  font-style: italic;
+  margin: 0 0 10px;
+}
+.lesson-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}

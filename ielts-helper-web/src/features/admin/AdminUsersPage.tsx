@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
+import './admin.css';
 
 interface AdminUser {
   id: string;
@@ -89,32 +90,21 @@ export default function AdminUsersPage() {
   return (
     <div>
       <h2>Người dùng</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Quản lý toàn bộ tài khoản: đổi vai trò hoặc gỡ khỏi hệ thống.
       </p>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          gap: 16,
-          flexWrap: 'wrap',
-          marginBottom: 16,
-        }}
-      >
+      <div className="toolbar">
         <span className="muted">{filteredUsers.length} tài khoản</span>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <div className="row-wrap-10">
           <input
-            className="input"
-            style={{ width: 240 }}
+            className="input w-240"
             placeholder="Tìm theo tên hoặc email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="input"
-            style={{ width: 170 }}
+            className="input w-170"
             value={roleFilter}
             onChange={(e) => {
               setRoleFilter(e.target.value);
@@ -133,7 +123,7 @@ export default function AdminUsersPage() {
         <p className="muted">Đang tải...</p>
       ) : filteredUsers.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             {search ? 'Không tìm thấy tài khoản nào khớp từ khoá.' : 'Chưa có tài khoản nào.'}
           </p>
         </div>
@@ -145,8 +135,8 @@ export default function AdminUsersPage() {
                 <th>Người dùng</th>
                 <th>Email</th>
                 <th>Vai trò</th>
-                <th style={{ width: 170 }}>Đổi vai trò</th>
-                <th style={{ width: 90 }}></th>
+                <th className="w-170">Đổi vai trò</th>
+                <th className="w-90"></th>
               </tr>
             </thead>
             <tbody>
@@ -155,27 +145,13 @@ export default function AdminUsersPage() {
                 return (
                   <tr key={u.id}>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span
-                          style={{
-                            width: 34,
-                            height: 34,
-                            borderRadius: '50%',
-                            background: 'var(--primary-light)',
-                            color: 'var(--primary)',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 800,
-                            fontSize: 13,
-                            flexShrink: 0,
-                          }}
-                        >
+                      <div className="row-center-10">
+                        <span className="admin-user-avatar">
                           {initials(u.name)}
                         </span>
-                        <span style={{ fontWeight: 600 }}>
+                        <span className="fw-600">
                           {u.name}
-                          {isSelf && <span className="muted" style={{ marginLeft: 6 }}>(bạn)</span>}
+                          {isSelf && <span className="muted ml-6">(bạn)</span>}
                         </span>
                       </div>
                     </td>
@@ -187,8 +163,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td>
                       <select
-                        className="input"
-                        style={{ padding: '7px 10px', fontSize: 14 }}
+                        className="input admin-role-select"
                         value={u.role}
                         disabled={savingId === u.id || isSelf}
                         onChange={(e) => handleRoleChange(u.id, e.target.value)}

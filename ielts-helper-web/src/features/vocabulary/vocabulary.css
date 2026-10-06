@@ -1,0 +1,63 @@
+/* ============================================================
+   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
+   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
+   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
+   ============================================================ */
+
+/* ---- VocabularyPage.tsx ---- */
+.vocab-done-card {
+  text-align: center;
+  padding: 40px;
+}
+.vocab-done-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+  color: var(--success);
+}
+.vocab-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.vocab-progress-track {
+  background: var(--border);
+  border-radius: 999px;
+  height: 6px;
+  margin-bottom: 20px;
+}
+.vocab-word {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+.vocab-meaning {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+.vocab-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: center;
+}
+.vocab-forgot-btn {
+  background: var(--danger-light);
+  color: var(--danger);
+  min-width: 140px;
+}
+.vocab-remember-btn {
+  background: var(--success);
+  color: white;
+  min-width: 140px;
+}
+.vocab-add-divider {
+  border-top: 1px solid var(--border);
+  margin: 36px 0 24px;
+}
+.vocab-added-note {
+  color: var(--success);
+  font-size: 14px;
+  margin-top: 12px;
+  margin-bottom: 0;
+}

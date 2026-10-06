@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { FaCircleCheck } from 'react-icons/fa6';
 import apiClient from '@/api/client';
 import type { Vocabulary } from '@/types';
+import './vocabulary.css';
 
 const fetchDue = () => apiClient.get<Vocabulary[]>('/api/Vocabularies/due').then((res) => res.data);
 
@@ -60,25 +61,25 @@ export default function VocabularyPage() {
   return (
     <div>
       <h2>Ôn từ vựng</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Hệ thống tự giãn cách lịch ôn: nhớ được thì lần sau ôn xa hơn, quên thì ôn lại sớm.
       </p>
 
       {loadingDue ? (
         <p className="muted">Đang tải...</p>
       ) : !currentCard ? (
-        <div className="card" style={{ textAlign: 'center', padding: 40 }}>
-          <div style={{ fontSize: 40, marginBottom: 8, color: 'var(--success)' }}><FaCircleCheck /></div>
-          <h3 style={{ marginBottom: 4 }}>Đã ôn xong tất cả từ đến hạn hôm nay!</h3>
-          <p className="muted" style={{ margin: 0 }}>Thêm từ mới bên dưới, hoặc quay lại vào ngày mai.</p>
+        <div className="card vocab-done-card">
+          <div className="vocab-done-icon"><FaCircleCheck /></div>
+          <h3 className="mb-4">Đã ôn xong tất cả từ đến hạn hôm nay!</h3>
+          <p className="muted m-0">Thêm từ mới bên dưới, hoặc quay lại vào ngày mai.</p>
         </div>
       ) : (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div className="vocab-card-head">
             <span className="badge badge-primary">Còn {total - currentIndex} từ cần ôn</span>
             <span className="muted">{done}/{total}</span>
           </div>
-          <div style={{ background: 'var(--border)', borderRadius: 999, height: 6, marginBottom: 20 }}>
+          <div className="vocab-progress-track">
             <div
               style={{
                 width: `${progress}%`,
@@ -102,27 +103,25 @@ export default function VocabularyPage() {
               transition: 'all 0.2s',
             }}
           >
-            <h1 style={{ fontSize: 36, marginBottom: 12 }}>{currentCard.word}</h1>
+            <h1 className="vocab-word">{currentCard.word}</h1>
             {revealed ? (
-              <p style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>{currentCard.meaning}</p>
+              <p className="vocab-meaning">{currentCard.meaning}</p>
             ) : (
-              <p className="muted" style={{ margin: 0 }}>Bấm vào thẻ để xem nghĩa</p>
+              <p className="muted m-0">Bấm vào thẻ để xem nghĩa</p>
             )}
           </div>
 
           {revealed && (
-            <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
+            <div className="vocab-actions">
               <button
                 onClick={() => handleReview(false)}
-                className="btn"
-                style={{ background: 'var(--danger-light)', color: 'var(--danger)', minWidth: 140 }}
+                className="btn vocab-forgot-btn"
               >
                 Quên rồi
               </button>
               <button
                 onClick={() => handleReview(true)}
-                className="btn"
-                style={{ background: 'var(--success)', color: 'white', minWidth: 140 }}
+                className="btn vocab-remember-btn"
               >
                 Nhớ được
               </button>
@@ -131,12 +130,12 @@ export default function VocabularyPage() {
         </div>
       )}
 
-      <div style={{ borderTop: '1px solid var(--border)', margin: '36px 0 24px' }} />
+      <div className="vocab-add-divider" />
 
       <h3>Thêm từ mới</h3>
       <form onSubmit={handleAdd} className="card">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div className="field" style={{ marginBottom: 0 }}>
+        <div className="grid-2col">
+          <div className="field mb-0">
             <label className="label">Từ tiếng Anh</label>
             <input
               className="input"
@@ -146,7 +145,7 @@ export default function VocabularyPage() {
               required
             />
           </div>
-          <div className="field" style={{ marginBottom: 0 }}>
+          <div className="field mb-0">
             <label className="label">Nghĩa</label>
             <input
               className="input"
@@ -157,11 +156,11 @@ export default function VocabularyPage() {
             />
           </div>
         </div>
-        <button type="submit" disabled={adding} className="btn btn-primary" style={{ marginTop: 16 }}>
+        <button type="submit" disabled={adding} className="btn btn-primary mt-16">
           {adding ? 'Đang thêm...' : 'Thêm từ'}
         </button>
         {addedCount > 0 && (
-          <p style={{ color: 'var(--success)', fontSize: 14, marginTop: 12, marginBottom: 0 }}>
+          <p className="vocab-added-note">
             Đã thêm {addedCount} từ trong phiên này.
           </p>
         )}

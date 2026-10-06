@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
 import type { CourseSummary } from '@/types';
+import './courses.css';
 
 interface CourseLesson {
   id: string;
@@ -123,61 +124,46 @@ export default function CoursesPage() {
       <div>
         <button
           onClick={() => { setSelectedId(null); setDetail(null); }}
-          className="btn btn-ghost"
-          style={{ padding: '8px 16px', fontSize: 14, marginBottom: 16 }}
+          className="btn btn-ghost btn-back"
         >
           ← Quay lại danh sách
         </button>
 
         <h2>{detail.title}</h2>
-        <div style={{ marginBottom: 12 }}>
+        <div className="mb-12">
           <span className="badge badge-primary">Band {detail.targetBand}</span>
-          <span className="muted" style={{ marginLeft: 10 }}>Giáo viên: {detail.teacherName}</span>
+          <span className="muted ml-10">Giáo viên: {detail.teacherName}</span>
         </div>
         <p>{detail.description}</p>
 
         {!detail.isEnrolled ? (
-          <div className="card" style={{ textAlign: 'center' }}>
+          <div className="card text-center">
             <p className="label">Học phí</p>
-            <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--primary)', margin: '0 0 16px' }}>
+            <p className="course-price-lg">
               {detail.price.toLocaleString('vi-VN')} đ
             </p>
             <button onClick={handleEnroll} disabled={enrolling} className="btn btn-primary">
               {enrolling ? 'Đang xử lý...' : 'Ghi danh học ngay'}
             </button>
-            <p className="muted" style={{ fontSize: 12, marginTop: 12, marginBottom: 0 }}>
+            <p className="muted course-note">
               Thanh toán VNPay đang tạm dừng — ghi danh miễn phí để test.
             </p>
           </div>
         ) : (
           <div>
-            <h3 style={{ marginTop: 24 }}>Danh sách bài học</h3>
+            <h3 className="mt-24">Danh sách bài học</h3>
             {detail.lessons.length === 0 && <p className="muted">Khóa học chưa có bài nào.</p>}
             {detail.lessons.map((l) => (
               <div key={l.id} className="list-item">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: 'var(--primary-light)',
-                      color: 'var(--primary)',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 700,
-                      fontSize: 13,
-                      flexShrink: 0,
-                    }}
-                  >
+                <div className="row-center-10">
+                  <span className="course-lesson-num">
                     {l.orderIndex}
                   </span>
                   <strong>{l.title}</strong>
                 </div>
-                {l.content && <p style={{ marginTop: 10, whiteSpace: 'pre-wrap' }}>{l.content}</p>}
+                {l.content && <p className="course-lesson-content">{l.content}</p>}
                 {l.videoUrl && (
-                  <p style={{ marginBottom: 0 }}>
+                  <p className="mb-0">
                     <a href={l.videoUrl} target="_blank" rel="noreferrer">Xem video bài học →</a>
                   </p>
                 )}
@@ -185,12 +171,12 @@ export default function CoursesPage() {
             ))}
 
             {isTeacher && (
-              <div style={{ marginTop: 20 }}>
+              <div className="mt-20">
                 <button onClick={() => setShowAddLesson((v) => !v)} className="btn btn-ghost">
                   {showAddLesson ? 'Đóng' : '+ Thêm bài học'}
                 </button>
                 {showAddLesson && (
-                  <form onSubmit={handleAddLesson} className="card" style={{ marginTop: 12 }}>
+                  <form onSubmit={handleAddLesson} className="card mt-12">
                     <div className="field">
                       <label className="label">Tên bài học</label>
                       <input className="input" value={lessonTitle} onChange={(e) => setLessonTitle(e.target.value)} required />
@@ -226,17 +212,17 @@ export default function CoursesPage() {
   return (
     <div>
       <h2>Khóa học</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Các khóa học có nội dung bài giảng chi tiết, ghi danh để mở khóa toàn bộ bài học.
       </p>
 
       {isTeacher && (
-        <div style={{ marginBottom: 24 }}>
+        <div className="mb-24">
           <button onClick={() => setShowCreateForm((v) => !v)} className="btn btn-primary">
             {showCreateForm ? 'Đóng' : '+ Tạo khóa học mới'}
           </button>
           {showCreateForm && (
-            <form onSubmit={handleCreateCourse} className="card" style={{ marginTop: 12 }}>
+            <form onSubmit={handleCreateCourse} className="card mt-12">
               <div className="field">
                 <label className="label">Tên khóa học</label>
                 <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} required />
@@ -251,7 +237,7 @@ export default function CoursesPage() {
                   rows={2}
                 />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="grid-2col">
                 <div className="field">
                   <label className="label">Band mục tiêu</label>
                   <input className="input" value={targetBand} onChange={(e) => setTargetBand(e.target.value)} placeholder="vd: 6.5-7.5" />
@@ -275,17 +261,17 @@ export default function CoursesPage() {
         <div>
           {courses.map((c) => (
             <div key={c.id} className="list-item clickable" onClick={() => openCourse(c.id)}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+              <div className="row-between-gap">
                 <div>
-                  <strong style={{ fontSize: 16 }}>{c.title}</strong>
-                  <p className="muted" style={{ margin: '6px 0' }}>{c.description}</p>
+                  <strong className="fs-16">{c.title}</strong>
+                  <p className="muted m-6-0">{c.description}</p>
                   <div>
                     <span className="badge badge-primary">Band {c.targetBand}</span>
-                    <span className="badge badge-accent" style={{ marginLeft: 6 }}>{c.lessonCount} bài học</span>
+                    <span className="badge badge-accent ml-6">{c.lessonCount} bài học</span>
                   </div>
-                  <p className="muted" style={{ fontSize: 13, margin: '8px 0 0' }}>Giáo viên: {c.teacherName}</p>
+                  <p className="muted course-teacher">Giáo viên: {c.teacherName}</p>
                 </div>
-                <span style={{ fontWeight: 800, color: 'var(--primary)', whiteSpace: 'nowrap' }}>
+                <span className="course-price">
                   {c.price.toLocaleString('vi-VN')} đ
                 </span>
               </div>

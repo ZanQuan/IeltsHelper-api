@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
 import type { CourseSummary } from '@/types';
+import './admin.css';
 
 const fetchCourses = () => apiClient.get<CourseSummary[]>('/api/Courses').then((res) => res.data);
 
@@ -45,26 +46,16 @@ export default function AdminCoursesPage() {
   return (
     <div>
       <h2>Khoá học</h2>
-      <p className="muted" style={{ marginBottom: 24 }}>
+      <p className="muted mb-24">
         Toàn bộ khoá học trong hệ thống, do mọi giáo viên tạo ra.
       </p>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          gap: 16,
-          flexWrap: 'wrap',
-          marginBottom: 16,
-        }}
-      >
+      <div className="toolbar">
         <span className="muted">
           {filtered.length} khoá học · tổng giá trị {totalValue.toLocaleString('vi-VN')}đ
         </span>
         <input
-          className="input"
-          style={{ width: 260 }}
+          className="input w-260"
           placeholder="Tìm theo tên khoá hoặc giáo viên..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -75,7 +66,7 @@ export default function AdminCoursesPage() {
         <p className="muted">Đang tải...</p>
       ) : filtered.length === 0 ? (
         <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
+          <p className="muted m-0">
             {search ? 'Không tìm thấy khoá học nào khớp từ khoá.' : 'Chưa có khoá học nào.'}
           </p>
         </div>
@@ -89,33 +80,27 @@ export default function AdminCoursesPage() {
                 <th>Band</th>
                 <th>Số bài</th>
                 <th>Giá</th>
-                <th style={{ width: 90 }}></th>
+                <th className="w-90"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((c) => (
                 <tr key={c.id}>
                   <td>
-                    <div style={{ fontWeight: 600 }}>{c.title}</div>
-                    <div className="muted" style={{ fontSize: 13 }}>{c.description}</div>
+                    <div className="fw-600">{c.title}</div>
+                    <div className="muted fs-13">{c.description}</div>
                   </td>
                   <td className="muted">{c.teacherName}</td>
                   <td>
                     <span className="badge badge-primary">{c.targetBand}</span>
                   </td>
                   <td>{c.lessonCount}</td>
-                  <td style={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
+                  <td className="admin-price-cell">
                     {c.price.toLocaleString('vi-VN')}đ
                   </td>
                   <td>
                     <button
-                      className="btn"
-                      style={{
-                        padding: '6px 14px',
-                        fontSize: 13,
-                        background: 'var(--danger-light)',
-                        color: 'var(--danger)',
-                      }}
+                      className="btn btn-danger-soft"
                       onClick={() => handleDelete(c.id, c.title)}
                     >
                       Xoá
