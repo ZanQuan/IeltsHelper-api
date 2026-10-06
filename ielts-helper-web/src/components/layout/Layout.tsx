@@ -1,106 +1,86 @@
-import { NavLink, Outlet, Link } from 'react-router-dom';
-import { FaShieldHalved } from 'react-icons/fa6';
+import { useCallback, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { FaBars, FaShieldHalved, FaXmark } from 'react-icons/fa6';
 import { useAuth } from '@/features/auth/useAuth';
 import logo from '@/assets/logo.png';
+import NavDropdown from './NavDropdown';
+import { HOME_ITEM, buildNavGroups } from './navConfig';
+import './layout.css';
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { pathname } = useLocation();
+  const groups = buildNavGroups(user?.role);
 
-  const navItems = [
-    { to: '/dashboard', label: 'Trang chủ' },
-    { to: '/lessons', label: 'Buổi học' },
-    { to: '/vocabulary', label: 'Từ vựng' },
-    { to: '/errors', label: 'Lỗi sai' },
-    { to: '/writing', label: 'Writing' },
-    { to: '/tests', label: 'Listening & Reading' },
-    { to: '/courses', label: 'Khóa học' },
-    { to: '/speaking', label: 'Speaking' },
-    { to: '/assignments', label: 'Bài tập' },
-    { to: '/teacher', label: user?.role === 'Student' ? 'Giáo viên' : 'Học viên' },
-  ];
+  const [openGroup, setOpenGroup] = useState<string | null>(null); // nhóm đang xổ xuống
+  const [menuOpen, setMenuOpen] = useState(false); // menu trên màn hình hẹp (nút ☰)
+
+  // Chuyển sang trang khác thì tự đóng mọi menu (cập nhật ngay lúc render, không cần useEffect)
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (prevPath !== pathname) {
+    setPrevPath(pathname);
+    setOpenGroup(null);
+    setMenuOpen(false);
+  }
+
+  const closeGroup = useCallback(() => setOpenGroup(null), []);
 
   return (
     <div>
-      <nav
-        style={{
-          background: 'var(--surface)',
-          borderBottom: '1px solid var(--border)',
-          padding: '14px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-          overflowX: 'auto',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-        }}
-      >
-        <Link
-          to="/"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            marginRight: 20,
-            whiteSpace: 'nowrap',
-            textDecoration: 'none',
-          }}
-        >
-          <img src={logo} alt="Whale English" style={{ height: 34, width: 34, objectFit: 'contain' }} />
-          <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--primary)', lineHeight: 1.1 }}>
-            Whale English
-          </span>
+      <nav className="topnav" aria-label="Menu chính">
+        <Link className="topnav-brand" to="/">
+          <img className="topnav-logo" src={logo} alt="Whale English" />
+          <span className="topnav-brand-name">Whale English</span>
         </Link>
 
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/dashboard'}
-            style={({ isActive }) => ({
-              color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-              background: isActive ? 'var(--primary-light)' : 'transparent',
-              padding: '8px 14px',
-              borderRadius: 999,
-              fontSize: 14,
-              fontWeight: 600,
-              whiteSpace: 'nowrap',
-            })}
-          >
-            {item.label}
-          </NavLink>
-        ))}
+        <button
+          type="button"
+          className="topnav-burger"
+          aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
+          aria-expanded={menuOpen}
+          aria-controls="topnav-menu"
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          {menuOpen ? <FaXmark /> : <FaBars />}
+        </button>
 
-        <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12, whiteSpace: 'nowrap' }}>
-          {user?.role === 'Admin' && (
-            <>
-              <Link
-                to="/admin"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '8px 16px',
-                  borderRadius: 999,
-                  background: '#141826',
-                  color: 'white',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                }}
-              >
-                <FaShieldHalved className="ico" />Khu vực quản trị
-              </Link>
-              <span style={{ width: 1, height: 22, background: 'var(--border)' }} />
-            </>
-          )}
-          <Link to="/settings" style={{ color: 'var(--text-muted)', fontSize: 14 }}> 
-          {user?.name}
-          </Link>
-          <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: 13 }}>
-            Đăng xuất
-          </button>
-        </span>
+        <div id="topnav-menu" className={`topnav-menu${menuOpen ? ' is-open' : ''}`}>
+          <NavLink
+            to={HOME_ITEM.to}
+            end
+            className={({ isActive }) => `topnav-link${isActive ? ' is-active' : ''}`}
+          >
+            {HOME_ITEM.label}
+          </NavLink>
+
+          {groups.map((group) => (
+            <NavDropdown
+              key={group.id}
+              group={group}
+              open={openGroup === group.id}
+              onToggle={() => setOpenGroup(openGroup === group.id ? null : group.id)}
+              onClose={closeGroup}
+            />
+          ))}
+
+          <span className="topnav-actions">
+            {user?.role === 'Admin' && (
+              <>
+                <Link className="topnav-admin-link" to="/admin">
+                  <FaShieldHalved className="ico" />
+                  Khu vực quản trị
+                </Link>
+                <span className="topnav-divider" />
+              </>
+            )}
+            <Link className="topnav-user" to="/settings" title={user?.name}>
+              {user?.name}
+            </Link>
+            <button onClick={logout} className="btn btn-ghost topnav-logout-btn">
+              Đăng xuất
+            </button>
+          </span>
+        </div>
       </nav>
 
       <div className="page">
