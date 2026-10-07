@@ -10,6 +10,7 @@ export interface NavGroup {
 }
 
 export const HOME_ITEM: NavItem = { to: '/dashboard', label: 'Trang chủ' };
+
 export function buildNavGroups(role?: string): NavGroup[] {
   return [
     {
@@ -17,6 +18,7 @@ export function buildNavGroups(role?: string): NavGroup[] {
       label: 'Lớp học',
       items: [
         { to: '/courses', label: 'Khóa học' },
+        { to: '/online', label: 'Học Online' },
         { to: '/assignments', label: 'Bài tập' },
         { to: '/lessons', label: 'Buổi học' },
         { to: '/teacher', label: role === 'Student' ? 'Giáo viên' : 'Học viên' },

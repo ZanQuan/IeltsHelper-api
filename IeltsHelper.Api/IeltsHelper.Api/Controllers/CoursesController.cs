@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
 
@@ -21,6 +22,19 @@ public class AddLessonRequest
     public string? VideoUrl { get; set; }
 }
 
+public class ExerciseQuestion
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Prompt { get; set; } = string.Empty;
+    public List<string> Options { get; set; } = new();
+    public List<int> CorrectIndexes { get; set; } = new();
+}
+
+public class SubmitExerciseRequest
+{
+    public Dictionary<string, List<int>> Answers { get; set; } = new();
+}
+
 [Route("api/[controller]")]
 public class CoursesController : BaseApiController
 {
@@ -29,6 +43,19 @@ public class CoursesController : BaseApiController
     public CoursesController(AppDbContext context)
     {
         _context = context;
+    }
+
+    private static List<ExerciseQuestion> ParseExercises(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return new List<ExerciseQuestion>();
+        try
+        {
+            return JsonSerializer.Deserialize<List<ExerciseQuestion>>(json) ?? new List<ExerciseQuestion>();
+        }
+        catch
+        {
+            return new List<ExerciseQuestion>();
+        }
     }
 
     [HttpGet]
@@ -80,7 +107,17 @@ public class CoursesController : BaseApiController
                     l.Title,
                     l.OrderIndex,
                     Content = canSeeContent ? l.Content : null,
-                    VideoUrl = canSeeContent ? l.VideoUrl : null
+                    VideoUrl = canSeeContent ? l.VideoUrl : null,
+                    // Trả câu hỏi nhưng KHÔNG trả đáp án đúng
+                    Exercises = (canSeeContent ? ParseExercises(l.ExercisesJson) : new List<ExerciseQuestion>())
+                        .Select(q => new
+                        {
+                            q.Id,
+                            q.Prompt,
+                            q.Options,
+                            Multiple = q.CorrectIndexes.Count > 1
+                        })
+                        .ToList()
                 })
         });
     }
@@ -131,6 +168,57 @@ public class CoursesController : BaseApiController
         await _context.SaveChangesAsync();
 
         return Ok(lesson);
+    }
+
+    [HttpPut("{id}/lessons/{lessonId}/exercises")]
+    [Authorize(Roles = "Teacher,Admin")]
+    public async Task<ActionResult> SetExercises(Guid id, Guid lessonId, List<ExerciseQuestion> input)
+    {
+        var lesson = await _context.CourseLessons
+            .Include(l => l.Course)
+            .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == id);
+        if (lesson == null) return NotFound();
+        if (lesson.Course!.TeacherId != CurrentUserId && !User.IsInRole("Admin"))
+            return Forbid();
+
+        foreach (var q in input)
+        {
+            if (string.IsNullOrWhiteSpace(q.Id)) q.Id = Guid.NewGuid().ToString();
+        }
+
+        lesson.ExercisesJson = JsonSerializer.Serialize(input);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { count = input.Count });
+    }
+
+    [HttpPost("{id}/lessons/{lessonId}/submit")]
+    public async Task<ActionResult> SubmitExercise(Guid id, Guid lessonId, SubmitExerciseRequest input)
+    {
+        var lesson = await _context.CourseLessons
+            .Include(l => l.Course)
+            .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == id);
+        if (lesson == null) return NotFound();
+
+        var allowed = lesson.Course!.TeacherId == CurrentUserId
+            || await _context.Enrollments.AnyAsync(e => e.CourseId == id && e.StudentId == CurrentUserId);
+        if (!allowed) return Forbid();
+
+        var questions = ParseExercises(lesson.ExercisesJson);
+        var results = questions.Select(q =>
+        {
+            input.Answers.TryGetValue(q.Id, out var picked);
+            var isCorrect = picked != null
+                && picked.Distinct().OrderBy(x => x).SequenceEqual(q.CorrectIndexes.OrderBy(x => x));
+            return new { QuestionId = q.Id, IsCorrect = isCorrect, q.CorrectIndexes };
+        }).ToList();
+
+        return Ok(new
+        {
+            Correct = results.Count(r => r.IsCorrect),
+            Total = results.Count,
+            Results = results
+        });
     }
 
     [HttpDelete("{id}")]
