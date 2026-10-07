@@ -57,7 +57,7 @@ function AppRoutes() {
         <Route path="/writing" element={<WritingPage />} />
         <Route path="/tests" element={<TestsPage />} />
         <Route path="/courses" element={<CoursesPage />} />
-        <Route path="/online" element={<OnlineLearningPage />} />
+        <Route path="/video-lessons" element={<OnlineLearningPage />} />
         <Route path="/speaking" element={<SpeakingPage />} />
         <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/teacher" element={<TeacherDashboardPage />} />
