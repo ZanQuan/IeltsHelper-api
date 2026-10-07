@@ -44,7 +44,6 @@ export default function AdminUsersPage() {
     setLoading(false);
   }
 
-  // Tải lại mỗi khi đổi bộ lọc vai trò ("ignore" bỏ kết quả cũ nếu đổi lọc nhanh)
   useEffect(() => {
     let ignore = false;
     fetchUsers(roleFilter).then((data) => {

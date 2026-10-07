@@ -1,16 +1,8 @@
-/* ============================================================
-   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
-   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
-   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
-   ============================================================ */
-
-/* ---- AdminCoursesPage.tsx ---- */
 .admin-price-cell {
   font-weight: 700;
   white-space: nowrap;
 }
 
-/* ---- AdminOverviewPage.tsx ---- */
 .admin-stat-value {
   font-size: 28px;
   font-weight: 800;
@@ -29,7 +21,6 @@
   gap: 14px;
 }
 
-/* ---- AdminUsersPage.tsx ---- */
 .admin-user-avatar {
   width: 34px;
   height: 34px;

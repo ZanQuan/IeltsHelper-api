@@ -10,16 +10,13 @@ interface Props {
   onClose: () => void;
 }
 
-/** Một nhóm menu xổ xuống: nút bấm + danh sách liên kết. */
 export default function NavDropdown({ group, open, onToggle, onClose }: Props) {
   const { pathname } = useLocation();
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Nhóm sáng lên khi trang hiện tại thuộc một mục bên trong nó
   const active = group.items.some((i) => pathname === i.to || pathname.startsWith(i.to + '/'));
 
-  // Đang mở: bấm ra ngoài, nhấn Esc, hoặc Tab sang chỗ khác thì đóng lại
   useEffect(() => {
     if (!open) return;
     const outside = (target: EventTarget | null) =>

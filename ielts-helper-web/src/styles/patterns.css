@@ -1,9 +1,3 @@
-/* ============================================================
-   MẪU BỐ CỤC DÙNG CHUNG – nhiều thuộc tính gộp thành một tên dễ hiểu
-   (hàng ngang, lưới, nút nhỏ, hộp thông tin...). Sửa ở đây là đổi cho mọi trang dùng nó.
-   Cũng được nạp CUỐI CÙNG (xem main.tsx).
-   ============================================================ */
-
 .avatar-40 {
   align-items: center;
   background: var(--primary-light);
@@ -178,7 +172,6 @@
   margin-bottom: 16px;
 }
 
-/* Chỉ dùng cho thẻ <a>/<Link>: "a." giúp thắng a:hover (đổi màu khi rê chuột) như style inline trước đây */
 a.link-plain {
   color: inherit;
   text-decoration: none;

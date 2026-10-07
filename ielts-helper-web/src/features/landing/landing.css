@@ -1,11 +1,8 @@
-/* Style riêng cho trang chủ công khai (trước khi đăng nhập).
-   Toàn bộ được scope trong .landing để không ảnh hưởng tới giao diện dashboard. */
-
 .landing {
   --navy: #0F1B3D;
   --navy-deep: #0A1330;
   --ocean: #38BDF8;
-  --wave-fill: #F7F8FC; /* = var(--bg) của app, dùng làm màu phần thân trang */
+  --wave-fill: #F7F8FC; 
   font-family: var(--font-sans);
   color: var(--text);
   background: var(--wave-fill);
@@ -20,7 +17,6 @@
   padding: 0 24px;
 }
 
-/* ---------- Nav ---------- */
 
 .lp-nav {
   position: sticky;
@@ -86,7 +82,6 @@
 
 .lp-btn-lg { padding: 14px 28px; font-size: 15px; }
 
-/* ---------- Hero ---------- */
 
 .lp-hero {
   background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
@@ -148,8 +143,6 @@
 }
 
 .lp-chip svg { flex-shrink: 0; }
-
-/* ---- hero mockup (mô phỏng kết quả chấm bài AI, không cần ảnh thật) ---- */
 
 .lp-hero-visual { position: relative; height: 100%; min-height: 340px; }
 
@@ -249,11 +242,8 @@
   opacity: 0.85;
 }
 
-/* ---------- Wave divider ---------- */
 
 .lp-wave { display: block; width: 100%; height: auto; margin-bottom: -1px; }
-
-/* ---------- Sections ---------- */
 
 .lp-section { padding: 88px 0; }
 .lp-section-tight { padding: 72px 0; }
@@ -261,8 +251,6 @@
 .lp-section-head { max-width: 60ch; margin-bottom: 44px; }
 .lp-section-head h2 { font-size: 30px; margin: 0 0 12px; letter-spacing: -0.01em; }
 .lp-section-head p { font-size: 15.5px; color: var(--text-muted); margin: 0; line-height: 1.6; }
-
-/* Features grid */
 
 .lp-feature-grid {
   display: grid;
@@ -292,8 +280,6 @@
 .lp-feature-card h3 { margin: 0 0 6px; font-size: 16px; }
 .lp-feature-card p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.55; }
 
-/* How it works */
-
 .lp-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -318,8 +304,6 @@
 .lp-step h3 { margin: 0 0 8px; font-size: 16.5px; }
 .lp-step p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 
-/* Why us */
-
 .lp-why-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -336,8 +320,6 @@
 
 .lp-why-item svg { color: var(--primary); flex-shrink: 0; }
 .lp-why-item p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
-
-/* About / photo placeholder */
 
 .lp-about {
   display: grid;
@@ -364,8 +346,6 @@
 .lp-about h2 { font-size: 28px; margin: 0 0 14px; }
 .lp-about p { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin: 0 0 14px; }
 
-/* Final CTA */
-
 .lp-cta-band {
   background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
   color: white;
@@ -375,8 +355,6 @@
 
 .lp-cta-band h2 { font-size: 30px; margin: 0 0 12px; color: #ffffff; }
 .lp-cta-band p { font-size: 15.5px; color: rgba(255, 255, 255, 0.75); margin: 0 0 28px; }
-
-/* Footer */
 
 .lp-footer { background: var(--navy-deep); color: rgba(255, 255, 255, 0.6); padding: 40px 0; }
 
@@ -398,8 +376,6 @@
 
 .lp-footer-copy { font-size: 12.5px; color: rgba(255, 255, 255, 0.4); margin-top: 24px; }
 
-/* ---------- Responsive ---------- */
-
 @media (max-width: 900px) {
   .lp-nav-links { display: none; }
   .lp-hero-inner { grid-template-columns: 1fr; padding-bottom: 60px; }
@@ -412,7 +388,6 @@
   .lp-section { padding: 56px 0; }
 }
 
-/* ---- style chuyển từ inline (LandingPage.tsx) ---- */
 .lp-section-surface {
   background: var(--surface);
   border-radius: var(--radius);

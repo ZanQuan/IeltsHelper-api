@@ -188,5 +188,4 @@ a:hover { color: var(--primary-hover); }
 .table tbody tr.clickable:hover { background: var(--primary-light); }
 .table tbody tr:last-child td { border-bottom: none; }
 
-/* Inline icon (react-icons) đặt cạnh text */
 .ico { display: inline-block; vertical-align: -0.125em; margin-right: 0.45em; }

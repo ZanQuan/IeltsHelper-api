@@ -1,10 +1,3 @@
-/* ============================================================
-   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
-   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
-   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
-   ============================================================ */
-
-/* ---- ForgotPasswordPage.tsx ---- */
 .auth-subtitle {
   text-align: center;
   margin-top: 4px;
@@ -15,13 +8,11 @@
   font-size: 14px;
 }
 
-/* ---- LoginPage.tsx ---- */
 .auth-forgot-row {
   text-align: right;
   margin: -8px 0 12px;
 }
 
-/* ---- ResetPasswordPage.tsx ---- */
 .auth-card-message {
   width: 360px;
   text-align: center;

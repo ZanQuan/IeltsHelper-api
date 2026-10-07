@@ -1,5 +1,3 @@
-// Kiểu dữ liệu dùng chung (khớp với dữ liệu API trả về).
-// Dùng:  import type { Student, Assignment } from '@/types';
 export type { Student } from './user';
 export type { CourseSummary } from './course';
 export type { TestSummary } from './test';

@@ -4,14 +4,13 @@ import apiClient from '@/api/client';
 import { AuthContext, type User } from './AuthContext';
 
 
-// Đọc phiên đăng nhập đã lưu ngay khi khởi tạo (không cần useEffect, không bị nháy trang "Đang tải")
 function readSavedUser(): User | null {
   try {
     const saved = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     if (saved && token) return JSON.parse(saved);
   } catch {
-    // Dữ liệu trong localStorage bị hỏng -> coi như chưa đăng nhập
+  
   }
   localStorage.removeItem('user');
   localStorage.removeItem('token');

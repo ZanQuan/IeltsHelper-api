@@ -12,10 +12,10 @@ export default function Layout() {
   const { pathname } = useLocation();
   const groups = buildNavGroups(user?.role);
 
-  const [openGroup, setOpenGroup] = useState<string | null>(null); // nhóm đang xổ xuống
-  const [menuOpen, setMenuOpen] = useState(false); // menu trên màn hình hẹp (nút ☰)
+  const [openGroup, setOpenGroup] = useState<string | null>(null); 
+  const [menuOpen, setMenuOpen] = useState(false); 
 
-  // Chuyển sang trang khác thì tự đóng mọi menu (cập nhật ngay lúc render, không cần useEffect)
+  
   const [prevPath, setPrevPath] = useState(pathname);
   if (prevPath !== pathname) {
     setPrevPath(pathname);

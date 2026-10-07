@@ -1,11 +1,9 @@
-/* ---- StudentAssignments.tsx ---- */
 .assign-result-card {
   margin-bottom: 20px;
   background: var(--success-light);
   border: 1px solid var(--success);
 }
 
-/* ---- TeacherAssignments.tsx ---- */
 .assign-delete-btn {
   margin-top: 16px;
   color: var(--danger);

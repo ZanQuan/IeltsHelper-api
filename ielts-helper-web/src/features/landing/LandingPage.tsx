@@ -2,8 +2,6 @@ import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import './landing.css';
 
-/* ---- Icon nhỏ, tự vẽ, không phụ thuộc thư viện ngoài ---- */
-
 function IconWriting() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

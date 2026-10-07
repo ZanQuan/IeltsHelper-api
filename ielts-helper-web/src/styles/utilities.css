@@ -1,16 +1,3 @@
-/* ============================================================
-   CLASS TIỆN ÍCH – mỗi class chỉ làm đúng MỘT việc (khoảng cách, cỡ chữ...)
-   Cách đọc tên:  <viết tắt>-<giá trị>   (số = px)
-     m / mt / mb / ml / mr = margin (chung / trên / dưới / trái / phải)
-     p = padding      w = width      maxw = max-width
-     fs = font-size   fw = font-weight   lh = line-height
-     ws = white-space   c = color   bg = background
-   Ví dụ: mb-24 = margin-bottom: 24px;   m-6-0-0 = margin: 6px 0 0;
-   Muốn thêm class mới: copy 1 dòng bên dưới rồi đổi tên + giá trị.
-   File này được nạp CUỐI CÙNG (xem main.tsx) nên nó ghi đè các class khác
-   có cùng độ ưu tiên, giống như style={{...}} trước đây.
-   ============================================================ */
-
 .m-0 { margin: 0; }
 .m-0-0-10 { margin: 0 0 10px; }
 .m-6-0 { margin: 6px 0; }

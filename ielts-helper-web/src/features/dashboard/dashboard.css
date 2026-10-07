@@ -1,10 +1,3 @@
-/* ============================================================
-   CSS riêng của tính năng này (trước đây viết bằng style={{...}} trong code).
-   Tên class có tiền tố của tính năng để tìm bằng Ctrl+F: ví dụ "vocab-word".
-   Mỗi cụm bên dưới ghi rõ file .tsx đang dùng nó.
-   ============================================================ */
-
-/* ---- ActionCard.tsx ---- */
 a.action-card {
   text-decoration: none;
   color: inherit;
@@ -18,14 +11,12 @@ a.action-card {
   font-size: 13.5px;
 }
 
-/* ---- QuickStat.tsx ---- */
 .quick-stat-value {
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
-/* ---- StudentHome.tsx ---- */
 .dash-grid-220 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
