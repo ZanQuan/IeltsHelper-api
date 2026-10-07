@@ -1,8 +1,3 @@
-// ============================================================
-// CẤU HÌNH MENU CHÍNH (thanh trên cùng của học viên/giáo viên)
-// Muốn thêm / bớt / đổi chỗ một mục menu: sửa ở file này, không cần đụng Layout.tsx
-// ============================================================
-
 export interface NavItem {
   to: string;
   label: string;
@@ -14,10 +9,7 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-/** Mục đứng riêng, luôn hiện ngoài cùng. */
 export const HOME_ITEM: NavItem = { to: '/dashboard', label: 'Trang chủ' };
-
-/** Các nhóm menu (mỗi nhóm là một danh sách xổ xuống). */
 export function buildNavGroups(role?: string): NavGroup[] {
   return [
     {
