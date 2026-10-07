@@ -15,7 +15,6 @@ export default function Layout() {
   const [openGroup, setOpenGroup] = useState<string | null>(null); 
   const [menuOpen, setMenuOpen] = useState(false); 
 
-  
   const [prevPath, setPrevPath] = useState(pathname);
   if (prevPath !== pathname) {
     setPrevPath(pathname);

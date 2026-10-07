@@ -54,13 +54,18 @@ public class EnrollmentsController : BaseApiController
             .Include(e => e.Course)
             .ToListAsync();
 
-        var result = enrollments.Select(e => new
+        var result = enrollments.Select(e =>
         {
-            e.Id,
-            CourseId = e.Course!.Id,
-            CourseTitle = e.Course.Title,
-            e.EnrolledAt,
-            CompletedCount = JsonSerializer.Deserialize<List<Guid>>(e.CompletedLessonIdsJson)!.Count
+            var ids = JsonSerializer.Deserialize<List<Guid>>(e.CompletedLessonIdsJson) ?? new List<Guid>();
+            return new
+            {
+                e.Id,
+                CourseId = e.Course!.Id,
+                CourseTitle = e.Course.Title,
+                e.EnrolledAt,
+                CompletedCount = ids.Count,
+                CompletedLessonIds = ids
+            };
         });
 
         return Ok(result);

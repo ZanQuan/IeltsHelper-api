@@ -8,6 +8,6 @@ public class CourseLesson
     public string Content { get; set; } = string.Empty;
     public string? VideoUrl { get; set; }
     public int OrderIndex { get; set; }
-
+    public string ExercisesJson { get; set; } = "[]";
     public Course? Course { get; set; }
 }

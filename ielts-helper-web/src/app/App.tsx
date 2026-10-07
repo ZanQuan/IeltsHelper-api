@@ -25,6 +25,7 @@ import AdminUsersPage from '@/features/admin/AdminUsersPage';
 import AdminCoursesPage from '@/features/admin/AdminCoursesPage';
 import AdminTestsPage from '@/features/admin/AdminTestsPage';
 import SettingsPage from '@/features/settings/SettingsPage';
+import OnlineLearningPage from '@/features/online/OnlineLearningPage';
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -56,6 +57,7 @@ function AppRoutes() {
         <Route path="/writing" element={<WritingPage />} />
         <Route path="/tests" element={<TestsPage />} />
         <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/online" element={<OnlineLearningPage />} />
         <Route path="/speaking" element={<SpeakingPage />} />
         <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/teacher" element={<TeacherDashboardPage />} />
