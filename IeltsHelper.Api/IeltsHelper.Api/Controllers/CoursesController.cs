@@ -32,6 +32,7 @@ public class ExerciseQuestion
 
 public class SubmitExerciseRequest
 {
+    // key = id câu hỏi, value = các đáp án đã chọn (vị trí bắt đầu từ 0)
     public Dictionary<string, List<int>> Answers { get; set; } = new();
 }
 
@@ -170,6 +171,7 @@ public class CoursesController : BaseApiController
         return Ok(lesson);
     }
 
+    // Giáo viên đặt (ghi đè) toàn bộ bài tập của một bài học
     [HttpPut("{id}/lessons/{lessonId}/exercises")]
     [Authorize(Roles = "Teacher,Admin")]
     public async Task<ActionResult> SetExercises(Guid id, Guid lessonId, List<ExerciseQuestion> input)
@@ -192,6 +194,22 @@ public class CoursesController : BaseApiController
         return Ok(new { count = input.Count });
     }
 
+    // Giáo viên xem bài tập hiện có (kèm đáp án đúng) để chỉnh sửa
+    [HttpGet("{id}/lessons/{lessonId}/exercises")]
+    [Authorize(Roles = "Teacher,Admin")]
+    public async Task<ActionResult> GetExercisesForTeacher(Guid id, Guid lessonId)
+    {
+        var lesson = await _context.CourseLessons
+            .Include(l => l.Course)
+            .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == id);
+        if (lesson == null) return NotFound();
+        if (lesson.Course!.TeacherId != CurrentUserId && !User.IsInRole("Admin"))
+            return Forbid();
+
+        return Ok(ParseExercises(lesson.ExercisesJson));
+    }
+
+    // Học viên nộp bài tập, server chấm điểm
     [HttpPost("{id}/lessons/{lessonId}/submit")]
     public async Task<ActionResult> SubmitExercise(Guid id, Guid lessonId, SubmitExerciseRequest input)
     {
