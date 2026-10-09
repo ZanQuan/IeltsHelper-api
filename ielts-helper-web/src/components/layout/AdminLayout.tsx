@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { FaBookOpen, FaChartPie, FaFileLines, FaHouse, FaRightFromBracket, FaUsers } from 'react-icons/fa6';
 import { useAuth } from '@/features/auth/useAuth';
 import './layout.css';
+import LiveClassNotifier from './LiveClassNotifier';
 
 interface NavItem {
   to: string;
@@ -117,6 +118,7 @@ export default function AdminLayout() {
       <main className="admin-main">
         <Outlet />
       </main>
+      <LiveClassNotifier />
     </div>
   );
 }

@@ -24,6 +24,8 @@ public class AppDbContext : DbContext
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
+
+    public DbSet<LiveClass> LiveClasses => Set<LiveClass>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TeacherStudentLink>()
@@ -53,6 +55,11 @@ public class AppDbContext : DbContext
             .HasOne(a => a.Student)
             .WithMany()
             .HasForeignKey(a => a.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<LiveClass>()
+            .HasOne(l => l.Teacher)
+            .WithMany()
+            .HasForeignKey(l => l.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

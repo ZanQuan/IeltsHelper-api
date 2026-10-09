@@ -6,6 +6,7 @@ import logo from '@/assets/logo.png';
 import NavDropdown from './NavDropdown';
 import { HOME_ITEM, buildNavGroups } from './navConfig';
 import './layout.css';
+import LiveClassNotifier from './LiveClassNotifier';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -83,6 +84,7 @@ export default function Layout() {
       </nav>
 
       <div className="page">
+        <LiveClassNotifier />
         <Outlet />
       </div>
     </div>

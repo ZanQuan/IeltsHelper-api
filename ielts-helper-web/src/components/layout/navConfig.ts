@@ -28,6 +28,7 @@ export function buildNavGroups(role?: string): NavGroup[] {
       label: 'Học trực tuyến',
       items: [
         { to: '/video-lessons', label: 'Bài giảng video' },
+        { to: '/live-classes', label: 'Lớp học trực tuyến' },
       ],
     },
     {

@@ -26,7 +26,8 @@ import AdminCoursesPage from '@/features/admin/AdminCoursesPage';
 import AdminTestsPage from '@/features/admin/AdminTestsPage';
 import SettingsPage from '@/features/settings/SettingsPage';
 import OnlineLearningPage from '@/features/online/OnlineLearningPage';
-
+import LiveClassesPage from '@/features/live/LiveClassesPage';
+import LiveClassRoomPage from '@/features/live/LiveClassRoomPage';
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
@@ -58,6 +59,8 @@ function AppRoutes() {
         <Route path="/tests" element={<TestsPage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/video-lessons" element={<OnlineLearningPage />} />
+        <Route path="/live-classes" element={<LiveClassesPage />} />
+        <Route path="/live-classes/:id" element={<LiveClassRoomPage />} />
         <Route path="/speaking" element={<SpeakingPage />} />
         <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/teacher" element={<TeacherDashboardPage />} />

@@ -50,6 +50,12 @@ builder.Services.AddHttpClient("Anthropic", client =>
     client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
     client.DefaultRequestHeaders.Add("x-api-key", builder.Configuration["Anthropic:ApiKey"]);
 });
+builder.Services.AddHttpClient("OpenAI", client =>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {builder.Configuration["OpenAI:ApiKey"]}");
+});
+builder.Services.AddScoped<SpeechToTextService>();
 builder.Services.AddScoped<AiGradingService>();
 builder.Services.AddScoped<VnPayService>();
 builder.Services.AddScoped<EmailService>();
