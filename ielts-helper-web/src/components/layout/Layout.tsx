@@ -8,13 +8,16 @@ import { HOME_ITEM, buildNavGroups } from './navConfig';
 import './layout.css';
 import LiveClassNotifier from './LiveClassNotifier';
 
+function initials(name: string) {
+  return name.trim().split(/\s+/).slice(-2).map((w) => w[0]).join('').toUpperCase();
+}
 export default function Layout() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
   const groups = buildNavGroups(user?.role);
 
-  const [openGroup, setOpenGroup] = useState<string | null>(null); 
-  const [menuOpen, setMenuOpen] = useState(false); 
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [prevPath, setPrevPath] = useState(pathname);
   if (prevPath !== pathname) {
@@ -74,7 +77,12 @@ export default function Layout() {
               </>
             )}
             <Link className="topnav-user" to="/settings" title={user?.name}>
-              {user?.name}
+              {user?.avatarUrl ? (
+                <img className="topnav-avatar" src={user.avatarUrl} alt="" />
+              ) : (
+                <span className="topnav-avatar topnav-avatar-initials">{initials(user?.name ?? '')}</span>
+              )}
+              <span className="topnav-user-name">{user?.name}</span>
             </Link>
             <button onClick={logout} className="btn btn-ghost topnav-logout-btn">
               Đăng xuất
