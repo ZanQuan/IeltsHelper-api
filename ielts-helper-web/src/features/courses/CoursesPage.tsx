@@ -1,3 +1,4 @@
+import CheckoutPanel from './CheckoutPanel';
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
@@ -87,7 +88,7 @@ export default function CoursesPage() {
       const res = await apiClient.post<{ paymentUrl: string }>(
         '/api/Payments/create-payment-url',
         { courseId: detail.id, provider },
-      ); 
+      );
       window.location.href = res.data.paymentUrl; // chuyển sang trang thanh toán
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
@@ -153,30 +154,28 @@ export default function CoursesPage() {
         <p>{detail.description}</p>
 
         {!detail.isEnrolled ? (
-          <div className="card text-center">
-            <p className="label">Học phí</p>
-            <p className="course-price-lg">
-              {detail.price.toLocaleString('vi-VN')} đ
-            </p>
-            {detail.price > 0 ? (
-              <>
-                <p className="muted course-note">Chọn phương thức thanh toán:</p>
-                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={() => handlePay('VnPay')} disabled={enrolling} className="btn btn-primary">
-                    {enrolling ? 'Đang chuyển hướng...' : 'Thanh toán VNPay'}
-                  </button>
-                  <button onClick={() => handlePay('Momo')} disabled={enrolling} className="btn btn-ghost">
-                    {enrolling ? 'Đang chuyển hướng...' : 'Thanh toán MoMo'}
-                  </button>
-                </div>
-                {payError && <p className="error-text">{payError}</p>}
-              </>
-            ) : (
+          detail.price > 0 ? (
+            <CheckoutPanel
+              course={{
+                title: detail.title,
+                price: detail.price,
+                teacherName: detail.teacherName,
+                targetBand: detail.targetBand,
+                lessonCount: detail.lessons.length,
+              }}
+              paying={enrolling}
+              error={payError}
+              onPay={handlePay}
+            />
+          ) : (
+            <div className="card text-center">
+              <p className="label">Học phí</p>
+              <p className="course-price-lg">Miễn phí</p>
               <button onClick={handleEnroll} disabled={enrolling} className="btn btn-primary">
                 {enrolling ? 'Đang xử lý...' : 'Ghi danh miễn phí'}
               </button>
-            )}
-          </div>
+            </div>
+          )
         ) : (
           <div>
             <h3 className="mt-24">Danh sách bài học</h3>

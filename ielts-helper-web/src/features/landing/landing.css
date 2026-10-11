@@ -14,7 +14,8 @@
 .landing .lp-shell {
   max-width: 1160px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 
@@ -350,7 +351,7 @@
   background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
   color: white;
   text-align: center;
-  padding: 8px 0 84px;
+  padding: 0 0 84px;
 }
 
 .lp-cta-band h2 { font-size: 30px; margin: 0 0 12px; color: #ffffff; }

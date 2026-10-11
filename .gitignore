@@ -12,3 +12,6 @@ dist-ssr/
 
 # Editor
 .vscode/ielts-helper-web/.env
+
+.agents/
+.codex/
