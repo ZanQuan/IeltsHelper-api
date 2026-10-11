@@ -49,6 +49,15 @@ public class ChangePasswordRequest
     public string CurrentPassword { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
 }
+public class UpdateProfileRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string? TargetBand { get; set; }
+    public string? Bio { get; set; }
+    public string? AvatarUrl { get; set; }
+}
 
 [ApiController]
 [Route("api/[controller]")]
@@ -259,8 +268,62 @@ public class AuthController : ControllerBase
             email = user.Email,
             role = user.Role,
             createdAt = user.CreatedAt,
-            isGoogleLinked = user.GoogleId != null
+            isGoogleLinked = user.GoogleId != null,
+            phoneNumber = user.PhoneNumber,
+            dateOfBirth = user.DateOfBirth,
+            targetBand = user.TargetBand,
+            bio = user.Bio,
+            avatarUrl = user.AvatarUrl
         });
+    }
+    [HttpPut("me")]
+    [Authorize]
+    public async Task<ActionResult> UpdateMe(UpdateProfileRequest request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        var name = request.Name?.Trim() ?? string.Empty;
+        if (name.Length < 2 || name.Length > 100)
+            return BadRequest(new { error = "Họ tên phải từ 2 đến 100 ký tự." });
+
+        var phone = request.PhoneNumber?.Trim();
+        if (!string.IsNullOrEmpty(phone) &&
+            !System.Text.RegularExpressions.Regex.IsMatch(phone, @"^[0-9+\-\s]{8,20}$"))
+            return BadRequest(new { error = "Số điện thoại không hợp lệ." });
+
+        if (request.DateOfBirth.HasValue &&
+            (request.DateOfBirth.Value > DateOnly.FromDateTime(DateTime.UtcNow) || request.DateOfBirth.Value.Year < 1900))
+            return BadRequest(new { error = "Ngày sinh không hợp lệ." });
+
+        var band = request.TargetBand?.Trim();
+        if (band != null && band.Length > 20)
+            return BadRequest(new { error = "Band mục tiêu quá dài." });
+
+        var bio = request.Bio?.Trim();
+        if (bio != null && bio.Length > 500)
+            return BadRequest(new { error = "Giới thiệu tối đa 500 ký tự." });
+
+        var avatar = string.IsNullOrWhiteSpace(request.AvatarUrl) ? null : request.AvatarUrl;
+        if (avatar != null)
+        {
+            var okType = avatar.StartsWith("data:image/jpeg;base64,") ||
+                         avatar.StartsWith("data:image/png;base64,") ||
+                         avatar.StartsWith("data:image/webp;base64,");
+            if (!okType || avatar.Length > 400_000)
+                return BadRequest(new { error = "Ảnh đại diện không hợp lệ hoặc quá lớn." });
+        }
+
+        user.Name = name;
+        user.PhoneNumber = string.IsNullOrEmpty(phone) ? null : phone;
+        user.DateOfBirth = request.DateOfBirth;
+        user.TargetBand = string.IsNullOrEmpty(band) ? null : band;
+        user.Bio = string.IsNullOrEmpty(bio) ? null : bio;
+        user.AvatarUrl = avatar;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Đã cập nhật hồ sơ.", name = user.Name });
     }
     private string GenerateJwtToken(User user)
     {
