@@ -4,7 +4,7 @@ export interface User {
   userId: string;
   name: string;
   role: string;
-}
+  avatarUrl?: string | null; }
 
 export interface AuthContextType {
   user: User | null;
@@ -12,6 +12,8 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   loginWithGoogle: (credential: string) => Promise<void>;
   logout: () => void;
+  updateName: (name: string) => void;
+  updateAvatar: (avatarUrl: string | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

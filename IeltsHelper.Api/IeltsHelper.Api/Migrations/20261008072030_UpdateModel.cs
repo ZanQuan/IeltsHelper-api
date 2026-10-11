@@ -10,12 +10,9 @@ namespace IeltsHelper.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "ExercisesJson",
-                table: "CourseLessons",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            migrationBuilder.Sql(@"
+                IF COL_LENGTH('CourseLessons', 'ExercisesJson') IS NULL
+                ALTER TABLE CourseLessons ADD ExercisesJson nvarchar(max) NOT NULL DEFAULT N''");
         }
 
         /// <inheritdoc />

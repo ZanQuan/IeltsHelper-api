@@ -282,3 +282,26 @@ a.topnav-panel-link.is-active {
     flex-wrap: wrap;
   }
 }
+.topnav-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topnav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.topnav-avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
