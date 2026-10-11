@@ -34,7 +34,7 @@ export default function CoursesPage() {
   const [detail, setDetail] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
-
+  const [payError, setPayError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -79,6 +79,22 @@ export default function CoursesPage() {
     }
   }
 
+  async function handlePay(provider: 'VnPay' | 'Momo') {
+    if (!detail) return;
+    setEnrolling(true);
+    setPayError('');
+    try {
+      const res = await apiClient.post<{ paymentUrl: string }>(
+        '/api/Payments/create-payment-url',
+        { courseId: detail.id, provider },
+      ); 
+      window.location.href = res.data.paymentUrl; // chuyển sang trang thanh toán
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setPayError(msg ?? 'Không tạo được giao dịch, vui lòng thử lại.');
+      setEnrolling(false);
+    }
+  }
   async function handleCreateCourse(e: FormEvent) {
     e.preventDefault();
     setCreating(true);
@@ -142,12 +158,24 @@ export default function CoursesPage() {
             <p className="course-price-lg">
               {detail.price.toLocaleString('vi-VN')} đ
             </p>
-            <button onClick={handleEnroll} disabled={enrolling} className="btn btn-primary">
-              {enrolling ? 'Đang xử lý...' : 'Ghi danh học ngay'}
-            </button>
-            <p className="muted course-note">
-              Thanh toán VNPay đang tạm dừng — ghi danh miễn phí để test.
-            </p>
+            {detail.price > 0 ? (
+              <>
+                <p className="muted course-note">Chọn phương thức thanh toán:</p>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button onClick={() => handlePay('VnPay')} disabled={enrolling} className="btn btn-primary">
+                    {enrolling ? 'Đang chuyển hướng...' : 'Thanh toán VNPay'}
+                  </button>
+                  <button onClick={() => handlePay('Momo')} disabled={enrolling} className="btn btn-ghost">
+                    {enrolling ? 'Đang chuyển hướng...' : 'Thanh toán MoMo'}
+                  </button>
+                </div>
+                {payError && <p className="error-text">{payError}</p>}
+              </>
+            ) : (
+              <button onClick={handleEnroll} disabled={enrolling} className="btn btn-primary">
+                {enrolling ? 'Đang xử lý...' : 'Ghi danh miễn phí'}
+              </button>
+            )}
           </div>
         ) : (
           <div>

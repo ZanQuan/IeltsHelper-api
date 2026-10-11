@@ -1,3 +1,4 @@
+import PaymentResultPage from '@/features/payment/PaymentResultPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -28,6 +29,7 @@ import SettingsPage from '@/features/settings/SettingsPage';
 import OnlineLearningPage from '@/features/online/OnlineLearningPage';
 import LiveClassesPage from '@/features/live/LiveClassesPage';
 import LiveClassRoomPage from '@/features/live/LiveClassRoomPage';
+
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
@@ -58,6 +60,7 @@ function AppRoutes() {
         <Route path="/writing" element={<WritingPage />} />
         <Route path="/tests" element={<TestsPage />} />
         <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/payment/result" element={<PaymentResultPage />} />
         <Route path="/video-lessons" element={<OnlineLearningPage />} />
         <Route path="/live-classes" element={<LiveClassesPage />} />
         <Route path="/live-classes/:id" element={<LiveClassRoomPage />} />

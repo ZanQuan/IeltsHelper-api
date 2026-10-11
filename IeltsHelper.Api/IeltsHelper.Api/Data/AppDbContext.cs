@@ -61,5 +61,9 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(l => l.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Order>().HasIndex(o => o.TxnRef).IsUnique();
+        modelBuilder.Entity<Enrollment>()
+            .HasIndex(e => new { e.CourseId, e.StudentId })
+            .IsUnique();
     }
 }

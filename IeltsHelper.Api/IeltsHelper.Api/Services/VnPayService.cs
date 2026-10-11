@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -20,6 +21,12 @@ public class VnPayService
         var hashSecret = _configuration["VnPay:HashSecret"]!;
         var returnUrl = _configuration["VnPay:ReturnUrl"]!;
 
+        // Chạy local IP thường là ::1, VNPay không nhận nên đổi thành IPv4
+        ipAddress = ipAddress == "::1" ? "127.0.0.1" : ipAddress;
+        // VNPay yêu cầu giờ Việt Nam (GMT+7), không phụ thuộc múi giờ của server
+        var vnTz = TimeZoneInfo.FindSystemTimeZoneById(
+            OperatingSystem.IsWindows() ? "SE Asia Standard Time" : "Asia/Bangkok");
+        var now = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vnTz);
         var vnpParams = new SortedList<string, string>(StringComparer.Ordinal)
         {
             { "vnp_Version", "2.1.0" },
@@ -33,7 +40,8 @@ public class VnPayService
             { "vnp_Locale", "vn" },
             { "vnp_ReturnUrl", returnUrl },
             { "vnp_IpAddr", ipAddress },
-            { "vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss") }
+            { "vnp_CreateDate", now.ToString("yyyyMMddHHmmss") },
+            { "vnp_ExpireDate", now.AddMinutes(15).ToString("yyyyMMddHHmmss") }
         };
 
         var query = new StringBuilder();

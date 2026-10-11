@@ -13,4 +13,6 @@ public class Order
 
     public User? Student { get; set; }
     public Course? Course { get; set; }
+    public string Provider { get; set; } = "VnPay";   // VnPay | Momo
+    public string? ProviderTransId { get; set; }
 }
