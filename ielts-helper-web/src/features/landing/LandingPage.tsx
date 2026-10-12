@@ -1,5 +1,11 @@
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
+import imgBrand from '@/assets/landing/whale-english-brand.webp';
+import imgOverview from '@/assets/landing/summer-english-overview.webp';
+import imgThcs from '@/assets/landing/summer-english-thcs-thpt.webp';
+import imgAdults from '@/assets/landing/summer-english-working-adults.webp';
+import imgSummer2025 from '@/assets/landing/summer-program-2025.webp';
+import imgWorkshop from '@/assets/landing/ielts-workshop.webp';
 import './landing.css';
 
 function IconWriting() {
@@ -84,14 +90,6 @@ function IconChart() {
     </svg>
   );
 }
-function IconCamera() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 8h3l2-2h6l2 2h3v11H4Z" />
-      <circle cx="12" cy="13" r="3.2" />
-    </svg>
-  );
-}
 
 function WaveDivider({ flip = false, fill }: { flip?: boolean; fill: string }) {
   return (
@@ -130,6 +128,14 @@ const WHY = [
   { icon: <IconChart />, title: 'Theo dõi tiến bộ rõ ràng', desc: 'Nhật ký buổi học, lỗi sai, điểm số — tất cả ở một nơi duy nhất.' },
 ];
 
+const POSTERS = [
+  { src: imgOverview, alt: 'Summer English: lớp Kids, THCS & THPT, người đi làm', caption: 'Các lớp hè theo độ tuổi' },
+  { src: imgThcs, alt: 'Summer English dành cho học sinh 11-18 tuổi', caption: 'THCS & THPT (11-18 tuổi)' },
+  { src: imgAdults, alt: 'Summer English dành cho người đi làm', caption: 'Lớp cho người đi làm' },
+  { src: imgWorkshop, alt: 'Workshop nghề dạy học và kinh nghiệm IELTS thực chiến', caption: 'Workshop IELTS thực chiến' },
+  { src: imgSummer2025, alt: 'Chương trình tiếng Anh hè 2025', caption: 'Chương trình tiếng Anh hè 2025' },
+];
+
 export default function LandingPage() {
   return (
     <div className="landing">
@@ -143,6 +149,7 @@ export default function LandingPage() {
             <a href="#features">Tính năng</a>
             <a href="#how-it-works">Cách hoạt động</a>
             <a href="#why-us">Vì sao chọn chúng tôi</a>
+            <a href="#programs">Chương trình</a>
           </nav>
           <div className="lp-nav-actions">
             <Link to="/login" className="lp-btn lp-btn-ghost-light">Đăng nhập</Link>
@@ -273,11 +280,12 @@ export default function LandingPage() {
 
       <section className="lp-section lp-shell">
         <div className="lp-about">
-          <div className="lp-photo-placeholder">
-            {/* TODO: thay bằng ảnh thật của giáo viên / lớp học khi có */}
-            <IconCamera />
-            <span>Ảnh giáo viên / lớp học — thêm sau</span>
-          </div>
+          <img
+            className="lp-about-img"
+            src={imgBrand}
+            alt="Whale English: Think Bold. Speak Real."
+            loading="lazy"
+          />
           <div>
             <h2>Về Whale English</h2>
             <p>
@@ -290,6 +298,21 @@ export default function LandingPage() {
               hệ thống — bên cạnh phần luyện tập được AI chấm điểm tức thì.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section id="programs" className="lp-section lp-shell">
+        <div className="lp-section-head">
+          <h2>Chương trình &amp; hoạt động</h2>
+          <p>Các lớp học hè, chương trình luyện thi và workshop đang diễn ra tại Whale English.</p>
+        </div>
+        <div className="lp-poster-grid">
+          {POSTERS.map((p) => (
+            <figure className="lp-poster" key={p.caption}>
+              <img src={p.src} alt={p.alt} loading="lazy" />
+              <figcaption>{p.caption}</figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 
@@ -312,6 +335,7 @@ export default function LandingPage() {
             <nav className="lp-footer-links">
               <a href="#features">Tính năng</a>
               <a href="#how-it-works">Cách hoạt động</a>
+              <a href="#programs">Chương trình</a>
               <Link to="/login">Đăng nhập</Link>
               <Link to="/register">Đăng ký</Link>
             </nav>
