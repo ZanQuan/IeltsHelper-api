@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -68,7 +69,7 @@ public class AssignmentsController : BaseApiController
         {
             Id = Guid.NewGuid(),
             TeacherId = CurrentUserId,
-            StudentId = request.StudentId,
+            StudentId = request.StudentId!.Value,
             Title = request.Title,
             Instructions = request.Instructions,
             Skill = string.IsNullOrWhiteSpace(request.Skill) ? "General" : request.Skill,
