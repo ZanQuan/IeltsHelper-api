@@ -27,7 +27,12 @@ public class ImagesController : BaseApiController
             _logger.LogWarning("Upload rejected for user {UserId}: {Reason}", CurrentUserId, error);
             return BadRequest(new { error });
         }
-
+        var realExtension = DetectImageExtension(request.File);
+        if (realExtension == null)
+        {
+            _logger.LogWarning("Upload rejected for user {UserId}: nội dung file không phải ảnh jpg/png", CurrentUserId);
+            return BadRequest(new { error = "File không phải ảnh JPG/PNG hợp lệ." });
+        }
         // Chỉ giữ tên hiển thị an toàn, bỏ mọi ký tự không hợp lệ trong tên file
         var safeName = Path.GetFileNameWithoutExtension(request.FileName);
         safeName = string.Concat(safeName.Where(c => !Path.GetInvalidFileNameChars().Contains(c)));
@@ -37,7 +42,7 @@ public class ImagesController : BaseApiController
         var imageDomainModel = new Image
         {
             File = request.File,
-            FileExtension = Path.GetExtension(request.File.FileName).ToLowerInvariant(),
+            FileExtension = realExtension,
             FileSizeInBytes = request.File.Length,
             FileName = safeName,
             FileDescription = request.FileDescription
@@ -79,6 +84,22 @@ public class ImagesController : BaseApiController
 
         if (request.File.Length > 5 * 1024 * 1024)
             return "Ảnh quá lớn, vui lòng chọn ảnh dưới 5MB.";
+
+        return null;
+    }
+    // Đọc vài byte đầu để xác định loại ảnh thật, trả về đuôi file hoặc null
+    private static string? DetectImageExtension(IFormFile file)
+    {
+        Span<byte> h = stackalloc byte[8];
+        using var stream = file.OpenReadStream();
+        var read = stream.Read(h);
+
+        if (read >= 3 && h[0] == 0xFF && h[1] == 0xD8 && h[2] == 0xFF)
+            return ".jpg";
+
+        if (read >= 8 && h[0] == 0x89 && h[1] == 0x50 && h[2] == 0x4E && h[3] == 0x47 &&
+            h[4] == 0x0D && h[5] == 0x0A && h[6] == 0x1A && h[7] == 0x0A)
+            return ".png";
 
         return null;
     }
