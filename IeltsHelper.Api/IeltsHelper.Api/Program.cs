@@ -121,6 +121,11 @@ using (var scope = app.Services.CreateScope())
 
     if (!string.IsNullOrEmpty(adminEmail) && !await db.Users.AnyAsync(u => u.Role == "Admin"))
     {
+        if (string.IsNullOrWhiteSpace(adminPassword) || adminPassword.Length < 8)
+            throw new InvalidOperationException(
+                "Admin:Password chưa được cấu hình hoặc quá ngắn (tối thiểu 8 ký tự). " +
+                "Đặt bằng user-secrets hoặc biến môi trường Admin__Password.");
+
         var hasher = new PasswordHasher<User>();
         var admin = new User
         {
@@ -129,7 +134,7 @@ using (var scope = app.Services.CreateScope())
             Email = adminEmail,
             Role = "Admin"
         };
-        admin.PasswordHash = hasher.HashPassword(admin, adminPassword ?? "ChangeMe123!");
+        admin.PasswordHash = hasher.HashPassword(admin, adminPassword);
         db.Users.Add(admin);
         await db.SaveChangesAsync();
         Console.WriteLine($"[Seed] Đã tạo tài khoản Admin: {adminEmail}");
