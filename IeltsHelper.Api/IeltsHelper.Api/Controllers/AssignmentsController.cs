@@ -8,21 +8,36 @@ namespace IeltsHelper.Api.Controllers;
 
 public class CreateAssignmentRequest
 {
-    public Guid StudentId { get; set; }
+    [Required(ErrorMessage = "Vui lòng chọn học viên.")]
+    public Guid? StudentId { get; set; }   
+    [Required(ErrorMessage = "Vui lòng nhập tiêu đề bài tập.")]
+    [StringLength(200, ErrorMessage = "Tiêu đề tối đa 200 ký tự.")]
     public string Title { get; set; } = string.Empty;
+
+    [StringLength(5000, ErrorMessage = "Hướng dẫn tối đa 5000 ký tự.")]
     public string Instructions { get; set; } = string.Empty;
+
+    [AllowedValues("General", "Writing", "Speaking", "Reading", "Listening", "Vocabulary",
+        ErrorMessage = "Kỹ năng không hợp lệ.")]
     public string Skill { get; set; } = "General";
+
     public DateTime? DueDate { get; set; }
 }
 
+
 public class SubmitAssignmentRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập nội dung bài làm.")]
+    [StringLength(20000, ErrorMessage = "Bài làm quá dài.")]
     public string AnswerText { get; set; } = string.Empty;
 }
 
 public class GradeAssignmentRequest
 {
+    [Range(0, 9, ErrorMessage = "Điểm phải từ 0 đến 9.")]
     public decimal Score { get; set; }
+
+    [StringLength(2000, ErrorMessage = "Nhận xét tối đa 2000 ký tự.")]
     public string? Feedback { get; set; }
 }
 

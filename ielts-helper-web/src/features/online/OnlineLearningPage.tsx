@@ -151,10 +151,10 @@ export default function OnlineLearningPage() {
     try {
       const [mine, all] = await Promise.all([
         apiClient.get<MyCourse[]>('/api/Enrollments/my-courses'),
-        apiClient.get<CourseSummary[]>('/api/Courses'),
+        apiClient.get<{ items: CourseSummary[] }>('/api/Courses', { params: { pageSize: 100 } }),
       ]);
       setMyCourses(mine.data);
-      setTotals(Object.fromEntries(all.data.map((c) => [c.id, c.lessonCount])));
+      setTotals(Object.fromEntries(all.data.items.map((c) => [c.id, c.lessonCount])));
     } catch {
       setError('Không tải được danh sách khóa học. Hãy thử tải lại trang.');
     } finally {

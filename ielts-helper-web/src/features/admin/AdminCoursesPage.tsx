@@ -3,7 +3,9 @@ import apiClient from '@/api/client';
 import type { CourseSummary } from '@/types';
 import './admin.css';
 
-const fetchCourses = () => apiClient.get<CourseSummary[]>('/api/Courses').then((res) => res.data);
+  const fetchCourses = () =>
+    apiClient.get<{ items: CourseSummary[] }>('/api/Courses', { params: { pageSize: 100 } })
+      .then((res) => res.data.items);
 
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<CourseSummary[]>([]);

@@ -11,12 +11,13 @@ using Microsoft.OpenApi;
 using System.Text;
 using IeltsHelper.Api.Repositories;
 using Microsoft.Extensions.FileProviders;
+using IeltsHelper.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var _logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) 
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .WriteTo.Console()
     .WriteTo.File("Logs/IeltsHelper_log.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
@@ -26,7 +27,14 @@ builder.Logging.AddSerilog(_logger);
 
 // Add services to the container.
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidateModelAttribute>();
+})
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.SuppressModelStateInvalidFilter = true;
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
