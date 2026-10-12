@@ -45,6 +45,10 @@ public class WritingSubmissionsController : BaseApiController
     [HttpPost]
     public async Task<ActionResult<WritingSubmission>> Submit(WritingSubmission input)
     {
+        if (string.IsNullOrWhiteSpace(input.EssayText) || input.EssayText.Length > 10_000)
+            return BadRequest(new { error = "Bài viết phải có nội dung và tối đa 10.000 ký tự." });
+        if (input.Prompt?.Length > 2_000)
+            return BadRequest(new { error = "Đề bài tối đa 2.000 ký tự." });
         GradingResult result;
         try
         {
