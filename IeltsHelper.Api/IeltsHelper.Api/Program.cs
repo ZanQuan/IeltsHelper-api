@@ -1,3 +1,5 @@
+using Serilog;
+using Serilog.Events;
 using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
 using IeltsHelper.Api.Services;
@@ -8,17 +10,30 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 using IeltsHelper.Api.Repositories;
+using Microsoft.Extensions.FileProviders;
 using IeltsHelper.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var _logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .WriteTo.Console()
+    .WriteTo.File("Logs/IeltsHelper_log.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(_logger);
+
+// Add services to the container.
+
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ValidateModelAttribute>();   
+    options.Filters.Add<ValidateModelAttribute>();
 })
     .ConfigureApiBehaviorOptions(options =>
     {
-        options.SuppressModelStateInvalidFilter = true;  
+        options.SuppressModelStateInvalidFilter = true;
     })
     .AddJsonOptions(options =>
     {
@@ -72,6 +87,8 @@ builder.Services.AddScoped<MomoService>();
 builder.Services.AddScoped<IVocabularyRepository, SQLVocabularyRepository>();
 builder.Services.AddScoped<ICourseRepository, SQLCourseRepository>();
 builder.Services.AddScoped<IErrorLogRepository, SQLErrorLogRepository>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -128,6 +145,14 @@ if (app.Environment.IsDevelopment())
         c.DocumentTitle = "Whale English API";
     });
 }
+// Tạo thư mục Images và cho phép truy cập ảnh qua /Images/ten-file.jpg
+var imagesPath = Path.Combine(builder.Environment.ContentRootPath, "Images");
+Directory.CreateDirectory(imagesPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = "/Images"
+});
 
 //app.UseHttpsRedirection();
 app.UseCors("AllowReactDev");

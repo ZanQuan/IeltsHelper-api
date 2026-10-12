@@ -24,7 +24,7 @@ public class AppDbContext : DbContext
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
-
+    public DbSet<Image> Images { get; set; }
     public DbSet<LiveClass> LiveClasses => Set<LiveClass>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
