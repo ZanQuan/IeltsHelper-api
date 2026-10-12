@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using IeltsHelper.Api.Data;
+﻿using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
 using IeltsHelper.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -109,14 +108,21 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterRequest request)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+        var email = request.Email?.Trim() ?? string.Empty;
+        if (!new EmailAddressAttribute().IsValid(email))
+            return BadRequest(new { error = "Email không đúng định dạng." });
+
+        if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 6)
+            return BadRequest(new { error = "Mật khẩu phải có ít nhất 6 ký tự." });
+
+        if (await _context.Users.AnyAsync(u => u.Email == email))
             return BadRequest(new { error = "Email đã được sử dụng." });
 
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Name = request.Name,
-            Email = request.Email,
+            Name = request.Name.Trim(),
+            Email = email,
             Role = "Student"
         };
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
@@ -126,7 +132,6 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Đăng ký thành công.", userId = user.Id });
     }
-
     [HttpPost("login")]
     public async Task<ActionResult> Login(LoginRequest request)
     {
@@ -248,8 +253,8 @@ public class AuthController : ControllerBase
         if (HashToken(request.Token) != user.PasswordResetTokenHash)
             return BadRequest(new { error = "Liên kết không hợp lệ hoặc đã hết hạn." });
 
-        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
-            return BadRequest(new { error = "Mật khẩu mới phải có ít nhất 6 ký tự." });
+        //if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+        //    return BadRequest(new { error = "Mật khẩu mới phải có ít nhất 6 ký tự." });
 
         user.PasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
         user.PasswordResetTokenHash = null;
@@ -283,8 +288,8 @@ public class AuthController : ControllerBase
         if (result == PasswordVerificationResult.Failed)
             return BadRequest(new { error = "Mật khẩu hiện tại không đúng." });
 
-        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
-            return BadRequest(new { error = "Mật khẩu mới phải có ít nhất 6 ký tự." });
+        //if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+        //    return BadRequest(new { error = "Mật khẩu mới phải có ít nhất 6 ký tự." });
 
         user.PasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
         await _context.SaveChangesAsync();
