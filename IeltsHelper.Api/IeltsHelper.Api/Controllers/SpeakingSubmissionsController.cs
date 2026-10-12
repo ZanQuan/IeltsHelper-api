@@ -19,15 +19,18 @@ public class SpeakingSubmissionsController : BaseApiController
     private readonly AppDbContext _context;
     private readonly SpeechToTextService _speechToTextService;
     private readonly AiGradingService _gradingService;
+    private readonly ILogger<WritingSubmissionsController> _logger;
 
     public SpeakingSubmissionsController(
         AppDbContext context,
         SpeechToTextService speechToTextService,
-        AiGradingService gradingService)
+        AiGradingService gradingService,
+        ILogger<WritingSubmissionsController> logger)
     {
         _context = context;
         _speechToTextService = speechToTextService;
         _gradingService = gradingService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -65,7 +68,8 @@ public class SpeakingSubmissionsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { error = "Xử lý ghi âm hoặc chấm điểm thất bại.", detail = ex.Message });
+            _logger.LogError(ex, "Xử lý Speaking thất bại cho user {UserId}", CurrentUserId);
+            return StatusCode(500, new { error = "Xử lý ghi âm hoặc chấm điểm thất bại, vui lòng thử lại sau." });
         }
 
         var submission = new SpeakingSubmission
