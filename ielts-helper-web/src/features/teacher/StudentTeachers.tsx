@@ -23,10 +23,12 @@ export default function StudentTeachers() {
   }, []);
 
   async function openTeacher(t: TeacherItem) {
-    setSelected(t);
-    const res = await apiClient.get<CourseSummary[]>('/api/Courses');
-    setCourses(res.data.filter((c) => c.teacherId === t.id));
-  }
+  setSelected(t);
+  const res = await apiClient.get<{ items: CourseSummary[] }>('/api/Courses', {
+    params: { pageSize: 100 },
+  });
+  setCourses(res.data.items.filter((c) => c.teacherId === t.id));
+}
 
   if (selected) {
     return (
