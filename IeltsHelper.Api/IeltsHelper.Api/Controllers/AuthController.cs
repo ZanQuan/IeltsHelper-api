@@ -11,31 +11,55 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace IeltsHelper.Api.Controllers;
 
 public class RegisterRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải từ 2 đến 100 ký tự.")]
     public string Name { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập email.")]
+    [EmailAddress(ErrorMessage = "Email không đúng định dạng.")]
+    [StringLength(256, ErrorMessage = "Email tối đa 256 ký tự.")]
     public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,100}$",
+        ErrorMessage = "Mật khẩu phải từ 8 ký tự, gồm cả chữ và số.")]
     public string Password { get; set; } = string.Empty;
 }
 
 public class LoginRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập email.")]
     public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
     public string Password { get; set; } = string.Empty;
 }
 
+
 public class ForgotPasswordRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập email.")]
+    [EmailAddress(ErrorMessage = "Email không đúng định dạng.")]
     public string Email { get; set; } = string.Empty;
 }
 
 public class ResetPasswordRequest
 {
+    [Required, EmailAddress]
     public string Email { get; set; } = string.Empty;
+
+    [Required]
     public string Token { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới.")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,100}$",
+        ErrorMessage = "Mật khẩu phải từ 8 ký tự, gồm cả chữ và số.")]
     public string NewPassword { get; set; } = string.Empty;
 }
 
@@ -46,7 +70,12 @@ public class GoogleLoginRequest
 }
 public class ChangePasswordRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu hiện tại.")]
     public string CurrentPassword { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới.")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,100}$",
+        ErrorMessage = "Mật khẩu phải từ 8 ký tự, gồm cả chữ và số.")]
     public string NewPassword { get; set; } = string.Empty;
 }
 public class UpdateProfileRequest

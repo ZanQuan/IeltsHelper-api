@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Models.DTO;
+using IeltsHelper.Api.Repositories;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -9,23 +11,34 @@ namespace IeltsHelper.Api.Controllers;
 public class VocabulariesController : BaseApiController
 {
     private readonly AppDbContext _context;
+    private readonly IVocabularyRepository _vocabularyRepository;
 
-    public VocabulariesController(AppDbContext context)
+    public VocabulariesController(AppDbContext context, IVocabularyRepository vocabularyRepository)
     {
         _context = context;
+        _vocabularyRepository = vocabularyRepository;
     }
 
+   
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Vocabulary>>> GetAll([FromQuery] Guid? studentId)
+    public async Task<ActionResult<PagedResult<Vocabulary>>> GetAll( [FromQuery] Guid? studentId,
+        [FromQuery] string? filterOn,
+        [FromQuery] string? filterQuery,
+        [FromQuery] string? sortBy,
+        [FromQuery] bool isAscending = true,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
         var targetUserId = await ResolveTargetUserIdAsync(_context, studentId);
         if (targetUserId == null) return Forbid();
 
-        var words = await _context.Vocabularies
-            .Where(v => v.UserId == targetUserId)
-            .OrderBy(v => v.Word)
-            .ToListAsync();
-        return Ok(words);
+        pageNumber = Math.Max(pageNumber, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);   
+
+        var result = await _vocabularyRepository.GetPagedByUserAsync(
+            targetUserId.Value, filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
+
+        return Ok(result);
     }
 
     [HttpGet("due")]
@@ -49,15 +62,15 @@ public class VocabulariesController : BaseApiController
     }
 
     [HttpPost]
-    public async Task<ActionResult<Vocabulary>> Create(Vocabulary input)
+    public async Task<ActionResult<Vocabulary>> Create(CreateVocabularyRequest input)
     {
         var vocab = new Vocabulary
         {
             Id = Guid.NewGuid(),
             UserId = CurrentUserId,
             LessonLogId = input.LessonLogId,
-            Word = input.Word,
-            Meaning = input.Meaning,
+            Word = input.Word.Trim(),
+            Meaning = input.Meaning.Trim(),
             SrsLevel = 0,
             IntervalDays = 0,
             NextReviewDate = DateTime.Today

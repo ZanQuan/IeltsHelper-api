@@ -1,4 +1,5 @@
 ﻿using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Models.DTO;
 
 namespace IeltsHelper.Api.Repositories;
 
@@ -10,4 +11,7 @@ public interface IVocabularyRepository
     Task<Vocabulary> AddAsync(Vocabulary vocabulary);
     Task<Vocabulary?> ReviewAsync(Guid id, Guid userId, bool remembered);
     Task<bool> DeleteAsync(Guid id, Guid userId);
+    Task<PagedResult<Vocabulary>> GetPagedByUserAsync(
+    Guid userId, string? filterOn, string? filterQuery,
+    string? sortBy, bool isAscending, int pageNumber, int pageSize);
 }

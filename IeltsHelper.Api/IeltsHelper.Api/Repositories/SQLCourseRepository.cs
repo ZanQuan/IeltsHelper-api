@@ -106,4 +106,56 @@ public class SQLCourseRepository : ICourseRepository
         await _context.SaveChangesAsync();
         return true;
     }
+    public async Task<PagedResult<CourseSummaryDTO>> GetPagedAsync(
+    string? filterOn, string? filterQuery,
+    string? sortBy, bool isAscending, int pageNumber, int pageSize)
+    {
+        var query = _context.Courses.AsNoTracking().AsQueryable();
+
+        // FILTER
+        if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
+        {
+            var q = filterQuery.Trim();
+            if (filterOn.Equals("title", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(c => c.Title.Contains(q));
+            else if (filterOn.Equals("targetBand", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(c => c.TargetBand.Contains(q));
+            else if (filterOn.Equals("teacher", StringComparison.OrdinalIgnoreCase))
+                query = query.Where(c => c.Teacher!.Name.Contains(q));
+        }
+
+        // SORT
+        query = (sortBy?.ToLowerInvariant()) switch
+        {
+            "title" => isAscending ? query.OrderBy(c => c.Title) : query.OrderByDescending(c => c.Title),
+            "price" => isAscending ? query.OrderBy(c => c.Price) : query.OrderByDescending(c => c.Price),
+            "createdat" => isAscending ? query.OrderBy(c => c.CreatedAt) : query.OrderByDescending(c => c.CreatedAt),
+            _ => query.OrderByDescending(c => c.CreatedAt)
+        };
+
+        // PAGINATION
+        var total = await query.CountAsync();
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new CourseSummaryDTO
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                TargetBand = c.TargetBand,
+                Price = c.Price,
+                TeacherName = c.Teacher!.Name,
+                LessonCount = c.Lessons.Count
+            })
+            .ToListAsync();
+
+        return new PagedResult<CourseSummaryDTO>
+        {
+            Items = items,
+            TotalCount = total,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
 }

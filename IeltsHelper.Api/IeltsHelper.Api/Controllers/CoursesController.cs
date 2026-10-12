@@ -3,21 +3,39 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using IeltsHelper.Api.Models;
 using IeltsHelper.Api.Repositories;
+using System.ComponentModel.DataAnnotations;
 
 namespace IeltsHelper.Api.Controllers;
 
 public class CreateCourseRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập tên khóa học.")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "Tên khóa học phải từ 3 đến 200 ký tự.")]
     public string Title { get; set; } = string.Empty;
+
+    [StringLength(2000, ErrorMessage = "Mô tả tối đa 2000 ký tự.")]
     public string Description { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập band mục tiêu.")]
+    [RegularExpression(@"^[0-9](\.[05])?(-[0-9](\.[05])?)?$",
+        ErrorMessage = "Band mục tiêu không hợp lệ (vd: 6.5 hoặc 6.5-7.5).")]
     public string TargetBand { get; set; } = string.Empty;
+
+    [Range(0, 100000000, ErrorMessage = "Giá phải từ 0 đến 100.000.000.")]
     public decimal Price { get; set; }
 }
 
 public class AddLessonRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập tiêu đề bài học.")]
+    [StringLength(200, ErrorMessage = "Tiêu đề tối đa 200 ký tự.")]
     public string Title { get; set; } = string.Empty;
+
+    [StringLength(20000, ErrorMessage = "Nội dung quá dài.")]
     public string Content { get; set; } = string.Empty;
+
+    [Url(ErrorMessage = "Đường dẫn video không hợp lệ.")]
+    [StringLength(500)]
     public string? VideoUrl { get; set; }
 }
 
@@ -59,10 +77,20 @@ public class CoursesController : BaseApiController
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetAll()
+    public async Task<ActionResult> GetAll(
+    [FromQuery] string? filterOn,
+    [FromQuery] string? filterQuery,
+    [FromQuery] string? sortBy,
+    [FromQuery] bool isAscending = true,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
     {
-        var courses = await _courseRepository.GetAllAsync();
-        return Ok(courses);
+        pageNumber = Math.Max(pageNumber, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var result = await _courseRepository.GetPagedAsync(
+            filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
