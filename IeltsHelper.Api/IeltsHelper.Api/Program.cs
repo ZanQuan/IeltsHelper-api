@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using IeltsHelper.Api.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -61,6 +63,9 @@ builder.Services.AddScoped<VnPayService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<LessonLogWordExportService>();
 builder.Services.AddScoped<MomoService>();
+builder.Services.AddScoped<IVocabularyRepository, SQLVocabularyRepository>();
+builder.Services.AddScoped<ICourseRepository, SQLCourseRepository>();
+builder.Services.AddScoped<IErrorLogRepository, SQLErrorLogRepository>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo

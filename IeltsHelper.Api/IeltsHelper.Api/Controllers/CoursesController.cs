@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Repositories;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -39,11 +38,11 @@ public class SubmitExerciseRequest
 [Route("api/[controller]")]
 public class CoursesController : BaseApiController
 {
-    private readonly AppDbContext _context;
+    private readonly ICourseRepository _courseRepository;
 
-    public CoursesController(AppDbContext context)
+    public CoursesController(ICourseRepository courseRepository)
     {
-        _context = context;
+        _courseRepository = courseRepository;
     }
 
     private static List<ExerciseQuestion> ParseExercises(string? json)
@@ -62,32 +61,17 @@ public class CoursesController : BaseApiController
     [HttpGet]
     public async Task<ActionResult> GetAll()
     {
-        var courses = await _context.Courses
-            .Select(c => new
-            {
-                c.Id,
-                c.Title,
-                c.Description,
-                c.TargetBand,
-                c.Price,
-                TeacherName = c.Teacher!.Name,
-                LessonCount = c.Lessons.Count
-            })
-            .ToListAsync();
+        var courses = await _courseRepository.GetAllAsync();
         return Ok(courses);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById(Guid id)
     {
-        var course = await _context.Courses
-            .Include(c => c.Lessons)
-            .Include(c => c.Teacher)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        var course = await _courseRepository.GetByIdWithLessonsAsync(id);
         if (course == null) return NotFound();
 
-        var isEnrolled = await _context.Enrollments
-            .AnyAsync(e => e.CourseId == id && e.StudentId == CurrentUserId);
+        var isEnrolled = await _courseRepository.IsEnrolledAsync(id, CurrentUserId);
         var isOwner = course.TeacherId == CurrentUserId;
         var canSeeContent = isEnrolled || isOwner;
 
@@ -138,9 +122,7 @@ public class CoursesController : BaseApiController
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync();
-
+        await _courseRepository.AddAsync(course);
         return CreatedAtAction(nameof(GetById), new { id = course.Id }, course);
     }
 
@@ -148,26 +130,12 @@ public class CoursesController : BaseApiController
     [Authorize(Roles = "Teacher,Admin")]
     public async Task<ActionResult> AddLesson(Guid id, AddLessonRequest input)
     {
-        var course = await _context.Courses.FindAsync(id);
+        var course = await _courseRepository.GetByIdAsync(id);
         if (course == null) return NotFound();
         if (course.TeacherId != CurrentUserId && !User.IsInRole("Admin"))
             return Forbid();
 
-        var lessonCount = await _context.CourseLessons.CountAsync(l => l.CourseId == id);
-
-        var lesson = new CourseLesson
-        {
-            Id = Guid.NewGuid(),
-            CourseId = id,
-            Title = input.Title,
-            Content = input.Content,
-            VideoUrl = input.VideoUrl,
-            OrderIndex = lessonCount + 1
-        };
-
-        _context.CourseLessons.Add(lesson);
-        await _context.SaveChangesAsync();
-
+        var lesson = await _courseRepository.AddLessonAsync(id, input.Title, input.Content, input.VideoUrl);
         return Ok(lesson);
     }
 
@@ -176,9 +144,7 @@ public class CoursesController : BaseApiController
     [Authorize(Roles = "Teacher,Admin")]
     public async Task<ActionResult> SetExercises(Guid id, Guid lessonId, List<ExerciseQuestion> input)
     {
-        var lesson = await _context.CourseLessons
-            .Include(l => l.Course)
-            .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == id);
+        var lesson = await _courseRepository.GetLessonWithCourseAsync(id, lessonId);
         if (lesson == null) return NotFound();
         if (lesson.Course!.TeacherId != CurrentUserId && !User.IsInRole("Admin"))
             return Forbid();
@@ -188,9 +154,7 @@ public class CoursesController : BaseApiController
             if (string.IsNullOrWhiteSpace(q.Id)) q.Id = Guid.NewGuid().ToString();
         }
 
-        lesson.ExercisesJson = JsonSerializer.Serialize(input);
-        await _context.SaveChangesAsync();
-
+        await _courseRepository.UpdateExercisesAsync(lessonId, JsonSerializer.Serialize(input));
         return Ok(new { count = input.Count });
     }
 
@@ -199,9 +163,7 @@ public class CoursesController : BaseApiController
     [Authorize(Roles = "Teacher,Admin")]
     public async Task<ActionResult> GetExercisesForTeacher(Guid id, Guid lessonId)
     {
-        var lesson = await _context.CourseLessons
-            .Include(l => l.Course)
-            .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == id);
+        var lesson = await _courseRepository.GetLessonWithCourseAsync(id, lessonId);
         if (lesson == null) return NotFound();
         if (lesson.Course!.TeacherId != CurrentUserId && !User.IsInRole("Admin"))
             return Forbid();
@@ -213,13 +175,11 @@ public class CoursesController : BaseApiController
     [HttpPost("{id}/lessons/{lessonId}/submit")]
     public async Task<ActionResult> SubmitExercise(Guid id, Guid lessonId, SubmitExerciseRequest input)
     {
-        var lesson = await _context.CourseLessons
-            .Include(l => l.Course)
-            .FirstOrDefaultAsync(l => l.Id == lessonId && l.CourseId == id);
+        var lesson = await _courseRepository.GetLessonWithCourseAsync(id, lessonId);
         if (lesson == null) return NotFound();
 
         var allowed = lesson.Course!.TeacherId == CurrentUserId
-            || await _context.Enrollments.AnyAsync(e => e.CourseId == id && e.StudentId == CurrentUserId);
+            || await _courseRepository.IsEnrolledAsync(id, CurrentUserId);
         if (!allowed) return Forbid();
 
         var questions = ParseExercises(lesson.ExercisesJson);
@@ -243,13 +203,12 @@ public class CoursesController : BaseApiController
     [Authorize(Roles = "Teacher,Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var course = await _context.Courses.FindAsync(id);
+        var course = await _courseRepository.GetByIdAsync(id);
         if (course == null) return NotFound();
         if (course.TeacherId != CurrentUserId && !User.IsInRole("Admin"))
             return Forbid();
 
-        _context.Courses.Remove(course);
-        await _context.SaveChangesAsync();
+        await _courseRepository.DeleteAsync(id);
         return NoContent();
     }
 }
