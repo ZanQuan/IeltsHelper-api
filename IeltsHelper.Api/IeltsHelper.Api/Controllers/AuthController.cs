@@ -350,22 +350,11 @@ public class AuthController : ControllerBase
             return BadRequest(new { error = "Giới thiệu tối đa 500 ký tự." });
 
         var avatar = string.IsNullOrWhiteSpace(request.AvatarUrl) ? null : request.AvatarUrl;
-        if (avatar != null)
+        if (avatar != null && avatar != user.AvatarUrl)
         {
-            var isDataUrl = avatar.StartsWith("data:image/jpeg;base64,") ||
-                            avatar.StartsWith("data:image/png;base64,") ||
-                            avatar.StartsWith("data:image/webp;base64,");
-            if (isDataUrl)
-            {
-                if (avatar.Length > 400_000)
-                    return BadRequest(new { error = "Ảnh đại diện quá lớn." });
-            }
-            else
-            {
-                var owned = await _context.Images.AnyAsync(i => i.FilePath == avatar && i.UploadedByUserId == userId);
-                if (!owned)
-                    return BadRequest(new { error = "Ảnh đại diện không hợp lệ." });
-            }
+            var owned = await _context.Images.AnyAsync(i => i.FilePath == avatar && i.UploadedByUserId == userId);
+            if (!owned)
+                return BadRequest(new { error = "Ảnh đại diện không hợp lệ." });
         }
 
         user.Name = name;
