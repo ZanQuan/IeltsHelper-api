@@ -11,31 +11,55 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace IeltsHelper.Api.Controllers;
 
 public class RegisterRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Họ tên phải từ 2 đến 100 ký tự.")]
     public string Name { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập email.")]
+    [EmailAddress(ErrorMessage = "Email không đúng định dạng.")]
+    [StringLength(256, ErrorMessage = "Email tối đa 256 ký tự.")]
     public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,100}$",
+        ErrorMessage = "Mật khẩu phải từ 8 ký tự, gồm cả chữ và số.")]
     public string Password { get; set; } = string.Empty;
 }
 
 public class LoginRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập email.")]
     public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
     public string Password { get; set; } = string.Empty;
 }
 
+
 public class ForgotPasswordRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập email.")]
+    [EmailAddress(ErrorMessage = "Email không đúng định dạng.")]
     public string Email { get; set; } = string.Empty;
 }
 
 public class ResetPasswordRequest
 {
+    [Required, EmailAddress]
     public string Email { get; set; } = string.Empty;
+
+    [Required]
     public string Token { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới.")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,100}$",
+        ErrorMessage = "Mật khẩu phải từ 8 ký tự, gồm cả chữ và số.")]
     public string NewPassword { get; set; } = string.Empty;
 }
 
@@ -46,7 +70,12 @@ public class GoogleLoginRequest
 }
 public class ChangePasswordRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu hiện tại.")]
     public string CurrentPassword { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới.")]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,100}$",
+        ErrorMessage = "Mật khẩu phải từ 8 ký tự, gồm cả chữ và số.")]
     public string NewPassword { get; set; } = string.Empty;
 }
 public class UpdateProfileRequest
@@ -68,11 +97,13 @@ public class AuthController : ControllerBase
     private readonly EmailService _emailService;
     private readonly PasswordHasher<User> _passwordHasher = new();
 
-    public AuthController(AppDbContext context, IConfiguration configuration, EmailService emailService)
+    private readonly ILogger<AuthController> _logger;
+    public AuthController(AppDbContext context, IConfiguration configuration, EmailService emailService, ILogger<AuthController> logger)
     {
         _context = context;
         _configuration = configuration;
         _emailService = emailService;
+        _logger = logger;
     }
 
     [HttpPost("register")]
@@ -101,11 +132,19 @@ public class AuthController : ControllerBase
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (user == null)
+        {
+            _logger.LogWarning("Login failed: unknown email {Email}", request.Email);
             return Unauthorized(new { error = "Email hoặc mật khẩu không đúng." });
+        }
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (result == PasswordVerificationResult.Failed)
+        {
+            _logger.LogWarning("Login failed: wrong password for user {UserId}", user.Id);
             return Unauthorized(new { error = "Email hoặc mật khẩu không đúng." });
+        }
+
+        _logger.LogInformation("User {UserId} logged in", user.Id);
 
         var token = GenerateJwtToken(user);
         return Ok(new { token, userId = user.Id, name = user.Name, role = user.Role });
@@ -308,11 +347,20 @@ public class AuthController : ControllerBase
         var avatar = string.IsNullOrWhiteSpace(request.AvatarUrl) ? null : request.AvatarUrl;
         if (avatar != null)
         {
-            var okType = avatar.StartsWith("data:image/jpeg;base64,") ||
-                         avatar.StartsWith("data:image/png;base64,") ||
-                         avatar.StartsWith("data:image/webp;base64,");
-            if (!okType || avatar.Length > 400_000)
-                return BadRequest(new { error = "Ảnh đại diện không hợp lệ hoặc quá lớn." });
+            var isDataUrl = avatar.StartsWith("data:image/jpeg;base64,") ||
+                            avatar.StartsWith("data:image/png;base64,") ||
+                            avatar.StartsWith("data:image/webp;base64,");
+            if (isDataUrl)
+            {
+                if (avatar.Length > 400_000)
+                    return BadRequest(new { error = "Ảnh đại diện quá lớn." });
+            }
+            else
+            {
+                var owned = await _context.Images.AnyAsync(i => i.FilePath == avatar && i.UploadedByUserId == userId);
+                if (!owned)
+                    return BadRequest(new { error = "Ảnh đại diện không hợp lệ." });
+            }
         }
 
         user.Name = name;

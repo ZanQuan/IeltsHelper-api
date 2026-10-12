@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from './useAuth';
 import WhaleMascot from '@/components/WhaleMascot/WhaleMascot';
+import axios from 'axios';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -16,11 +17,12 @@ export default function RegisterPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
-    try {
+        try {
       await register(name, email, password);
       navigate('/dashboard');
-    } catch {
-      setError('Đăng ký thất bại — email có thể đã được dùng.');
+    } catch (err) {
+      const msg = axios.isAxiosError(err) ? err.response?.data?.error : undefined;
+      setError(msg ?? 'Đăng ký thất bại. Vui lòng thử lại.');
     }
   }
 

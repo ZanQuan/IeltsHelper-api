@@ -14,4 +14,7 @@ public interface ICourseRepository
     Task<CourseLesson?> GetLessonWithCourseAsync(Guid courseId, Guid lessonId);
     Task<bool> UpdateExercisesAsync(Guid lessonId, string exercisesJson);
     Task<bool> DeleteAsync(Guid id);
+    Task<PagedResult<CourseSummaryDTO>> GetPagedAsync(
+    string? filterOn, string? filterQuery,
+    string? sortBy, bool isAscending, int pageNumber, int pageSize);
 }
