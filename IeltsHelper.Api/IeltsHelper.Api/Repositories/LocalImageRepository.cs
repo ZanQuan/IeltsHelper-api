@@ -75,4 +75,26 @@ public class LocalImageRepository : IImageRepository
             : "image/jpeg";
         return (bytes, contentType, image.FileName + image.FileExtension);
     }
+    public Task<int> CountByUserAsync(Guid userId) =>
+    _dbContext.Images.CountAsync(i => i.UploadedByUserId == userId);
+
+    public async Task DeleteByFilePathAsync(string filePath, Guid userId)
+    {
+        var image = await _dbContext.Images
+            .FirstOrDefaultAsync(i => i.FilePath == filePath && i.UploadedByUserId == userId);
+        if (image == null) return; 
+
+        var path = Path.Combine(ImagesFolder, image.StoredFileName);
+        _dbContext.Images.Remove(image);
+        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Không xóa được file ảnh {ImageId} trên đĩa", image.Id);
+        }
+    }
 }

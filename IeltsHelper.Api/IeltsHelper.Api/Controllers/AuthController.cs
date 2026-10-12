@@ -1,16 +1,17 @@
 ﻿using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Repositories;
 using IeltsHelper.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.ComponentModel.DataAnnotations;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -97,12 +98,14 @@ public class AuthController : ControllerBase
     private readonly PasswordHasher<User> _passwordHasher = new();
 
     private readonly ILogger<AuthController> _logger;
-    public AuthController(AppDbContext context, IConfiguration configuration, EmailService emailService, ILogger<AuthController> logger)
+    private readonly IImageRepository _imageRepository;
+    public AuthController(AppDbContext context, IConfiguration configuration, EmailService emailService,ILogger<AuthController> logger, IImageRepository imageRepository)
     {
         _context = context;
         _configuration = configuration;
         _emailService = emailService;
         _logger = logger;
+        _imageRepository = imageRepository;
     }
 
     [HttpPost("register")]
@@ -357,6 +360,8 @@ public class AuthController : ControllerBase
                 return BadRequest(new { error = "Ảnh đại diện không hợp lệ." });
         }
 
+        var oldAvatar = user.AvatarUrl;
+
         user.Name = name;
         user.PhoneNumber = string.IsNullOrEmpty(phone) ? null : phone;
         user.DateOfBirth = request.DateOfBirth;
@@ -364,6 +369,9 @@ public class AuthController : ControllerBase
         user.Bio = string.IsNullOrEmpty(bio) ? null : bio;
         user.AvatarUrl = avatar;
         await _context.SaveChangesAsync();
+
+        if (!string.IsNullOrEmpty(oldAvatar) && oldAvatar != avatar)
+            await _imageRepository.DeleteByFilePathAsync(oldAvatar, userId);
 
         return Ok(new { message = "Đã cập nhật hồ sơ.", name = user.Name });
     }

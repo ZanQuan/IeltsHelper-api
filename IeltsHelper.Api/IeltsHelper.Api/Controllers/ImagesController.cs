@@ -10,7 +10,7 @@ public class ImagesController : BaseApiController
 {
     private readonly IImageRepository _imageRepository;
     private readonly ILogger<ImagesController> _logger;
-
+    private const int MaxImagesPerUser = 20;
     public ImagesController(IImageRepository imageRepository, ILogger<ImagesController> logger)
     {
         _imageRepository = imageRepository;
@@ -27,6 +27,8 @@ public class ImagesController : BaseApiController
             _logger.LogWarning("Upload rejected for user {UserId}: {Reason}", CurrentUserId, error);
             return BadRequest(new { error });
         }
+        if (!User.IsInRole("Admin") && await _imageRepository.CountByUserAsync(CurrentUserId) >= MaxImagesPerUser)
+            return BadRequest(new { error = $"Bạn đã đạt giới hạn {MaxImagesPerUser} ảnh. Hãy xóa bớt ảnh cũ." });
         var realExtension = DetectImageExtension(request.File);
         if (realExtension == null)
         {
