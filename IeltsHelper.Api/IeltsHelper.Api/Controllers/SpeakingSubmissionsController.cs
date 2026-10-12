@@ -59,6 +59,12 @@ public class SpeakingSubmissionsController : BaseApiController
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<SpeakingSubmission>> Submit([FromForm] SpeakingSubmitRequest request)
     {
+        if (request.AudioFile == null || request.AudioFile.Length == 0)
+            return BadRequest(new { error = "Thiếu file ghi âm." });
+        if (request.AudioFile.Length > 10 * 1024 * 1024)
+            return BadRequest(new { error = "File ghi âm tối đa 10MB." });
+        if (request.Prompt?.Length > 2_000)
+            return BadRequest(new { error = "Đề bài tối đa 2.000 ký tự." });
         string transcript;
         GradingResult result;
         try

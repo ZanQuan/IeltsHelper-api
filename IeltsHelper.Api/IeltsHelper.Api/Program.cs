@@ -1,17 +1,18 @@
-using Serilog;
-using Serilog.Events;
 using IeltsHelper.Api.Data;
+using IeltsHelper.Api.Filters;
 using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Repositories;
 using IeltsHelper.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Serilog;
+using Serilog.Events;
 using System.Text;
-using IeltsHelper.Api.Repositories;
-using Microsoft.Extensions.FileProviders;
-using IeltsHelper.Api.Filters;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,24 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
+    });
+});
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("ai", httpContext =>
+    {
+        // Tính theo user đã đăng nhập, nếu không có thì theo IP
+        var key = httpContext.User.Identity?.IsAuthenticated == true
+            ? httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value
+            : httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon";
+
+        return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,                    
+            Window = TimeSpan.FromMinutes(1),   
+            QueueLimit = 0
+        });
     });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -163,7 +182,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("AllowReactDev");
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseRateLimiter();
 app.MapControllers();
 
 app.Run();
