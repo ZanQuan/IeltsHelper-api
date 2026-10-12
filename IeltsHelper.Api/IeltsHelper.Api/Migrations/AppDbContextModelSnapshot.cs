@@ -459,7 +459,8 @@ namespace IeltsHelper.Api.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("TeacherId", "StudentId")
+                        .IsUnique();
 
                     b.ToTable("TeacherStudentLinks");
                 });

@@ -65,5 +65,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Enrollment>()
             .HasIndex(e => new { e.CourseId, e.StudentId })
             .IsUnique();
+        modelBuilder.Entity<TeacherStudentLink>()
+            .HasIndex(l => new { l.TeacherId, l.StudentId })
+            .IsUnique();
     }
 }

@@ -1,5 +1,6 @@
 export interface CourseSummary {
   id: string;
+  teacherId: string;
   title: string;
   description: string;
   targetBand: string;

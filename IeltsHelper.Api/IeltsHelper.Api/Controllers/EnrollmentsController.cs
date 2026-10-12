@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IeltsHelper.Api.Data;
+using IeltsHelper.Api.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using IeltsHelper.Api.Data;
-using IeltsHelper.Api.Models;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -44,6 +44,23 @@ public class EnrollmentsController : BaseApiController
 
         _context.Enrollments.Add(enrollment);
         await _context.SaveChangesAsync();
+
+        // Tự liên kết học viên với giáo viên của khóa học
+        var alreadyLinked = await _context.TeacherStudentLinks
+            .AnyAsync(l => l.TeacherId == course.TeacherId && l.StudentId == CurrentUserId);
+
+        if (!alreadyLinked)
+        {
+            _context.TeacherStudentLinks.Add(new TeacherStudentLink
+            {
+                Id = Guid.NewGuid(),
+                TeacherId = course.TeacherId,
+                StudentId = CurrentUserId,
+                CreatedAt = DateTime.UtcNow
+            });
+            try { await _context.SaveChangesAsync(); }
+            catch (DbUpdateException) { /* đã có bản ghi trùng */ }
+        }
 
         return Ok(new { message = $"Đã đăng ký khóa học '{course.Title}'." });
     }

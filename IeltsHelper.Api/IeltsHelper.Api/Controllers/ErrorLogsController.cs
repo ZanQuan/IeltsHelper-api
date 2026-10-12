@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using IeltsHelper.Api.Data;
 using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Models.DTO;
+using IeltsHelper.Api.Repositories;
 
 namespace IeltsHelper.Api.Controllers;
 
 [Route("api/[controller]")]
 public class ErrorLogsController : BaseApiController
 {
+    // Chỉ dùng cho ResolveTargetUserIdAsync (kiểm tra quan hệ giáo viên - học viên)
     private readonly AppDbContext _context;
+    private readonly IErrorLogRepository _errorLogRepository;
 
-    public ErrorLogsController(AppDbContext context)
+    public ErrorLogsController(AppDbContext context, IErrorLogRepository errorLogRepository)
     {
         _context = context;
+        _errorLogRepository = errorLogRepository;
     }
 
     [HttpGet]
@@ -21,23 +25,20 @@ public class ErrorLogsController : BaseApiController
         var targetUserId = await ResolveTargetUserIdAsync(_context, studentId);
         if (targetUserId == null) return Forbid();
 
-        var errors = await _context.ErrorLogs
-            .Where(e => e.UserId == targetUserId)
-            .ToListAsync();
+        var errors = await _errorLogRepository.GetAllByUserAsync(targetUserId.Value);
         return Ok(errors);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ErrorLog>> GetById(Guid id)
     {
-        var error = await _context.ErrorLogs
-            .FirstOrDefaultAsync(e => e.Id == id && e.UserId == CurrentUserId);
+        var error = await _errorLogRepository.GetByIdAsync(id, CurrentUserId);
         if (error == null) return NotFound();
         return Ok(error);
     }
 
     [HttpPost]
-    public async Task<ActionResult<ErrorLog>> Create(ErrorLog input)
+    public async Task<ActionResult<ErrorLog>> Create(ErrorLogRequest input)
     {
         var error = new ErrorLog
         {
@@ -48,49 +49,30 @@ public class ErrorLogsController : BaseApiController
             Description = input.Description
         };
 
-        _context.ErrorLogs.Add(error);
-        await _context.SaveChangesAsync();
-
+        await _errorLogRepository.AddAsync(error);
         return CreatedAtAction(nameof(GetById), new { id = error.Id }, error);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, ErrorLog input)
+    public async Task<IActionResult> Update(Guid id, ErrorLogRequest input)
     {
-        var error = await _context.ErrorLogs
-            .FirstOrDefaultAsync(e => e.Id == id && e.UserId == CurrentUserId);
-        if (error == null) return NotFound();
-
-        error.ErrorType = input.ErrorType;
-        error.Description = input.Description;
-        error.LessonLogId = input.LessonLogId;
-
-        await _context.SaveChangesAsync();
+        var updated = await _errorLogRepository.UpdateAsync(id, CurrentUserId, input);
+        if (!updated) return NotFound();
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var error = await _context.ErrorLogs
-            .FirstOrDefaultAsync(e => e.Id == id && e.UserId == CurrentUserId);
-        if (error == null) return NotFound();
-
-        _context.ErrorLogs.Remove(error);
-        await _context.SaveChangesAsync();
+        var deleted = await _errorLogRepository.DeleteAsync(id, CurrentUserId);
+        if (!deleted) return NotFound();
         return NoContent();
     }
 
     [HttpGet("stats")]
     public async Task<ActionResult> GetStats()
     {
-        var stats = await _context.ErrorLogs
-            .Where(e => e.UserId == CurrentUserId)
-            .GroupBy(e => e.ErrorType)
-            .Select(g => new { ErrorType = g.Key, Count = g.Count() })
-            .OrderByDescending(x => x.Count)
-            .ToListAsync();
-
+        var stats = await _errorLogRepository.GetStatsByUserAsync(CurrentUserId);
         return Ok(stats);
     }
 }

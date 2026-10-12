@@ -1,39 +1,13 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
 import type { ErrorLog, LessonLog, Student } from '@/types';
 import './teacher.css';
+import StudentTeachers from './StudentTeachers';
 
 export default function TeacherDashboardPage() {
   const { user } = useAuth();
   const isTeacher = user?.role === 'Teacher' || user?.role === 'Admin';
-
-  const [teacherEmail, setTeacherEmail] = useState('');
-  const [linking, setLinking] = useState(false);
-  const [linkMessage, setLinkMessage] = useState('');
-  const [linkOk, setLinkOk] = useState(false);
-
-  async function handleAddTeacher(e: FormEvent) {
-    e.preventDefault();
-    setLinking(true);
-    setLinkMessage('');
-    try {
-      const res = await apiClient.post('/api/TeacherLinks/add-teacher', { teacherEmail });
-      setLinkMessage(res.data.message);
-      setLinkOk(true);
-      setTeacherEmail('');
-    } catch (err) {
-      setLinkOk(false);
-      if (axios.isAxiosError(err)) {
-        setLinkMessage(err.response?.data?.error || 'Liên kết thất bại.');
-      } else {
-        setLinkMessage('Liên kết thất bại.');
-      }
-    } finally {
-      setLinking(false);
-    }
-  }
 
   const [students, setStudents] = useState<Student[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(isTeacher);
@@ -66,44 +40,8 @@ export default function TeacherDashboardPage() {
     return name.trim().split(/\s+/).slice(-2).map((w) => w[0]).join('').toUpperCase();
   }
 
-  if (!isTeacher) {
-    return (
-      <div className="teacher-link-page">
-        <h2>Liên kết giáo viên</h2>
-        <p className="muted mb-20">
-          Thêm giáo viên đang dạy bạn để họ xem được nhật ký buổi học và lỗi sai của bạn.
-        </p>
-        <form onSubmit={handleAddTeacher} className="card">
-          <div className="field">
-            <label className="label">Email giáo viên</label>
-            <input
-              className="input"
-              type="email"
-              value={teacherEmail}
-              onChange={(e) => setTeacherEmail(e.target.value)}
-              required
-              placeholder="giaovien@example.com"
-            />
-          </div>
-          <button type="submit" disabled={linking} className="btn btn-primary">
-            {linking ? 'Đang liên kết...' : 'Thêm giáo viên'}
-          </button>
-          {linkMessage && (
-            <p
-              style={{
-                marginTop: 14,
-                marginBottom: 0,
-                fontSize: 14,
-                color: linkOk ? 'var(--success)' : 'var(--danger)',
-              }}
-            >
-              {linkMessage}
-            </p>
-          )}
-        </form>
-      </div>
-    );
-  }
+  // Học viên: xem danh sách giáo viên để kết nối qua khóa học
+  if (!isTeacher) return <StudentTeachers />;
 
   if (selectedStudent) {
     return (
@@ -180,8 +118,8 @@ export default function TeacherDashboardPage() {
       ) : students.length === 0 ? (
         <div className="card">
           <p className="muted m-0">
-            Chưa có học viên nào liên kết với bạn. Bảo học viên vào mục "Giáo viên" trong tài khoản của họ và nhập
-            email của bạn.
+            Chưa có học viên nào liên kết với bạn. Học viên sẽ tự được kết nối khi họ thanh toán
+            một khóa học của bạn.
           </p>
         </div>
       ) : (

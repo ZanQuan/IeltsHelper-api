@@ -58,4 +58,33 @@ public class TeacherLinksController : BaseApiController
 
         return Ok(students);
     }
+
+    [HttpGet("teachers")]
+    public async Task<ActionResult> GetTeachers()
+    {
+        var linkedIds = await _context.TeacherStudentLinks
+            .Where(l => l.StudentId == CurrentUserId)
+            .Select(l => l.TeacherId)
+            .ToListAsync();
+
+        var teachers = await _context.Users
+            .Where(u => u.Role == "Teacher")
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                u.Bio,
+                CourseCount = _context.Courses.Count(c => c.TeacherId == u.Id)
+            })
+            .ToListAsync();
+
+        return Ok(teachers.Select(t => new
+        {
+            t.Id,
+            t.Name,
+            t.Bio,
+            t.CourseCount,
+            IsLinked = linkedIds.Contains(t.Id)
+        }));
+    }
 }

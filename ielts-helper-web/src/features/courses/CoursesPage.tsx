@@ -4,6 +4,7 @@ import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
 import type { CourseSummary } from '@/types';
 import './courses.css';
+import { useSearchParams } from 'react-router-dom';
 
 interface CourseLesson {
   id: string;
@@ -29,6 +30,7 @@ const fetchCourses = () => apiClient.get<CourseSummary[]>('/api/Courses').then((
 export default function CoursesPage() {
   const { user } = useAuth();
   const isTeacher = user?.role === 'Teacher' || user?.role === 'Admin';
+  const [params] = useSearchParams();
 
   const [courses, setCourses] = useState<CourseSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -56,11 +58,19 @@ export default function CoursesPage() {
     setLoading(false);
   }
 
-  useEffect(() => {
+      useEffect(() => {
     fetchCourses().then((data) => {
       setCourses(data);
       setLoading(false);
     });
+
+    // Mở thẳng khóa học khi vào từ trang Giáo viên: /courses?courseId=...
+    const id = params.get('courseId');
+    if (id) {
+      openCourse(id).catch(() => {
+        setSelectedId(null); // id sai hoặc khóa đã bị xóa → về danh sách
+      });
+    }
   }, []);
 
   async function openCourse(id: string) {

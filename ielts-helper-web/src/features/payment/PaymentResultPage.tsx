@@ -51,7 +51,7 @@ export default function PaymentResultPage() {
       {status === 'Paid' && (
         <>
           <h2>Thanh toán thành công 🎉</h2>
-          <p className="muted">Bạn đã được ghi danh vào khóa học.</p>
+          <p className="muted">Bạn đã được ghi danh và kết nối với giáo viên.</p>
           <Link to="/courses" className="btn btn-primary">Vào khóa học</Link>
         </>
       )}

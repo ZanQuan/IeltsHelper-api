@@ -231,6 +231,35 @@ public class PaymentsController : BaseApiController
                 catch (DbUpdateException)
                 {
                     // Index duy nhất (CourseId, StudentId) đã chặn bản ghi trùng
+                    _context.ChangeTracker.Clear();
+                }
+            }
+
+            var teacherId = await _context.Courses
+                .Where(c => c.Id == order.CourseId)
+                .Select(c => c.TeacherId)
+                .FirstAsync();
+
+            var alreadyLinked = await _context.TeacherStudentLinks
+                .AnyAsync(l => l.TeacherId == teacherId && l.StudentId == order.StudentId);
+
+            if (!alreadyLinked)
+            {
+                _context.TeacherStudentLinks.Add(new TeacherStudentLink
+                {
+                    Id = Guid.NewGuid(),
+                    TeacherId = teacherId,
+                    StudentId = order.StudentId,
+                    CreatedAt = DateTime.UtcNow
+                });
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    // Đã có liên kết (chạy song song)
+                    _context.ChangeTracker.Clear();
                 }
             }
         }

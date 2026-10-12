@@ -26,6 +26,7 @@ public class SQLCourseRepository : ICourseRepository
                 TargetBand = c.TargetBand,
                 Price = c.Price,
                 TeacherName = c.Teacher!.Name,
+                TeacherId = c.TeacherId,
                 LessonCount = c.Lessons.Count
             })
             .ToListAsync();
