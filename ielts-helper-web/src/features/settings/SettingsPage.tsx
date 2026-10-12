@@ -79,6 +79,7 @@ export default function SettingsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     apiClient.get<Profile>('/api/Auth/me').then((res) => {
@@ -114,12 +115,22 @@ export default function SettingsPage() {
       setProfileMsg('Ảnh quá lớn, vui lòng chọn ảnh dưới 5MB.');
       return;
     }
+    setUploading(true);
+    setProfileMsg('');
     try {
-      setField('avatarUrl', await resizeToSquare(file));
-      setProfileMsg('');
-    } catch {
+      const dataUrl = await resizeToSquare(file);
+      const blob = await (await fetch(dataUrl)).blob();
+      const body = new FormData();
+      body.append('File', new File([blob], 'avatar.jpg', { type: 'image/jpeg' }));
+      body.append('FileName', 'avatar');
+      body.append('FileDescription', 'Ảnh đại diện');
+      const res = await apiClient.post<{ filePath: string }>('/api/Images/Upload', body);
+      setField('avatarUrl', res.data.filePath);
+    } catch (err) {
       setProfileErr(true);
-      setProfileMsg('Không đọc được ảnh này, hãy thử ảnh khác.');
+      setProfileMsg(errorText(err, 'Tải ảnh lên thất bại.'));
+    } finally {
+      setUploading(false);
     }
   }
 
