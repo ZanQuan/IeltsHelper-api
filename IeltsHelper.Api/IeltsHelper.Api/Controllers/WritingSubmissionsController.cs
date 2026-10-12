@@ -11,11 +11,13 @@ public class WritingSubmissionsController : BaseApiController
 {
     private readonly AppDbContext _context;
     private readonly AiGradingService _gradingService;
+    private readonly ILogger<WritingSubmissionsController> _logger;
 
-    public WritingSubmissionsController(AppDbContext context, AiGradingService gradingService)
+    public WritingSubmissionsController(AppDbContext context,AiGradingService gradingService,ILogger<WritingSubmissionsController> logger)
     {
         _context = context;
         _gradingService = gradingService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -50,7 +52,8 @@ public class WritingSubmissionsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { error = "Chấm bài thất bại, kiểm tra lại API key hoặc thử lại sau.", detail = ex.Message });
+            _logger.LogError(ex, "Chấm bài Writing thất bại cho user {UserId}", CurrentUserId);
+            return StatusCode(500, new { error = "Chấm bài thất bại, vui lòng thử lại sau." });
         }
 
         var submission = new WritingSubmission
