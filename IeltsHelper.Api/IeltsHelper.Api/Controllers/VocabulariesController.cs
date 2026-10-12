@@ -19,9 +19,9 @@ public class VocabulariesController : BaseApiController
         _vocabularyRepository = vocabularyRepository;
     }
 
-   
     [HttpGet]
-    public async Task<ActionResult<PagedResult<Vocabulary>>> GetAll( [FromQuery] Guid? studentId,
+    public async Task<ActionResult<PagedResult<Vocabulary>>> GetAll(
+        [FromQuery] Guid? studentId,
         [FromQuery] string? filterOn,
         [FromQuery] string? filterQuery,
         [FromQuery] string? sortBy,
@@ -32,18 +32,13 @@ public class VocabulariesController : BaseApiController
         var targetUserId = await ResolveTargetUserIdAsync(_context, studentId);
         if (targetUserId == null) return Forbid();
 
-<<<<<<< HEAD
-        var words = await _vocabularyRepository.GetAllByUserAsync(targetUserId.Value);
-        return Ok(words);
-=======
         pageNumber = Math.Max(pageNumber, 1);
-        pageSize = Math.Clamp(pageSize, 1, 100);   
+        pageSize = Math.Clamp(pageSize, 1, 100);
 
         var result = await _vocabularyRepository.GetPagedByUserAsync(
             targetUserId.Value, filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
 
         return Ok(result);
->>>>>>> 47f402e5ab6858e619ec0148e95ecc9d50db06d8
     }
 
     [HttpGet("due")]
@@ -62,25 +57,15 @@ public class VocabulariesController : BaseApiController
     }
 
     [HttpPost]
-<<<<<<< HEAD
-    public async Task<ActionResult<Vocabulary>> Create(CreateVocabularyRequest request)
-=======
     public async Task<ActionResult<Vocabulary>> Create(CreateVocabularyRequest input)
->>>>>>> 47f402e5ab6858e619ec0148e95ecc9d50db06d8
     {
         var vocab = new Vocabulary
         {
             Id = Guid.NewGuid(),
             UserId = CurrentUserId,
-<<<<<<< HEAD
-            LessonLogId = request.LessonLogId,
-            Word = request.Word,
-            Meaning = request.Meaning,
-=======
             LessonLogId = input.LessonLogId,
             Word = input.Word.Trim(),
             Meaning = input.Meaning.Trim(),
->>>>>>> 47f402e5ab6858e619ec0148e95ecc9d50db06d8
             SrsLevel = 0,
             IntervalDays = 0,
             NextReviewDate = DateTime.Today
