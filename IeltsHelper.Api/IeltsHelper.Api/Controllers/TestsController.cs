@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IeltsHelper.Api.Data;
+using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using IeltsHelper.Api.Data;
-using IeltsHelper.Api.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace IeltsHelper.Api.Controllers;
 
@@ -41,12 +42,22 @@ public class TestsController : BaseApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Test>> GetById(Guid id)
+    public async Task<ActionResult> GetById(Guid id)
     {
-        var test = await _context.Tests.Include(t => t.Questions).FirstOrDefaultAsync(t => t.Id == id);
+        var test = await _context.Tests.AsNoTracking()
+            .Include(t => t.Questions)
+            .FirstOrDefaultAsync(t => t.Id == id);
         if (test == null) return NotFound();
-        return Ok(test);
+
+        var canSeeAnswers = User.IsInRole("Teacher") || User.IsInRole("Admin");
+        return canSeeAnswers
+            ? Ok(ToDto(test, q => new QuestionWithAnswerDTO(q.Id, q.QuestionText, q.OptionsJson, q.CorrectAnswer)))
+            : Ok(ToDto(test, q => new QuestionDTO(q.Id, q.QuestionText, q.OptionsJson)));
     }
+
+    private static TestDTO<T> ToDto<T>(Test t, Func<Question, T> mapQuestion) =>
+        new(t.Id, t.Skill, t.Title, t.PassageOrTranscript, t.TimeLimitMinutes,
+            t.Questions.Select(mapQuestion).ToList());
 
     [HttpPost]
     [Authorize(Roles = "Teacher,Admin")]
