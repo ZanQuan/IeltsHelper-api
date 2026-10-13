@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import apiClient from '@/api/client';
 import type { TestSummary } from '@/types';
+import TestCreateForm from './TestCreateForm';
 
 const fetchTests = () => apiClient.get<TestSummary[]>('/api/Tests').then((res) => res.data);
 
@@ -47,6 +48,7 @@ export default function AdminTestsPage() {
       <h2>Đề thi</h2>
       <p className="muted mb-24">
         Ngân hàng đề Listening &amp; Reading dùng chung cho toàn hệ thống.
+        <TestCreateForm onCreated={loadTests} />
       </p>
 
       <div className="toolbar">

@@ -2,14 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IeltsHelper.Api.Data;
-using IeltsHelper.Api.Models;
+using IeltsHelper.Api.Models.DTO;
 
 namespace IeltsHelper.Api.Controllers;
-
-public class AddTeacherRequest
-{
-    public string TeacherEmail { get; set; } = string.Empty;
-}
 
 [Route("api/[controller]")]
 public class TeacherLinksController : BaseApiController
@@ -19,32 +14,6 @@ public class TeacherLinksController : BaseApiController
     public TeacherLinksController(AppDbContext context)
     {
         _context = context;
-    }
-
-    [HttpPost("add-teacher")]
-    public async Task<ActionResult> AddTeacher(AddTeacherRequest request)
-    {
-        var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.TeacherEmail);
-        if (teacher == null || teacher.Role != "Teacher")
-            return BadRequest(new { error = "Không tìm thấy giáo viên với email này." });
-
-        var alreadyLinked = await _context.TeacherStudentLinks
-            .AnyAsync(l => l.TeacherId == teacher.Id && l.StudentId == CurrentUserId);
-        if (alreadyLinked)
-            return BadRequest(new { error = "Đã liên kết với giáo viên này rồi." });
-
-        var link = new TeacherStudentLink
-        {
-            Id = Guid.NewGuid(),
-            TeacherId = teacher.Id,
-            StudentId = CurrentUserId,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.TeacherStudentLinks.Add(link);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = $"Đã liên kết với giáo viên {teacher.Name}." });
     }
 
     [HttpGet("my-students")]
@@ -59,32 +28,70 @@ public class TeacherLinksController : BaseApiController
         return Ok(students);
     }
 
+    // Danh bạ giáo viên: chỉ giáo viên đã có khóa học, có tìm kiếm theo tên và phân trang
     [HttpGet("teachers")]
-    public async Task<ActionResult> GetTeachers()
+    public async Task<ActionResult<PagedResult<TeacherListItemDTO>>> GetTeachers(
+        [FromQuery] string? search,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var linkedIds = await _context.TeacherStudentLinks
-            .Where(l => l.StudentId == CurrentUserId)
-            .Select(l => l.TeacherId)
-            .ToListAsync();
+        pageNumber = Math.Max(pageNumber, 1);
+        pageSize = Math.Clamp(pageSize, 1, 50);
+        var currentUserId = CurrentUserId;
 
-        var teachers = await _context.Users
-            .Where(u => u.Role == "Teacher")
-            .Select(u => new
+        var query = _context.Users
+            .AsNoTracking()
+            .Where(u => u.Role == "Teacher" && _context.Courses.Any(c => c.TeacherId == u.Id));
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var keyword = search.Trim();
+            query = query.Where(u => u.Name.Contains(keyword));
+        }
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderBy(u => u.Name)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(u => new TeacherListItemDTO
             {
-                u.Id,
-                u.Name,
-                u.Bio,
-                CourseCount = _context.Courses.Count(c => c.TeacherId == u.Id)
+                Id = u.Id,
+                Name = u.Name,
+                Bio = u.Bio,
+                AvatarUrl = u.AvatarUrl,
+                CourseCount = _context.Courses.Count(c => c.TeacherId == u.Id),
+                Bands = _context.Courses
+                    .Where(c => c.TeacherId == u.Id)
+                    .Select(c => c.TargetBand)
+                    .Distinct()
+                    .ToList(),
+                IsLinked = _context.TeacherStudentLinks
+                    .Any(l => l.TeacherId == u.Id && l.StudentId == currentUserId)
             })
             .ToListAsync();
 
-        return Ok(teachers.Select(t => new
+        return Ok(new PagedResult<TeacherListItemDTO>
         {
-            t.Id,
-            t.Name,
-            t.Bio,
-            t.CourseCount,
-            IsLinked = linkedIds.Contains(t.Id)
-        }));
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        });
+    }
+
+    // Học viên hoặc giáo viên đều có thể hủy liên kết với đối phương
+    [HttpDelete("{otherUserId:guid}")]
+    public async Task<IActionResult> Unlink(Guid otherUserId)
+    {
+        var currentUserId = CurrentUserId;
+        var link = await _context.TeacherStudentLinks.FirstOrDefaultAsync(l =>
+            (l.TeacherId == otherUserId && l.StudentId == currentUserId) ||
+            (l.StudentId == otherUserId && l.TeacherId == currentUserId));
+        if (link == null) return NotFound();
+
+        _context.TeacherStudentLinks.Remove(link);
+        await _context.SaveChangesAsync();
+        return NoContent();
     }
 }

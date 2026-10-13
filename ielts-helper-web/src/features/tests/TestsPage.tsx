@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import apiClient from '@/api/client';
 import type { TestSummary } from '@/types';
 import './tests.css';
@@ -23,6 +24,11 @@ interface SubmitResult {
   elapsedMinutes: number;
 }
 
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (axios.isAxiosError(err)) return err.response?.data?.error ?? fallback;
+  return fallback;
+}
+
 export default function TestsPage() {
   const [tests, setTests] = useState<TestSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +38,7 @@ export default function TestsPage() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     apiClient.get<TestSummary[]>('/api/Tests').then((res) => {
@@ -52,11 +59,16 @@ export default function TestsPage() {
   }, [attempt, secondsLeft, result]);
 
   async function startTest(testId: string) {
-    const res = await apiClient.post<AttemptData>('/api/Attempts/start', { testId });
-    setAttempt(res.data);
-    setAnswers({});
-    setResult(null);
-    setSecondsLeft(res.data.timeLimitMinutes * 60);
+    setError('');
+    try {
+      const res = await apiClient.post<AttemptData>('/api/Attempts/start', { testId });
+      setAttempt(res.data);
+      setAnswers({});
+      setResult(null);
+      setSecondsLeft(res.data.timeLimitMinutes * 60);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Không bắt đầu được bài thi, vui lòng thử lại.'));
+    }
   }
 
   function selectAnswer(questionId: string, value: string) {
@@ -66,9 +78,20 @@ export default function TestsPage() {
   async function handleSubmit() {
     if (!attempt || submitting) return;
     setSubmitting(true);
-    const res = await apiClient.post<SubmitResult>(`/api/Attempts/${attempt.attemptId}/submit`, answers);
-    setResult(res.data);
-    setSubmitting(false);
+    setError('');
+    try {
+      const res = await apiClient.post<SubmitResult>(`/api/Attempts/${attempt.attemptId}/submit`, answers);
+      setResult(res.data);
+    } catch (err) {
+      const message = getErrorMessage(err, 'Nộp bài thất bại, vui lòng thử lại.');
+      // 400: bài đã nộp hoặc đã hết giờ -> không thể nộp nữa, quay lại danh sách
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        backToList();
+      }
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function backToList() {
@@ -168,6 +191,7 @@ export default function TestsPage() {
           );
         })}
 
+        {error && <p className="error-text">{error}</p>}
         <button onClick={handleSubmit} disabled={submitting} className="btn btn-primary">
           {submitting ? 'Đang nộp...' : 'Nộp bài'}
         </button>
@@ -181,6 +205,7 @@ export default function TestsPage() {
       <p className="muted mb-24">
         Luyện đề có tính giờ giống thi thật, chấm điểm tự động ngay khi nộp.
       </p>
+      {error && <p className="error-text">{error}</p>}
       {tests.length === 0 ? (
         <div className="card">
           <p className="muted m-0">

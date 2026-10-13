@@ -23,6 +23,7 @@ export default function ErrorLogsPage() {
   const [stats, setStats] = useState<ErrorStat[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [errorType, setErrorType] = useState(ERROR_TYPES[0]);
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -43,12 +44,27 @@ export default function ErrorLogsPage() {
     });
   }, []);
 
+  function resetForm() {
+    setEditingId(null);
+    setErrorType(ERROR_TYPES[0]);
+    setDescription('');
+  }
+
+  function startEdit(err: ErrorLog) {
+    setEditingId(err.id);
+    setErrorType(err.errorType);
+    setDescription(err.description);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await apiClient.post('/api/ErrorLogs', { errorType, description });
-      setDescription('');
+      const payload = { errorType, description };
+      if (editingId) await apiClient.put(`/api/ErrorLogs/${editingId}`, payload);
+      else await apiClient.post('/api/ErrorLogs', payload);
+      resetForm();
       await loadData();
     } finally {
       setSubmitting(false);
@@ -58,6 +74,7 @@ export default function ErrorLogsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Xóa lỗi sai này?')) return;
     await apiClient.delete(`/api/ErrorLogs/${id}`);
+    if (editingId === id) resetForm();
     await loadData();
   }
 
@@ -95,7 +112,7 @@ export default function ErrorLogsPage() {
       )}
 
       <form onSubmit={handleSubmit} className="card mb-32">
-        <h3>Ghi lỗi sai mới</h3>
+        <h3>{editingId ? 'Sửa lỗi sai' : 'Ghi lỗi sai mới'}</h3>
         <div className="field">
           <label className="label">Loại lỗi</label>
           <div className="err-type-buttons">
@@ -130,9 +147,16 @@ export default function ErrorLogsPage() {
             placeholder="Ví dụ: Quên dùng 'the' trước danh từ đã xác định"
           />
         </div>
-        <button type="submit" disabled={submitting} className="btn btn-primary">
-          {submitting ? 'Đang lưu...' : 'Lưu lỗi sai'}
-        </button>
+        <div className="row-wrap-10">
+          <button type="submit" disabled={submitting} className="btn btn-primary">
+            {submitting ? 'Đang lưu...' : editingId ? 'Lưu thay đổi' : 'Lưu lỗi sai'}
+          </button>
+          {editingId && (
+            <button type="button" className="btn btn-ghost" onClick={resetForm}>
+              Hủy sửa
+            </button>
+          )}
+        </div>
       </form>
 
       <h3>Danh sách lỗi sai</h3>
@@ -146,12 +170,14 @@ export default function ErrorLogsPage() {
             <div key={err.id} className="list-item">
               <span className="badge badge-accent">{err.errorType}</span>
               <p className="m-10-0-8">{err.description}</p>
-              <button
-                onClick={() => handleDelete(err.id)}
-                className="btn btn-ghost btn-sm"
-              >
-                Xóa
-              </button>
+              <div className="row-wrap-10">
+                <button onClick={() => startEdit(err)} className="btn btn-ghost btn-sm">
+                  Sửa
+                </button>
+                <button onClick={() => handleDelete(err.id)} className="btn btn-ghost btn-sm">
+                  Xóa
+                </button>
+              </div>
             </div>
           ))}
         </div>

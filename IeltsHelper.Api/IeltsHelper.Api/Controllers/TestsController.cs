@@ -4,23 +4,40 @@ using IeltsHelper.Api.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace IeltsHelper.Api.Controllers;
 
 public class CreateQuestionRequest
 {
+    [Required(ErrorMessage = "Vui lòng nhập nội dung câu hỏi.")]
+    [StringLength(1000)]
     public string QuestionText { get; set; } = string.Empty;
+
+    [MinLength(2, ErrorMessage = "Mỗi câu cần ít nhất 2 đáp án.")]
     public List<string>? Options { get; set; }
+
+    [Required(ErrorMessage = "Vui lòng chọn đáp án đúng.")]
     public string CorrectAnswer { get; set; } = string.Empty;
 }
 
 public class CreateTestRequest
 {
+    [AllowedValues("Listening", "Reading", ErrorMessage = "Kỹ năng không hợp lệ.")]
     public string Skill { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập tên đề.")]
+    [StringLength(200)]
     public string Title { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Vui lòng nhập đoạn văn / transcript.")]
     public string PassageOrTranscript { get; set; } = string.Empty;
+
+    [Range(1, 180, ErrorMessage = "Thời gian từ 1 đến 180 phút.")]
     public int TimeLimitMinutes { get; set; }
+
+    [MinLength(1, ErrorMessage = "Đề thi cần ít nhất 1 câu hỏi.")]
     public List<CreateQuestionRequest> Questions { get; set; } = new();
 }
 

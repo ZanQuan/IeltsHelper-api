@@ -48,7 +48,8 @@ namespace IeltsHelper.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Score")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<string>("Skill")
                         .IsRequired()
@@ -126,6 +127,7 @@ namespace IeltsHelper.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TargetBand")
@@ -369,6 +371,7 @@ namespace IeltsHelper.Api.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("CourseId")
@@ -444,7 +447,8 @@ namespace IeltsHelper.Api.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("EstimatedBand")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<string>("Feedback")
                         .HasColumnType("nvarchar(max)");
@@ -635,7 +639,8 @@ namespace IeltsHelper.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("EstimatedBand")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(3, 1)
+                        .HasColumnType("decimal(3,1)");
 
                     b.Property<string>("Feedback")
                         .HasColumnType("nvarchar(max)");

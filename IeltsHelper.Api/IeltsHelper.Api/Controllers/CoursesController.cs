@@ -78,18 +78,19 @@ public class CoursesController : BaseApiController
 
     [HttpGet]
     public async Task<ActionResult> GetAll(
-    [FromQuery] string? filterOn,
-    [FromQuery] string? filterQuery,
-    [FromQuery] string? sortBy,
-    [FromQuery] bool isAscending = true,
-    [FromQuery] int pageNumber = 1,
-    [FromQuery] int pageSize = 10)
+        [FromQuery] string? filterOn,
+        [FromQuery] string? filterQuery,
+        [FromQuery] Guid? teacherId,
+        [FromQuery] string? sortBy,
+        [FromQuery] bool isAscending = true,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
         pageNumber = Math.Max(pageNumber, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
         var result = await _courseRepository.GetPagedAsync(
-            filterOn, filterQuery, sortBy, isAscending, pageNumber, pageSize);
+            filterOn, filterQuery, teacherId, sortBy, isAscending, pageNumber, pageSize);
         return Ok(result);
     }
 
@@ -100,8 +101,8 @@ public class CoursesController : BaseApiController
         if (course == null) return NotFound();
 
         var isEnrolled = await _courseRepository.IsEnrolledAsync(id, CurrentUserId);
-        var isOwner = course.TeacherId == CurrentUserId;
-        var canSeeContent = isEnrolled || isOwner;
+        var canEdit = course.TeacherId == CurrentUserId || User.IsInRole("Admin");
+        var canSeeContent = isEnrolled || canEdit;
 
         return Ok(new
         {
@@ -111,6 +112,7 @@ public class CoursesController : BaseApiController
             course.TargetBand,
             course.Price,
             TeacherName = course.Teacher!.Name,
+            CanEdit = canEdit,
             IsEnrolled = canSeeContent,
             Lessons = course.Lessons
                 .OrderBy(l => l.OrderIndex)

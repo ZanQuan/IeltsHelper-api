@@ -35,7 +35,7 @@ public class SubmitAssignmentRequest
 
 public class GradeAssignmentRequest
 {
-    [Range(0, 9, ErrorMessage = "Điểm phải từ 0 đến 9.")]
+    [Range(0, 10, ErrorMessage = "Điểm phải từ 0 đến 10.")]
     public decimal Score { get; set; }
 
     [StringLength(2000, ErrorMessage = "Nhận xét tối đa 2000 ký tự.")]

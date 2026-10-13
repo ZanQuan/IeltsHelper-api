@@ -7,3 +7,4 @@ export type { Vocabulary } from './vocabulary';
 export type { ErrorLog } from './errorLog';
 export type { WritingSubmission } from './writing';
 export type { SpeakingSubmission } from './speaking';
+export * from './page';

@@ -28,9 +28,8 @@ public class AdminController : BaseApiController
             .Where(o => o.Status == "Paid")
             .SumAsync(o => (decimal?)o.Amount) ?? 0;
 
-        var pendingGrading =
-            await _context.WritingSubmissions.CountAsync(w => w.GradedAt == null) +
-            await _context.SpeakingSubmissions.CountAsync(s => s.GradedAt == null);
+        var pendingGrading = await _context.Assignments
+            .CountAsync(a => a.SubmittedAt != null && a.GradedAt == null);
 
         return Ok(new
         {
@@ -77,6 +76,14 @@ public class AdminController : BaseApiController
         return NoContent();
     }
 
+    private async Task<bool> HasRelatedDataAsync(Guid userId) =>
+    await _context.Courses.AnyAsync(c => c.TeacherId == userId)
+    || await _context.Enrollments.AnyAsync(e => e.StudentId == userId)
+    || await _context.Orders.AnyAsync(o => o.StudentId == userId)
+    || await _context.Assignments.AnyAsync(a => a.TeacherId == userId || a.StudentId == userId)
+    || await _context.TeacherStudentLinks.AnyAsync(l => l.TeacherId == userId || l.StudentId == userId)
+    || await _context.LiveClasses.AnyAsync(l => l.TeacherId == userId);
+
     [HttpDelete("users/{id}")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
@@ -85,6 +92,9 @@ public class AdminController : BaseApiController
 
         var user = await _context.Users.FindAsync(id);
         if (user == null) return NotFound();
+
+        if (await HasRelatedDataAsync(id))
+            return Conflict(new { error = "Người dùng còn dữ liệu liên quan (khóa học, bài tập, lớp, liên kết...). Hãy gỡ dữ liệu trước khi xóa." });
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();

@@ -68,5 +68,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<TeacherStudentLink>()
             .HasIndex(l => new { l.TeacherId, l.StudentId })
             .IsUnique();
+        modelBuilder.Entity<Course>().Property(c => c.Price).HasPrecision(18, 2);
+        modelBuilder.Entity<Order>().Property(o => o.Amount).HasPrecision(18, 2);
+        modelBuilder.Entity<Assignment>().Property(a => a.Score).HasPrecision(3, 1);
+        modelBuilder.Entity<WritingSubmission>().Property(w => w.EstimatedBand).HasPrecision(3, 1);
+        modelBuilder.Entity<SpeakingSubmission>().Property(s => s.EstimatedBand).HasPrecision(3, 1);
     }
 }

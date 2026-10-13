@@ -14,6 +14,9 @@ public class StartAttemptRequest
 [Route("api/[controller]")]
 public class AttemptsController : BaseApiController
 {
+    // Dung sai cho độ trễ mạng khi client tự động nộp lúc đồng hồ về 0
+    private static readonly TimeSpan SubmitGrace = TimeSpan.FromMinutes(1);
+
     private readonly AppDbContext _context;
 
     public AttemptsController(AppDbContext context)
@@ -28,6 +31,7 @@ public class AttemptsController : BaseApiController
         if (targetUserId == null) return Forbid();
 
         var attempts = await _context.Attempts
+            .AsNoTracking()
             .Where(a => a.UserId == targetUserId)
             .OrderByDescending(a => a.StartedAt)
             .ToListAsync();
@@ -37,7 +41,10 @@ public class AttemptsController : BaseApiController
     [HttpPost("start")]
     public async Task<ActionResult> StartAttempt(StartAttemptRequest request)
     {
-        var test = await _context.Tests.Include(t => t.Questions).FirstOrDefaultAsync(t => t.Id == request.TestId);
+        var test = await _context.Tests
+            .AsNoTracking()
+            .Include(t => t.Questions)
+            .FirstOrDefaultAsync(t => t.Id == request.TestId);
         if (test == null) return NotFound();
 
         var attempt = new Attempt
@@ -51,6 +58,7 @@ public class AttemptsController : BaseApiController
         _context.Attempts.Add(attempt);
         await _context.SaveChangesAsync();
 
+        // Không trả CorrectAnswer cho học viên
         var questionsForClient = test.Questions.Select(q => new
         {
             q.Id,
@@ -72,27 +80,28 @@ public class AttemptsController : BaseApiController
     public async Task<ActionResult> SubmitAttempt(Guid id, Dictionary<Guid, string> answers)
     {
         var attempt = await _context.Attempts
+            .Include(a => a.Test).ThenInclude(t => t!.Questions)
             .FirstOrDefaultAsync(a => a.Id == id && a.UserId == CurrentUserId);
         if (attempt == null) return NotFound();
 
-        var questions = await _context.Questions.Where(q => q.TestId == attempt.TestId).ToListAsync();
+        if (attempt.SubmittedAt != null)
+            return BadRequest(new { error = "Bài thi này đã được nộp." });
 
-        int score = 0;
-        foreach (var q in questions)
-        {
-            if (answers.TryGetValue(q.Id, out var userAnswer) &&
-                string.Equals(userAnswer.Trim(), q.CorrectAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
-            {
-                score++;
-            }
-        }
+        var now = DateTime.UtcNow;
+        var deadline = attempt.StartedAt.AddMinutes(attempt.Test!.TimeLimitMinutes) + SubmitGrace;
+        if (now > deadline)
+            return BadRequest(new { error = "Đã hết thời gian làm bài." });
+
+        var score = attempt.Test.Questions.Count(q =>
+            answers.TryGetValue(q.Id, out var userAnswer) &&
+            string.Equals(userAnswer.Trim(), q.CorrectAnswer.Trim(), StringComparison.OrdinalIgnoreCase));
 
         attempt.AnswersJson = JsonSerializer.Serialize(answers);
         attempt.Score = score;
-        attempt.SubmittedAt = DateTime.UtcNow;
+        attempt.SubmittedAt = now;
         await _context.SaveChangesAsync();
 
-        var elapsedMinutes = (attempt.SubmittedAt.Value - attempt.StartedAt).TotalMinutes;
+        var elapsedMinutes = (now - attempt.StartedAt).TotalMinutes;
 
         return Ok(new
         {

@@ -10,6 +10,7 @@ export default function LessonLogsPage() {
   const [logs, setLogs] = useState<LessonLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const [lessonDate, setLessonDate] = useState('');
   const [skillFocus, setSkillFocus] = useState('Speaking');
@@ -52,27 +53,48 @@ export default function LessonLogsPage() {
     });
   }, []);
 
+  function resetForm() {
+    setEditingId(null);
+    setLessonDate('');
+    setSkillFocus('Speaking');
+    setSummary('');
+    setHomework('');
+    setSelfRating(3);
+    setNewVocabulary('');
+    setGrammarNotes('');
+    setOtherNotes('');
+  }
+
+  function startEdit(log: LessonLog) {
+    setEditingId(log.id);
+    setLessonDate(log.lessonDate.slice(0, 10));
+    setSkillFocus(log.skillFocus);
+    setSummary(log.summary);
+    setHomework(log.homework ?? '');
+    setSelfRating(log.selfRating);
+    setNewVocabulary(log.newVocabulary ?? '');
+    setGrammarNotes(log.grammarNotes ?? '');
+    setOtherNotes(log.otherNotes ?? '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    const payload = {
+      lessonDate,
+      skillFocus,
+      summary,
+      homework: homework || null,
+      selfRating,
+      newVocabulary: newVocabulary || null,
+      grammarNotes: grammarNotes || null,
+      otherNotes: otherNotes || null,
+    };
     try {
-      await apiClient.post('/api/LessonLogs', {
-        lessonDate,
-        skillFocus,
-        summary,
-        homework: homework || null,
-        selfRating,
-        newVocabulary: newVocabulary || null,
-        grammarNotes: grammarNotes || null,
-        otherNotes: otherNotes || null,
-      });
-      setLessonDate('');
-      setSummary('');
-      setHomework('');
-      setSelfRating(3);
-      setNewVocabulary('');
-      setGrammarNotes('');
-      setOtherNotes('');
+      if (editingId) await apiClient.put(`/api/LessonLogs/${editingId}`, payload);
+      else await apiClient.post('/api/LessonLogs', payload);
+      resetForm();
       await loadLogs();
     } finally {
       setSubmitting(false);
@@ -82,6 +104,7 @@ export default function LessonLogsPage() {
   async function handleDelete(id: string) {
     if (!confirm('Xóa buổi học này?')) return;
     await apiClient.delete(`/api/LessonLogs/${id}`);
+    if (editingId === id) resetForm();
     await loadLogs();
   }
 
@@ -99,7 +122,7 @@ export default function LessonLogsPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="card mb-32">
-        <h3>Ghi buổi học mới</h3>
+        <h3>{editingId ? 'Sửa buổi học' : 'Ghi buổi học mới'}</h3>
         <div className="grid-2col">
           <div className="field">
             <label className="label">Ngày học</label>
@@ -165,9 +188,16 @@ export default function LessonLogsPage() {
           <label className="label">Tự đánh giá hiểu bài (1-5)</label>
           <input className="input" type="number" min={1} max={5} value={selfRating} onChange={(e) => setSelfRating(Number(e.target.value))} />
         </div>
-        <button type="submit" disabled={submitting} className="btn btn-primary">
-          {submitting ? 'Đang lưu...' : 'Lưu buổi học'}
-        </button>
+        <div className="row-wrap-10">
+          <button type="submit" disabled={submitting} className="btn btn-primary">
+            {submitting ? 'Đang lưu...' : editingId ? 'Lưu thay đổi' : 'Lưu buổi học'}
+          </button>
+          {editingId && (
+            <button type="button" className="btn btn-ghost" onClick={resetForm}>
+              Hủy sửa
+            </button>
+          )}
+        </div>
       </form>
 
       <div className="lesson-list-head">
@@ -247,6 +277,9 @@ export default function LessonLogsPage() {
                           <p className="muted m-0">Buổi học này chưa có ghi chú chi tiết.</p>
                         )}
                         <div className="lesson-actions">
+                          <button onClick={() => startEdit(log)} className="btn btn-ghost btn-sm">
+                            Sửa
+                          </button>
                           <button
                             onClick={() => downloadWord(`/api/LessonLogs/${log.id}/export-word`, `BuoiHoc_${log.lessonDate}.docx`, log.id)}
                             disabled={exportingId === log.id}
