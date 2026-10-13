@@ -15,11 +15,14 @@ export default function StudentTeachers() {
   const [selected, setSelected] = useState<TeacherItem | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    apiClient.get<TeacherItem[]>('/api/TeacherLinks/teachers').then((res) => {
-      setTeachers(res.data);
-      setLoading(false);
-    });
+    useEffect(() => {
+    apiClient
+      .get<{ items: TeacherItem[] }>('/api/TeacherLinks/teachers', {
+        params: { pageSize: 50 },
+      })
+      .then((res) => setTeachers(res.data.items))
+      .catch(() => setTeachers([]))
+      .finally(() => setLoading(false));
   }, []);
 
   async function openTeacher(t: TeacherItem) {
