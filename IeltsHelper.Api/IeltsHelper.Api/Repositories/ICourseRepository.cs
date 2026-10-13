@@ -17,4 +17,7 @@ public interface ICourseRepository
     Task<PagedResult<CourseSummaryDTO>> GetPagedAsync(
     string? filterOn, string? filterQuery,
     string? sortBy, bool isAscending, int pageNumber, int pageSize);
+    Task<PagedResult<CourseSummaryDTO>> GetPagedAsync(
+    string? filterOn, string? filterQuery, Guid? teacherId,
+    string? sortBy, bool isAscending, int pageNumber, int pageSize);
 }

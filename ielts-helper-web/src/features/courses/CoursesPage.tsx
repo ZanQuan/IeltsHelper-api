@@ -1,4 +1,5 @@
 import CheckoutPanel from './CheckoutPanel';
+import LessonExerciseEditor from './LessonExerciseEditor';
 import { useState, useEffect, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
@@ -22,13 +23,14 @@ interface CourseDetail {
   price: number;
   teacherName: string;
   isEnrolled: boolean;
+  canEdit: boolean;
   lessons: CourseLesson[];
 }
 
-  const fetchCourses = () =>
-    apiClient.get<{ items: CourseSummary[] }>('/api/Courses', { params: { pageSize: 100 } })
-      .then((res) => res.data.items);
-      
+const fetchCourses = () =>
+  apiClient.get<{ items: CourseSummary[] }>('/api/Courses', { params: { pageSize: 100 } })
+    .then((res) => res.data.items);
+
 export default function CoursesPage() {
   const { user } = useAuth();
   const isTeacher = user?.role === 'Teacher' || user?.role === 'Admin';
@@ -60,7 +62,7 @@ export default function CoursesPage() {
     setLoading(false);
   }
 
-      useEffect(() => {
+  useEffect(() => {
     fetchCourses().then((data) => {
       setCourses(data);
       setLoading(false);
@@ -73,6 +75,7 @@ export default function CoursesPage() {
         setSelectedId(null); // id sai hoặc khóa đã bị xóa → về danh sách
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function openCourse(id: string) {
@@ -108,6 +111,7 @@ export default function CoursesPage() {
       setEnrolling(false);
     }
   }
+
   async function handleCreateCourse(e: FormEvent) {
     e.preventDefault();
     setCreating(true);
@@ -206,10 +210,11 @@ export default function CoursesPage() {
                     <a href={l.videoUrl} target="_blank" rel="noreferrer">Xem video bài học →</a>
                   </p>
                 )}
+                {detail.canEdit && <LessonExerciseEditor courseId={detail.id} lessonId={l.id} />}
               </div>
             ))}
 
-            {isTeacher && (
+            {detail.canEdit && (
               <div className="mt-20">
                 <button onClick={() => setShowAddLesson((v) => !v)} className="btn btn-ghost">
                   {showAddLesson ? 'Đóng' : '+ Thêm bài học'}

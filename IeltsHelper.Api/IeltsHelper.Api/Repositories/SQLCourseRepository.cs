@@ -107,11 +107,23 @@ public class SQLCourseRepository : ICourseRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public Task<PagedResult<CourseSummaryDTO>> GetPagedAsync(
+        string? filterOn, string? filterQuery,
+        string? sortBy, bool isAscending, int pageNumber, int pageSize)
+    {
+        return GetPagedAsync(filterOn, filterQuery, null, sortBy, isAscending, pageNumber, pageSize);
+    }
+
     public async Task<PagedResult<CourseSummaryDTO>> GetPagedAsync(
-    string? filterOn, string? filterQuery,
-    string? sortBy, bool isAscending, int pageNumber, int pageSize)
+        string? filterOn, string? filterQuery, Guid? teacherId,
+        string? sortBy, bool isAscending, int pageNumber, int pageSize)
     {
         var query = _context.Courses.AsNoTracking().AsQueryable();
+
+        // TEACHER FILTER
+        if (teacherId.HasValue)
+            query = query.Where(c => c.TeacherId == teacherId.Value);
 
         // FILTER
         if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
