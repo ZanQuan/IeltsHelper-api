@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '@/api/client';
 import type { CourseSummary } from '@/types';
+import './teacher.css';
 
 interface TeacherItem {
-  id: string; name: string; bio: string | null;
-  courseCount: number; isLinked: boolean;
+  id: string;
+  name: string;
+  bio: string | null;
+  courseCount: number;
+  isLinked: boolean;
 }
 
 export default function StudentTeachers() {
@@ -14,21 +18,44 @@ export default function StudentTeachers() {
   const [courses, setCourses] = useState<CourseSummary[]>([]);
   const [selected, setSelected] = useState<TeacherItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    apiClient.get<TeacherItem[]>('/api/TeacherLinks/teachers').then((res) => {
-      setTeachers(res.data);
-      setLoading(false);
-    });
+    let cancelled = false;
+    apiClient
+      .get<TeacherItem[]>('/api/TeacherLinks/teachers')
+      .then((res) => {
+        if (!cancelled) setTeachers(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setError('Không tải được danh sách giáo viên.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function openTeacher(t: TeacherItem) {
-  setSelected(t);
-  const res = await apiClient.get<{ items: CourseSummary[] }>('/api/Courses', {
-    params: { pageSize: 100 },
-  });
-  setCourses(res.data.items.filter((c) => c.teacherId === t.id));
-}
+    setSelected(t);
+    setCourses([]);
+    setError(null);
+    setLoadingCourses(true);
+    try {
+      const res = await apiClient.get<{ items: CourseSummary[] }>('/api/Courses', {
+        params: { pageSize: 100 },
+      });
+      const items = res.data?.items ?? [];
+      setCourses(items.filter((c) => c.teacherId === t.id));
+    } catch {
+      setError('Không tải được khóa học của giáo viên này.');
+    } finally {
+      setLoadingCourses(false);
+    }
+  }
 
   if (selected) {
     return (
@@ -38,17 +65,25 @@ export default function StudentTeachers() {
         </button>
         <h2>Khóa học của {selected.name}</h2>
         <p className="muted mb-24">Thanh toán một khóa học để kết nối với giáo viên này.</p>
-        {courses.length === 0 ? (
-          <p className="muted">Giáo viên này chưa có khóa học nào.</p>
+
+        {error && <p className="muted">{error}</p>}
+
+        {loadingCourses ? (
+          <p className="muted">Đang tải...</p>
+        ) : courses.length === 0 ? (
+          !error && <p className="muted">Giáo viên này chưa có khóa học nào.</p>
         ) : (
           courses.map((c) => (
-            <div key={c.id} className="list-item clickable"
-                 onClick={() => navigate(`/courses?courseId=${c.id}`)}>
+            <div
+              key={c.id}
+              className="list-item clickable"
+              onClick={() => navigate(`/courses?courseId=${c.id}`)}
+            >
               <strong>{c.title}</strong>
               <p className="muted">{c.description}</p>
               <span className="badge badge-primary">Band {c.targetBand}</span>
               <span className="badge badge-accent ml-6">{c.lessonCount} bài học</span>
-              <strong className="ml-10">{c.price.toLocaleString('vi-VN')} đ</strong>
+              <strong className="ml-10">{(c.price ?? 0).toLocaleString('vi-VN')} đ</strong>
             </div>
           ))
         )}
@@ -60,8 +95,14 @@ export default function StudentTeachers() {
     <div>
       <h2>Giáo viên</h2>
       <p className="muted mb-24">Chọn giáo viên và đăng ký khóa học để được kết nối.</p>
-      {loading ? <p className="muted">Đang tải...</p> :
-        teachers.length === 0 ? <p className="muted">Chưa có giáo viên nào.</p> :
+
+      {error && <p className="muted">{error}</p>}
+
+      {loading ? (
+        <p className="muted">Đang tải...</p>
+      ) : teachers.length === 0 ? (
+        !error && <p className="muted">Chưa có giáo viên nào.</p>
+      ) : (
         teachers.map((t) => (
           <div key={t.id} className="list-item clickable" onClick={() => openTeacher(t)}>
             <strong>{t.name}</strong>
@@ -69,7 +110,8 @@ export default function StudentTeachers() {
             {t.bio && <p className="muted m-6-0">{t.bio}</p>}
             <span className="badge badge-accent">{t.courseCount} khóa học</span>
           </div>
-        ))}
+        ))
+      )}
     </div>
   );
 }

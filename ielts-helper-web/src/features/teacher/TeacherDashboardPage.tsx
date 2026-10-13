@@ -5,12 +5,24 @@ import type { ErrorLog, LessonLog, Student } from '@/types';
 import './teacher.css';
 import StudentTeachers from './StudentTeachers';
 
+function initials(name?: string | null) {
+  if (!name) return '?';
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(-2)
+    .map((w) => w[0] ?? '')
+    .join('')
+    .toUpperCase();
+}
+
 export default function TeacherDashboardPage() {
   const { user } = useAuth();
   const isTeacher = user?.role === 'Teacher' || user?.role === 'Admin';
 
   const [students, setStudents] = useState<Student[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(isTeacher);
+  const [error, setError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [studentLogs, setStudentLogs] = useState<LessonLog[]>([]);
   const [studentErrors, setStudentErrors] = useState<ErrorLog[]>([]);
@@ -18,26 +30,42 @@ export default function TeacherDashboardPage() {
 
   useEffect(() => {
     if (!isTeacher) return;
-    apiClient.get<Student[]>('/api/TeacherLinks/my-students').then((res) => {
-      setStudents(res.data);
-      setLoadingStudents(false);
-    });
+    let cancelled = false;
+    setLoadingStudents(true);
+    apiClient
+      .get<Student[]>('/api/TeacherLinks/my-students')
+      .then((res) => {
+        if (!cancelled) setStudents(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setError('Không tải được danh sách học viên.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingStudents(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [isTeacher]);
 
   async function viewStudent(student: Student) {
     setSelectedStudent(student);
+    setStudentLogs([]);
+    setStudentErrors([]);
+    setError(null);
     setLoadingDetail(true);
-    const [logsRes, errorsRes] = await Promise.all([
-      apiClient.get<LessonLog[]>(`/api/LessonLogs?studentId=${student.id}`),
-      apiClient.get<ErrorLog[]>(`/api/ErrorLogs?studentId=${student.id}`),
-    ]);
-    setStudentLogs(logsRes.data);
-    setStudentErrors(errorsRes.data);
-    setLoadingDetail(false);
-  }
-
-  function initials(name: string) {
-    return name.trim().split(/\s+/).slice(-2).map((w) => w[0]).join('').toUpperCase();
+    try {
+      const [logsRes, errorsRes] = await Promise.all([
+        apiClient.get<LessonLog[]>(`/api/LessonLogs?studentId=${student.id}`),
+        apiClient.get<ErrorLog[]>(`/api/ErrorLogs?studentId=${student.id}`),
+      ]);
+      setStudentLogs(Array.isArray(logsRes.data) ? logsRes.data : []);
+      setStudentErrors(Array.isArray(errorsRes.data) ? errorsRes.data : []);
+    } catch {
+      setError('Không tải được dữ liệu của học viên này.');
+    } finally {
+      setLoadingDetail(false);
+    }
   }
 
   // Học viên: xem danh sách giáo viên để kết nối qua khóa học
@@ -54,14 +82,14 @@ export default function TeacherDashboardPage() {
         </button>
 
         <div className="teacher-student-head">
-          <span className="teacher-student-avatar">
-            {initials(selectedStudent.name)}
-          </span>
+          <span className="teacher-student-avatar">{initials(selectedStudent.name)}</span>
           <div>
             <h2 className="m-0">{selectedStudent.name}</h2>
             <span className="muted">{selectedStudent.email}</span>
           </div>
         </div>
+
+        {error && <p className="muted">{error}</p>}
 
         {loadingDetail ? (
           <p className="muted">Đang tải...</p>
@@ -76,7 +104,9 @@ export default function TeacherDashboardPage() {
                   <div key={log.id} className="list-item">
                     <div className="row-between">
                       <div>
-                        <strong>{new Date(log.lessonDate).toLocaleDateString('vi-VN')}</strong>
+                        <strong>
+                          {new Date(log.lessonDate).toLocaleDateString('vi-VN')}
+                        </strong>
                         <span className="badge badge-primary ml-10">{log.skillFocus}</span>
                       </div>
                       <span className="badge badge-success">Hiểu bài: {log.selfRating}/5</span>
@@ -113,23 +143,25 @@ export default function TeacherDashboardPage() {
         Bấm vào từng học viên để xem nhật ký buổi học và lỗi sai họ đã ghi lại.
       </p>
 
+      {error && <p className="muted">{error}</p>}
+
       {loadingStudents ? (
         <p className="muted">Đang tải...</p>
       ) : students.length === 0 ? (
-        <div className="card">
-          <p className="muted m-0">
-            Chưa có học viên nào liên kết với bạn. Học viên sẽ tự được kết nối khi họ thanh toán
-            một khóa học của bạn.
-          </p>
-        </div>
+        !error && (
+          <div className="card">
+            <p className="muted m-0">
+              Chưa có học viên nào liên kết với bạn. Học viên sẽ tự được kết nối khi họ thanh
+              toán một khóa học của bạn.
+            </p>
+          </div>
+        )
       ) : (
         <div>
           {students.map((s) => (
             <div key={s.id} className="list-item clickable" onClick={() => viewStudent(s)}>
               <div className="row-center-14">
-                <span className="avatar-40">
-                  {initials(s.name)}
-                </span>
+                <span className="avatar-40">{initials(s.name)}</span>
                 <div>
                   <strong>{s.name}</strong>
                   <p className="muted m-0">{s.email}</p>
