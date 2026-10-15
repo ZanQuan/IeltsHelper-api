@@ -89,6 +89,10 @@ public class CoursesController : BaseApiController
         pageNumber = Math.Max(pageNumber, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
+        // Giáo viên chỉ thấy khóa học do chính mình tạo (học viên và Admin thấy tất cả)
+        if (User.IsInRole("Teacher"))
+            teacherId = CurrentUserId;
+
         var result = await _courseRepository.GetPagedAsync(
             filterOn, filterQuery, teacherId, sortBy, isAscending, pageNumber, pageSize);
         return Ok(result);
@@ -99,6 +103,10 @@ public class CoursesController : BaseApiController
     {
         var course = await _courseRepository.GetByIdWithLessonsAsync(id);
         if (course == null) return NotFound();
+
+        // Giáo viên không được xem khóa học của giáo viên khác
+        if (User.IsInRole("Teacher") && course.TeacherId != CurrentUserId)
+            return NotFound();
 
         var isEnrolled = await _courseRepository.IsEnrolledAsync(id, CurrentUserId);
         var canEdit = course.TeacherId == CurrentUserId || User.IsInRole("Admin");

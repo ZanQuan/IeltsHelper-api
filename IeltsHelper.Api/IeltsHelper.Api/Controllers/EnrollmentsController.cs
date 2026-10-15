@@ -26,6 +26,7 @@ public class EnrollmentsController : BaseApiController
     {
         var course = await _context.Courses.FindAsync(request.CourseId);
         if (course == null) return NotFound();
+        if (User.IsInRole("Teacher") && course.TeacherId != CurrentUserId) return NotFound();
         if (course.Price > 0)
             return BadRequest(new { error = "Khóa học có phí, vui lòng thanh toán để ghi danh." });
 

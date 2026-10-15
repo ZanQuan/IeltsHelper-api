@@ -79,7 +79,6 @@ export default function SettingsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     apiClient.get<Profile>('/api/Auth/me').then((res) => {

@@ -46,7 +46,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactDev", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        var origins = new[]
+            {
+                builder.Configuration["Frontend:BaseUrl"],
+                "http://localhost:5173"
+            }
+            .Where(o => !string.IsNullOrWhiteSpace(o))
+            .Select(o => o!.TrimEnd('/'))
+            .Distinct()
+            .ToArray();
+
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -176,6 +186,15 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(imagesPath),
     RequestPath = "/Images"
+});
+
+// Video bài giảng do giáo viên tải lên: truy cập qua /Videos/ten-file.mp4 (hỗ trợ tua video)
+var videosPath = Path.Combine(builder.Environment.ContentRootPath, "Videos");
+Directory.CreateDirectory(videosPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(videosPath),
+    RequestPath = "/Videos"
 });
 
 //app.UseHttpsRedirection();

@@ -1,6 +1,6 @@
 import CheckoutPanel from './CheckoutPanel';
 import LessonExerciseEditor from './LessonExerciseEditor';
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import apiClient from '@/api/client';
 import { useAuth } from '@/features/auth/useAuth';
 import type { CourseSummary } from '@/types';
@@ -25,6 +25,16 @@ interface CourseDetail {
   isEnrolled: boolean;
   canEdit: boolean;
   lessons: CourseLesson[];
+}
+
+const MAX_VIDEO_MB = 200; // khớp với giới hạn của máy chủ (VideosController)
+
+function uploadErrorMessage(err: unknown): string {
+  const e = err as { response?: { status?: number; data?: { error?: string } } };
+  if (e.response?.data?.error) return e.response.data.error;
+  if (e.response?.status === 404 || e.response?.status === 413)
+    return `Máy chủ từ chối file (có thể vượt giới hạn ${MAX_VIDEO_MB} MB).`;
+  return 'Tải video lên thất bại. Hãy thử lại.';
 }
 
 const fetchCourses = () =>
@@ -55,6 +65,9 @@ export default function CoursesPage() {
   const [lessonVideoUrl, setLessonVideoUrl] = useState('');
   const [addingLesson, setAddingLesson] = useState(false);
   const [lessonError, setLessonError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedName, setUploadedName] = useState('');
 
   async function loadCourses() {
     setLoading(true);
@@ -127,6 +140,41 @@ export default function CoursesPage() {
     }
   }
 
+  async function handlePickVideo(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // cho phép chọn lại đúng file đó lần sau
+    if (!file) return;
+
+    setLessonError('');
+    if (!/\.(mp4|webm)$/i.test(file.name)) {
+      setLessonError('Chỉ chấp nhận video .mp4 hoặc .webm.');
+      return;
+    }
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+      setLessonError(`Video quá lớn (tối đa ${MAX_VIDEO_MB} MB).`);
+      return;
+    }
+
+    const form = new FormData();
+    form.append('file', file);
+    setUploading(true);
+    setUploadProgress(0);
+    try {
+      const res = await apiClient.post<{ url: string }>('/api/Videos/upload', form, {
+        timeout: 0, // video lớn có thể mất nhiều phút
+        onUploadProgress: (ev) => {
+          if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+        },
+      });
+      setLessonVideoUrl(res.data.url);
+      setUploadedName(file.name);
+    } catch (err) {
+      setLessonError(uploadErrorMessage(err));
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function handleAddLesson(e: FormEvent) {
     e.preventDefault();
     if (!detail) return;
@@ -141,6 +189,7 @@ export default function CoursesPage() {
       setLessonTitle('');
       setLessonContent('');
       setLessonVideoUrl('');
+      setUploadedName('');
       setShowAddLesson(false);
       await openCourse(detail.id);
     } catch {
@@ -237,10 +286,33 @@ export default function CoursesPage() {
                     </div>
                     <div className="field">
                       <label className="label">Link video (không bắt buộc)</label>
-                      <input className="input" value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)} />
+                      <input
+                        className="input"
+                        value={lessonVideoUrl}
+                        onChange={(e) => { setLessonVideoUrl(e.target.value); setUploadedName(''); }}
+                        placeholder="Dán link YouTube, hoặc chọn video từ máy ở bên dưới"
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label">Hoặc chọn video từ máy (MP4/WebM, tối đa {MAX_VIDEO_MB} MB)</label>
+                      <input
+                        type="file"
+                        accept="video/mp4,video/webm,.mp4,.webm"
+                        onChange={handlePickVideo}
+                        disabled={uploading || addingLesson}
+                      />
+                      {uploading && (
+                        <p className="muted" style={{ margin: '8px 0 0' }}>
+                          Đang tải video lên... {uploadProgress}%
+                          <progress value={uploadProgress} max={100} style={{ display: 'block', width: '100%', marginTop: 6 }} />
+                        </p>
+                      )}
+                      {!uploading && uploadedName && (
+                        <p className="muted" style={{ margin: '8px 0 0' }}>Đã tải lên: {uploadedName}. Link đã được điền ở ô phía trên.</p>
+                      )}
                     </div>
                     {lessonError && <p className="error-text">{lessonError}</p>}
-                    <button type="submit" disabled={addingLesson} className="btn btn-primary">
+                    <button type="submit" disabled={addingLesson || uploading} className="btn btn-primary">
                       {addingLesson ? 'Đang thêm...' : 'Thêm bài học'}
                     </button>
                   </form>

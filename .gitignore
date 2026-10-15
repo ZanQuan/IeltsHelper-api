@@ -18,3 +18,7 @@ dist-ssr/
 
 .agents/
 .codex/
+
+IeltsHelper.Api/IeltsHelper.Api/Videos/
+IeltsHelper.Api/IeltsHelper.Api/Images/
+IeltsHelper.Api/schema.sql
