@@ -22,3 +22,5 @@ dist-ssr/
 IeltsHelper.Api/IeltsHelper.Api/Videos/
 IeltsHelper.Api/IeltsHelper.Api/Images/
 IeltsHelper.Api/schema.sql
+
+IeltsHelper.Api/IeltsHelper.Api/Audios/

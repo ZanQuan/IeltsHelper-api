@@ -12,4 +12,5 @@ export interface TestSummary {
   skill: string;
   title: string;
   timeLimitMinutes: number;
+  audioUrl?: string | null;
 }

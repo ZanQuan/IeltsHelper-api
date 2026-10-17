@@ -516,6 +516,9 @@ namespace IeltsHelper.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AudioUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PassageOrTranscript")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

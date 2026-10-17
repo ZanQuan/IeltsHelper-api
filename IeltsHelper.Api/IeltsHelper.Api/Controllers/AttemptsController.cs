@@ -70,7 +70,9 @@ public class AttemptsController : BaseApiController
         {
             attemptId = attempt.Id,
             testTitle = test.Title,
-            passageOrTranscript = test.PassageOrTranscript,
+            // Đề có audio: không gửi transcript cho học viên, chỉ gửi link audio
+            passageOrTranscript = string.IsNullOrWhiteSpace(test.AudioUrl) ? test.PassageOrTranscript : string.Empty,
+            audioUrl = test.AudioUrl,
             timeLimitMinutes = test.TimeLimitMinutes,
             questions = questionsForClient
         });

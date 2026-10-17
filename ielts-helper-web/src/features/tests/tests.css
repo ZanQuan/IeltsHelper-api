@@ -90,3 +90,7 @@
   font-size: 13px;
   color: var(--text-muted);
 }
+.test-audio-title {
+  margin: 0 0 12px;
+  font-weight: 600;
+}

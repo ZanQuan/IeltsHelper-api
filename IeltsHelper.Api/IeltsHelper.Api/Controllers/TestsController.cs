@@ -31,8 +31,11 @@ public class CreateTestRequest
     [StringLength(200)]
     public string Title { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập đoạn văn / transcript.")]
-    public string PassageOrTranscript { get; set; } = string.Empty;
+    // Reading: bắt buộc. Listening: có thể bỏ trống nếu đã có file audio (kiểm tra trong Create)
+    public string? PassageOrTranscript { get; set; }
+
+    [StringLength(500, ErrorMessage = "Link audio tối đa 500 ký tự.")]
+    public string? AudioUrl { get; set; }
 
     [Range(1, 180, ErrorMessage = "Thời gian từ 1 đến 180 phút.")]
     public int TimeLimitMinutes { get; set; }
@@ -51,10 +54,18 @@ public class TestsController : BaseApiController
         _context = context;
     }
 
+    private bool IsStaff => User.IsInRole("Teacher") || User.IsInRole("Admin");
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Test>>> GetAll()
     {
-        var tests = await _context.Tests.ToListAsync();
+        var tests = await _context.Tests.AsNoTracking().ToListAsync();
+
+        // Đề Listening có audio: học viên không được thấy transcript (kể cả qua danh sách)
+        if (!IsStaff)
+            foreach (var t in tests.Where(t => !string.IsNullOrWhiteSpace(t.AudioUrl)))
+                t.PassageOrTranscript = string.Empty;
+
         return Ok(tests);
     }
 
@@ -66,26 +77,47 @@ public class TestsController : BaseApiController
             .FirstOrDefaultAsync(t => t.Id == id);
         if (test == null) return NotFound();
 
-        var canSeeAnswers = User.IsInRole("Teacher") || User.IsInRole("Admin");
+        var canSeeAnswers = IsStaff;
         return canSeeAnswers
             ? Ok(ToDto(test, q => new QuestionWithAnswerDTO(q.Id, q.QuestionText, q.OptionsJson, q.CorrectAnswer)))
             : Ok(ToDto(test, q => new QuestionDTO(q.Id, q.QuestionText, q.OptionsJson)));
     }
 
-    private static TestDTO<T> ToDto<T>(Test t, Func<Question, T> mapQuestion) =>
-        new(t.Id, t.Skill, t.Title, t.PassageOrTranscript, t.TimeLimitMinutes,
-            t.Questions.Select(mapQuestion).ToList());
+    private TestDTO<T> ToDto<T>(Test t, Func<Question, T> mapQuestion)
+    {
+        // Học viên không thấy transcript của đề đã có audio
+        var hideTranscript = !IsStaff && !string.IsNullOrWhiteSpace(t.AudioUrl);
+        return new(t.Id, t.Skill, t.Title, hideTranscript ? string.Empty : t.PassageOrTranscript, t.AudioUrl,
+            t.TimeLimitMinutes, t.Questions.Select(mapQuestion).ToList());
+    }
 
     [HttpPost]
     [Authorize(Roles = "Teacher,Admin")]
     public async Task<ActionResult<Test>> Create(CreateTestRequest input)
     {
+        var audioUrl = input.AudioUrl?.Trim();
+        var passage = input.PassageOrTranscript?.Trim() ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(audioUrl))
+        {
+            if (input.Skill != "Listening")
+                return BadRequest(new { error = "Chỉ đề Listening mới có file audio." });
+            if (!Uri.TryCreate(audioUrl, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+                return BadRequest(new { error = "Link audio không hợp lệ." });
+        }
+
+        if (input.Skill == "Reading" && passage.Length == 0)
+            return BadRequest(new { error = "Vui lòng nhập đoạn văn." });
+        if (input.Skill == "Listening" && string.IsNullOrEmpty(audioUrl) && passage.Length == 0)
+            return BadRequest(new { error = "Đề Listening cần file audio hoặc transcript." });
+
         var test = new Test
         {
             Id = Guid.NewGuid(),
             Skill = input.Skill,
             Title = input.Title,
-            PassageOrTranscript = input.PassageOrTranscript,
+            PassageOrTranscript = passage,
+            AudioUrl = string.IsNullOrEmpty(audioUrl) ? null : audioUrl,
             TimeLimitMinutes = input.TimeLimitMinutes,
             Questions = input.Questions.Select(q => new Question
             {

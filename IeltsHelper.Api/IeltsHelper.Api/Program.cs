@@ -197,6 +197,15 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/Videos"
 });
 
+// File audio của đề Listening: truy cập qua /Audios/ten-file.mp3 (hỗ trợ tua)
+var audiosPath = Path.Combine(builder.Environment.ContentRootPath, "Audios");
+Directory.CreateDirectory(audiosPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(audiosPath),
+    RequestPath = "/Audios"
+});
+
 //app.UseHttpsRedirection();
 app.UseCors("AllowReactDev");
 app.UseAuthentication();

@@ -94,7 +94,10 @@ export default function AdminTestsPage() {
             <tbody>
               {filtered.map((t) => (
                 <tr key={t.id}>
-                  <td className="fw-600">{t.title}</td>
+                  <td className="fw-600">
+                    {t.title}
+                    {t.audioUrl && <span className="badge badge-accent ml-6">Có audio</span>}
+                  </td>
                   <td>
                     <span className="badge badge-primary">{t.skill}</span>
                   </td>

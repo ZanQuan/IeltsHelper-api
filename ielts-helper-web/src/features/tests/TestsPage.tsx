@@ -14,6 +14,7 @@ interface AttemptData {
   attemptId: string;
   testTitle: string;
   passageOrTranscript: string;
+  audioUrl?: string | null;
   timeLimitMinutes: number;
   questions: AttemptQuestion[];
 }
@@ -228,9 +229,16 @@ export default function TestsPage() {
           </span>
         </div>
 
-        <div className="card test-passage">
-          {attempt.passageOrTranscript}
-        </div>
+        {attempt.audioUrl ? (
+          <div className="card test-audio">
+            <p className="test-audio-title">Nghe đoạn ghi âm rồi trả lời các câu hỏi bên dưới.</p>
+            <audio controls preload="metadata" controlsList="nodownload" src={attempt.audioUrl} style={{ width: '100%' }} />
+          </div>
+        ) : (
+          <div className="card test-passage">
+            {attempt.passageOrTranscript}
+          </div>
+        )}
 
         {attempt.questions.map((q, idx) => {
           const options: string[] = q.optionsJson ? JSON.parse(q.optionsJson) : [];

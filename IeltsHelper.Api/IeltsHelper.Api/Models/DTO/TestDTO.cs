@@ -5,5 +5,5 @@ public record QuestionDTO(Guid Id, string QuestionText, string? OptionsJson);
 public record QuestionWithAnswerDTO(Guid Id, string QuestionText, string? OptionsJson, string CorrectAnswer);
 
 public record TestDTO<TQuestion>(
-    Guid Id, string Skill, string Title, string PassageOrTranscript,
+    Guid Id, string Skill, string Title, string PassageOrTranscript, string? AudioUrl,
     int TimeLimitMinutes, IReadOnlyList<TQuestion> Questions);
