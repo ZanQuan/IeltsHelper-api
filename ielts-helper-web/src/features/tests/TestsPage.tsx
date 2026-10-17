@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import apiClient from '@/api/client';
-import type { TestSummary } from '@/types';
+import type { TestAttempt, TestSummary } from '@/types';
 import './tests.css';
 
 interface AttemptQuestion {
@@ -24,6 +24,29 @@ interface SubmitResult {
   elapsedMinutes: number;
 }
 
+const PASS_PERCENT = 70; // một đề được tính là "đạt" khi điểm cao nhất từ 70% trở lên
+
+interface TestStat {
+  attempts: number;
+  bestScore: number;
+  bestTotal: number;
+  bestPercent: number;
+  lastAt: string | null;
+}
+
+function percentOf(score: number, total: number) {
+  return total === 0 ? 0 : Math.round((score / total) * 100);
+}
+
+function ProgressBar({ value, tone = 'primary', label }: { value: number; tone?: 'primary' | 'success' | 'accent'; label: string }) {
+  const v = Math.max(0, Math.min(100, value));
+  return (
+    <div className="progress-track" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={v}>
+      <div className={`progress-fill progress-${tone}`} style={{ width: `${v}%` }} />
+    </div>
+  );
+}
+
 function getErrorMessage(err: unknown, fallback: string): string {
   if (axios.isAxiosError(err)) return err.response?.data?.error ?? fallback;
   return fallback;
@@ -31,6 +54,7 @@ function getErrorMessage(err: unknown, fallback: string): string {
 
 export default function TestsPage() {
   const [tests, setTests] = useState<TestSummary[]>([]);
+  const [attempts, setAttempts] = useState<TestAttempt[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [attempt, setAttempt] = useState<AttemptData | null>(null);
@@ -40,12 +64,67 @@ export default function TestsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const loadAttempts = useCallback(
+    () =>
+      apiClient
+        .get<TestAttempt[]>('/api/Attempts')
+        .then((res) => setAttempts(res.data))
+        .catch(() => setAttempts([])),
+    [],
+  );
+
   useEffect(() => {
-    apiClient.get<TestSummary[]>('/api/Tests').then((res) => {
-      setTests(res.data);
-      setLoading(false);
+    Promise.all([
+      apiClient.get<TestSummary[]>('/api/Tests').then((res) => setTests(res.data)),
+      loadAttempts(),
+    ])
+      .catch(() => setError('Không tải được danh sách đề, vui lòng thử lại.'))
+      .finally(() => setLoading(false));
+  }, [loadAttempts]);
+
+  // Thống kê theo từng đề: chỉ tính các lượt đã nộp
+  const statsByTest = useMemo(() => {
+    const map = new Map<string, TestStat>();
+    for (const a of attempts) {
+      if (!a.submittedAt || a.score === null) continue;
+      const pct = percentOf(a.score, a.totalQuestions);
+      const cur = map.get(a.testId);
+      if (!cur) {
+        map.set(a.testId, { attempts: 1, bestScore: a.score, bestTotal: a.totalQuestions, bestPercent: pct, lastAt: a.submittedAt });
+        continue;
+      }
+      cur.attempts += 1;
+      if (pct > cur.bestPercent) {
+        cur.bestScore = a.score;
+        cur.bestTotal = a.totalQuestions;
+        cur.bestPercent = pct;
+      }
+      if (!cur.lastAt || new Date(a.submittedAt).getTime() > new Date(cur.lastAt).getTime()) cur.lastAt = a.submittedAt;
+    }
+    return map;
+  }, [attempts]);
+
+  // Tổng hợp tiến trình: đã làm, đã đạt, điểm trung bình (theo điểm cao nhất mỗi đề), và theo từng kỹ năng
+  const summary = useMemo(() => {
+    const isPassed = (id: string) => (statsByTest.get(id)?.bestPercent ?? 0) >= PASS_PERCENT;
+    const attempted = tests.filter((t) => statsByTest.has(t.id));
+    const avgBest =
+      attempted.length === 0
+        ? 0
+        : Math.round(attempted.reduce((sum, t) => sum + (statsByTest.get(t.id)?.bestPercent ?? 0), 0) / attempted.length);
+    const skills = Array.from(new Set(tests.map((t) => t.skill))).map((skill) => {
+      const inSkill = tests.filter((t) => t.skill === skill);
+      const done = inSkill.filter((t) => statsByTest.has(t.id));
+      return { skill, total: inSkill.length, done: done.length, passed: done.filter((t) => isPassed(t.id)).length };
     });
-  }, []);
+    return {
+      total: tests.length,
+      done: attempted.length,
+      passed: attempted.filter((t) => isPassed(t.id)).length,
+      avgBest,
+      skills,
+    };
+  }, [tests, statsByTest]);
 
   useEffect(() => {
     if (!attempt || result) return;
@@ -97,6 +176,7 @@ export default function TestsPage() {
   function backToList() {
     setAttempt(null);
     setResult(null);
+    loadAttempts(); // cập nhật lại tiến trình sau khi vừa làm bài
   }
 
   function formatTime(totalSeconds: number) {
@@ -206,6 +286,49 @@ export default function TestsPage() {
         Luyện đề có tính giờ giống thi thật, chấm điểm tự động ngay khi nộp.
       </p>
       {error && <p className="error-text">{error}</p>}
+      {tests.length > 0 && (
+        <div className="card test-progress-card">
+          <h3 className="m-0">Tiến trình luyện thi của bạn</h3>
+
+          <div className="test-progress-row">
+            <div className="test-progress-head">
+              <span>Đã học</span>
+              <strong>
+                {summary.done}/{summary.total} đề ({percentOf(summary.done, summary.total)}%)
+              </strong>
+            </div>
+            <ProgressBar value={percentOf(summary.done, summary.total)} label="Số đề đã làm" />
+          </div>
+
+          <div className="test-progress-row">
+            <div className="test-progress-head">
+              <span>Đạt được</span>
+              <strong>
+                {summary.passed}/{summary.total} đề đạt
+                {summary.done > 0 ? ` · điểm trung bình ${summary.avgBest}%` : ''}
+              </strong>
+            </div>
+            <ProgressBar value={percentOf(summary.passed, summary.total)} tone="success" label="Số đề đạt" />
+          </div>
+
+          {summary.skills.length > 1 &&
+            summary.skills.map((s) => (
+              <div key={s.skill} className="test-progress-row">
+                <div className="test-progress-head test-progress-skill">
+                  <span>{s.skill}</span>
+                  <span>
+                    đã làm {s.done}/{s.total} · đạt {s.passed}
+                  </span>
+                </div>
+                <ProgressBar value={percentOf(s.done, s.total)} label={`Số đề ${s.skill} đã làm`} />
+              </div>
+            ))}
+
+          <p className="test-progress-note">
+            Một đề được tính là "đạt" khi điểm cao nhất của bạn từ {PASS_PERCENT}% trở lên.
+          </p>
+        </div>
+      )}
       {tests.length === 0 ? (
         <div className="card">
           <p className="muted m-0">
@@ -214,22 +337,51 @@ export default function TestsPage() {
         </div>
       ) : (
         <div>
-          {tests.map((t) => (
-            <div key={t.id} className="list-item">
-              <div className="test-footer-bar">
-                <div>
-                  <strong className="fs-16">{t.title}</strong>
-                  <div className="mt-6">
-                    <span className="badge badge-primary">{t.skill}</span>
-                    <span className="badge badge-accent ml-6">{t.timeLimitMinutes} phút</span>
+          {tests.map((t) => {
+            const stat = statsByTest.get(t.id);
+            const passed = !!stat && stat.bestPercent >= PASS_PERCENT;
+            return (
+              <div key={t.id} className="list-item">
+                <div className="test-footer-bar">
+                  <div>
+                    <strong className="fs-16">{t.title}</strong>
+                    <div className="mt-6">
+                      <span className="badge badge-primary">{t.skill}</span>
+                      <span className="badge badge-accent ml-6">{t.timeLimitMinutes} phút</span>
+                      {stat ? (
+                        <span className={`badge ml-6 ${passed ? 'badge-success' : 'badge-accent'}`}>
+                          {passed ? 'Đạt' : 'Chưa đạt'}
+                        </span>
+                      ) : (
+                        <span className="badge ml-6 test-badge-new">Chưa làm</span>
+                      )}
+                    </div>
                   </div>
+                  <button onClick={() => startTest(t.id)} className="btn btn-primary">
+                    {stat ? 'Làm lại' : 'Bắt đầu làm bài'}
+                  </button>
                 </div>
-                <button onClick={() => startTest(t.id)} className="btn btn-primary">
-                  Bắt đầu làm bài
-                </button>
+                {stat && (
+                  <div className="test-item-progress">
+                    <div className="test-progress-head">
+                      <span>
+                        Điểm cao nhất: <strong>{stat.bestScore}/{stat.bestTotal}</strong> ({stat.bestPercent}%)
+                      </span>
+                      <span className="muted">
+                        Đã làm {stat.attempts} lần
+                        {stat.lastAt ? ` · gần nhất ${new Date(stat.lastAt).toLocaleDateString('vi-VN')}` : ''}
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={stat.bestPercent}
+                      tone={passed ? 'success' : 'accent'}
+                      label={`Điểm cao nhất của ${t.title}`}
+                    />
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

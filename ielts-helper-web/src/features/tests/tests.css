@@ -45,3 +45,48 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+.test-progress-card {
+  margin-bottom: 24px;
+}
+.test-progress-row {
+  margin-top: 16px;
+}
+.test-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+.test-progress-skill {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.progress-primary { background: var(--primary); }
+.progress-success { background: var(--success); }
+.progress-accent { background: var(--accent); }
+.test-item-progress {
+  margin-top: 14px;
+}
+.test-badge-new {
+  background: var(--border);
+  color: var(--text-muted);
+}
+.test-progress-note {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
